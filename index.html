@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Flight Logbook">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="stylesheet" href="style.css">
+  <title>Flight Logbook</title>
+</head>
+<body>
+<header>
+  <div>
+    <h1>✈️ Flight Logbook</h1>
+    <div class="sub">Private · offline · EASA-style</div>
+  </div>
+  <button id="addTop" class="primary">＋ Flight</button>
+</header>
+
+<main>
+  <section id="dashboard" class="page active">
+    <div class="cards">
+      <div class="card"><span>Total flight time</span><strong id="totalTime">00:00</strong></div>
+      <div class="card"><span>Flights</span><strong id="flightCount">0</strong></div>
+      <div class="card"><span>Night</span><strong id="nightTime">00:00</strong></div>
+      <div class="card"><span>Landings</span><strong id="landings">0</strong></div>
+    </div>
+    <div class="panel">
+      <div class="panelHead"><h2>Recent flights</h2><button id="allFlights">View all</button></div>
+      <div id="recent"></div>
+    </div>
+    <div class="panel">
+      <h2>Quick actions</h2>
+      <div class="actions">
+        <button id="backupBtn">Export backup</button>
+        <label class="button">Import backup<input id="importInput" type="file" accept=".json" hidden></label>
+        <button id="csvBtn">Export CSV</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="flights" class="page">
+    <div class="toolbar">
+      <input id="search" placeholder="Search route, aircraft, registration, remarks…">
+      <button id="addFlight" class="primary">＋ Add flight</button>
+    </div>
+    <div class="panel"><div id="flightList"></div></div>
+  </section>
+
+  <section id="aircraft" class="page">
+    <div class="toolbar"><h2>Aircraft</h2><button id="addAircraft" class="primary">＋ Aircraft</button></div>
+    <div class="panel"><div id="aircraftList"></div></div>
+  </section>
+
+  <section id="settings" class="page">
+    <div class="panel">
+      <h2>Settings</h2>
+      <label>Your name<input id="ownerName" placeholder="Pilot name"></label>
+      <label>Licence / remarks<textarea id="ownerNotes" rows="4"></textarea></label>
+      <button id="saveSettings" class="primary">Save settings</button>
+    </div>
+    <div class="panel">
+      <h2>Data</h2>
+      <p class="muted">All flight data is stored locally in this browser. Export a JSON backup regularly.</p>
+      <div class="actions">
+        <button id="backupBtn2">Export backup</button>
+        <label class="button">Import backup<input id="importInput2" type="file" accept=".json" hidden></label>
+        <button id="clearData" class="danger">Delete all data</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<nav>
+  <button data-page="dashboard" class="selected">⌂<span>Home</span></button>
+  <button data-page="flights">☷<span>Flights</span></button>
+  <button data-page="aircraft">✈<span>Aircraft</span></button>
+  <button data-page="settings">⚙<span>Settings</span></button>
+</nav>
+
+<div id="modal" class="modal hidden">
+  <div class="modalBox">
+    <div class="modalHead"><h2 id="modalTitle">Add flight</h2><button id="closeModal">×</button></div>
+    <form id="flightForm">
+      <input type="hidden" id="flightId">
+      <div class="grid">
+        <label>Date<input id="date" type="date" required></label>
+        <label>Registration<input id="reg" placeholder="LY-ABC"></label>
+        <label>Type<input id="type" placeholder="A320-214"></label>
+        <label>Flight no.<input id="flightNo" placeholder="VLG1234"></label>
+        <label>Departure<input id="dep" placeholder="EYVI" maxlength="4"></label>
+        <label>Arrival<input id="arr" placeholder="LEBL" maxlength="4"></label>
+        <label>Off-block<input id="off" type="time"></label>
+        <label>On-block<input id="on" type="time"></label>
+        <label>Flight time<input id="duration" type="time" step="60" value="00:00"></label>
+        <label>Night<input id="night" type="time" step="60" value="00:00"></label>
+        <label>Landings<input id="landingsInput" type="number" min="0" value="0"></label>
+        <label>Takeoffs<input id="takeoffsInput" type="number" min="0" value="0"></label>
+      </div>
+      <fieldset>
+        <legend>Time / role</legend>
+        <div class="grid">
+          <label>PIC<input id="pic" type="time" step="60" value="00:00"></label>
+          <label>SIC<input id="sic" type="time" step="60" value="00:00"></label>
+          <label>Dual received<input id="dual" type="time" step="60" value="00:00"></label>
+          <label>Instructor<input id="instruction" type="time" step="60" value="00:00"></label>
+          <label>IFR<input id="ifr" type="time" step="60" value="00:00"></label>
+        </div>
+      </fieldset>
+      <label>Remarks<textarea id="remarks" rows="3"></textarea></label>
+      <div class="formActions"><button type="button" id="cancel" class="secondary">Cancel</button><button class="primary">Save flight</button></div>
+    </form>
+  </div>
+</div>
+
+<div id="aircraftModal" class="modal hidden">
+  <div class="modalBox small">
+    <div class="modalHead"><h2>Aircraft</h2><button id="closeAircraft">×</button></div>
+    <form id="aircraftForm">
+      <label>Registration<input id="aReg" required></label>
+      <label>Type<input id="aType" required></label>
+      <label>Operator<input id="aOperator"></label>
+      <div class="formActions"><button type="button" id="cancelAircraft">Cancel</button><button class="primary">Save</button></div>
+    </form>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
