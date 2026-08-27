@@ -1,9 +1,8 @@
-EASA Flight Logbook V35
-Google Drive backup test build.
+EASA Flight Logbook V36
 
-- Visible build: V35
-- Google OAuth Client ID configured for the GitHub Pages origin.
+Google Drive backup/session persistence test.
+- OAuth client configured for the GitHub Pages origin.
 - Scope: https://www.googleapis.com/auth/drive.file
-- First backup creates one JSON file and stores its Drive file ID.
-- Later backups update that exact file.
-- The app attempts silent Google authorization after reload when possible.
+- First backup creates one JSON backup file.
+- Later backups update the same Drive file.
+- After reload, the app attempts silent Google authorization so the user does not normally need to sign in again.

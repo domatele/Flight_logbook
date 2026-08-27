@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#080F27">
-<title>EASA Flight Logbook V35</title>
+<title>EASA Flight Logbook V36</title>
 <style>
 /* ==================================================================
    EASA Flight Logbook — iOS-style visual design system (V21 UI pass)
@@ -463,7 +463,7 @@ tbody tr:hover{background:var(--input-bg)}
 </style>
 </head>
 
-<body><div id="v35VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V35</div>
+<body><div id="v36VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V36</div><div id="v35VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V35</div>
 <header class="v16-header">
   <h1>EASA Flight Logbook</h1>
   <span class="sub">Offline-first digital logbook</span>
@@ -698,15 +698,15 @@ tbody tr:hover{background:var(--input-bg)}
 <div class="section-title">Google Drive Backup</div>
 <div id="v34DriveStatus" class="v34-drive-status">Not connected</div>
 <div class="v34-drive-actions">
-<button type="button" onclick="v35ConnectDrive()">Connect Google Drive</button>
-<button type="button" onclick="v35BackupNow()">Backup now</button>
-<button type="button" onclick="v35Restore()">Restore backup</button>
+<button type="button" onclick="v36ConnectDrive()">Connect Google Drive</button>
+<button type="button" onclick="v36BackupNow()">Backup now</button>
+<button type="button" onclick="v36Restore()">Restore backup</button>
 </div>
 <div id="v34BackupMeta" class="v34-backup-meta">Your logbook remains available offline.</div>
 </section>
 
 <section class="card">
-  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V35 • local/offline-first test build</div>
+  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V36 • local/offline-first test build</div>
   <div class="notice" style="margin-bottom:12px">Choose what is automatically selected when you start a new flight. You can still change any selection for an individual flight.</div>
   <div class="default-checks">
     <label><input id="defaultIFR" type="checkbox"> IFR</label>
@@ -3275,120 +3275,244 @@ setTimeout(updateTotalsPeriodV23,300);
   // Initial state: PF unless this is an explicitly loaded PM flight.
   sync(pm.checked ? 'pm' : 'pf');
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V35 • local/offline-first test build');
-  document.title='EASA Flight Logbook V35';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V36 • local/offline-first test build');
+  document.title='EASA Flight Logbook V36';
 })();
 </script>
-<script id="V35_GOOGLE_DRIVE">
-/* V35 Google Drive backup */
-const V35_CLIENT_ID="910959620041-8dld34q4vuu13rhm3jujj2ubo8qv17p9.apps.googleusercontent.com";
-const V35_SCOPE="https://www.googleapis.com/auth/drive.file";
-const V35_FILE_NAME="EASA Flight Logbook - backup.json";
-const V35_FILE_ID_KEY="v35_drive_file_id";
-const V35_LAST_BACKUP_KEY="v35_last_backup";
-let v35AccessToken=null,v35TokenExpiresAt=0,v35TokenClient=null;
+<script id="V36_GOOGLE_DRIVE">
+/* V36 Google Drive backup/session persistence */
+const V36_CLIENT_ID="910959620041-8dld34q4vuu13rhm3jujj2ubo8qv17p9.apps.googleusercontent.com";
+const V36_SCOPE="https://www.googleapis.com/auth/drive.file";
+const V36_FILE_NAME="EASA Flight Logbook - backup.json";
+const V36_FILE_ID_KEY="v36_drive_file_id";
+const V36_CONNECTED_KEY="v36_drive_connected";
+const V36_LAST_BACKUP_KEY="v36_last_backup";
+let v36AccessToken=null;
+let v36TokenExpiresAt=0;
+let v36TokenClient=null;
+let v36SilentAttempt=false;
 
-function v35SetStatus(title,detail){
- const a=document.getElementById("v34DriveStatus"),b=document.getElementById("v34BackupMeta");
- if(a)a.textContent=title;if(b)b.textContent=detail||"";
+function v36SetStatus(title,detail){
+  const a=document.getElementById("v34DriveStatus");
+  const b=document.getElementById("v34BackupMeta");
+  if(a)a.textContent=title;
+  if(b)b.textContent=detail||"";
 }
-function v35InitGoogle(){
- if(!window.google?.accounts?.oauth2)return false;
- if(v35TokenClient)return true;
- v35TokenClient=google.accounts.oauth2.initTokenClient({
-  client_id:V35_CLIENT_ID,scope:V35_SCOPE,
-  callback:(r)=>{
-   if(r?.error){console.warn("Google OAuth",r);v35AccessToken=null;v35TokenExpiresAt=0;v35SetStatus("Google Drive — Sign-in needed","Tap Connect / reconnect Google Drive.");return;}
-   v35AccessToken=r.access_token;
-   v35TokenExpiresAt=Date.now()+((Number(r.expires_in)||3600)*1000)-60000;
-   localStorage.setItem("v35_drive_connected","1");
-   const last=localStorage.getItem(V35_LAST_BACKUP_KEY);
-   v35SetStatus("Google Drive — Connected",last?"Last backup: "+new Date(last).toLocaleString():"Authorization is active.");
-  },
-  error_callback:(e)=>{console.warn("Google OAuth UI",e);v35SetStatus("Google Drive — Sign-in needed","Tap Connect / reconnect Google Drive.");}
- });
- return true;
+
+function v36InitGoogle(){
+  if(!window.google?.accounts?.oauth2)return false;
+  if(v36TokenClient)return true;
+  v36TokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:V36_CLIENT_ID,
+    scope:V36_SCOPE,
+    callback:(r)=>{
+      v36SilentAttempt=false;
+      if(r?.error){
+        console.warn("V36 Google token:",r);
+        v36AccessToken=null;
+        v36TokenExpiresAt=0;
+        v36SetStatus(
+          localStorage.getItem(V36_CONNECTED_KEY)==="1"
+            ? "Google Drive — Reconnect needed"
+            : "Google Drive — Not connected",
+          "Tap Connect / reconnect Google Drive."
+        );
+        return;
+      }
+      v36AccessToken=r.access_token;
+      v36TokenExpiresAt=Date.now()+((Number(r.expires_in)||3600)*1000)-60000;
+      localStorage.setItem(V36_CONNECTED_KEY,"1");
+      const last=localStorage.getItem(V36_LAST_BACKUP_KEY);
+      v36SetStatus("Google Drive — Connected",
+        last?"Last backup: "+new Date(last).toLocaleString():"Authorization restored automatically.");
+    },
+    error_callback:(e)=>{
+      v36SilentAttempt=false;
+      console.warn("V36 Google authorization UI:",e);
+      v36SetStatus(
+        localStorage.getItem(V36_CONNECTED_KEY)==="1"
+          ? "Google Drive — Reconnect needed"
+          : "Google Drive — Not connected",
+        "Tap Connect / reconnect Google Drive."
+      );
+    }
+  });
+  return true;
 }
-function v35ConnectDrive(){
- if(!v35InitGoogle()){alert("Google sign-in is still loading. Please wait a moment and try again.");return;}
- v35TokenClient.requestAccessToken({prompt:""});
-}
-function v35SilentReconnect(){
- if(!v35InitGoogle())return;
- try{v35TokenClient.requestAccessToken({prompt:"none"});}catch(e){console.warn(e);}
-}
-async function v35EnsureToken(){
- if(v35AccessToken&&Date.now()<v35TokenExpiresAt)return true;
- if(!v35InitGoogle())return false;
- return new Promise(resolve=>{
-  let done=false;
-  const old=v35TokenClient.callback;
-  const timer=setTimeout(()=>{if(done)return;done=true;v35TokenClient.callback=old;resolve(false);},5000);
-  v35TokenClient.callback=(r)=>{
-   if(done)return;done=true;clearTimeout(timer);v35TokenClient.callback=old;
-   if(r?.access_token){v35AccessToken=r.access_token;v35TokenExpiresAt=Date.now()+((Number(r.expires_in)||3600)*1000)-60000;resolve(true);}
-   else resolve(false);
-  };
-  try{v35TokenClient.requestAccessToken({prompt:"none"});}catch(e){clearTimeout(timer);done=true;v35TokenClient.callback=old;resolve(false);}
- });
-}
-function v35CollectData(){
- const d={backupVersion:2,appVersion:"V35",createdAt:new Date().toISOString(),source:"EASA Flight Logbook",localStorage:{}};
- for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&!k.startsWith("v35_"))d.localStorage[k]=localStorage.getItem(k);}
- ["flights","aircraftLibrary","crewLibrary","simulatorLibrary","simSessions","airportDatabase","settings","appSettings"].forEach(k=>{try{if(typeof window[k]!=="undefined")d[k]=window[k];}catch(e){}});
- return d;
-}
-async function v35Read(r,fallback){
- let text="";try{text=await r.text();}catch(e){}
- let d=null;try{d=text?JSON.parse(text):null;}catch(e){}
- if(!r.ok){
-  const er=d?.error,reason=er?.errors?.[0]?.reason?(" ["+er.errors[0].reason+"]"):"";
-  throw new Error((er?.message||text||fallback)+reason+" (HTTP "+r.status+")");
- }
- return d;
-}
-async function v35CreateFile(){
- const r=await fetch("https://www.googleapis.com/drive/v3/files?fields=id,name,mimeType",{method:"POST",headers:{"Authorization":"Bearer "+v35AccessToken,"Content-Type":"application/json"},body:JSON.stringify({name:V35_FILE_NAME,mimeType:"application/json"})});
- const d=await v35Read(r,"Unable to create the Google Drive backup file.");
- if(!d?.id)throw new Error("Google Drive did not return a file ID.");
- localStorage.setItem(V35_FILE_ID_KEY,d.id);return d.id;
-}
-async function v35Upload(id){
- const r=await fetch("https://www.googleapis.com/upload/drive/v3/files/"+encodeURIComponent(id)+"?uploadType=media",{method:"PATCH",headers:{"Authorization":"Bearer "+v35AccessToken,"Content-Type":"application/json; charset=UTF-8"},body:JSON.stringify(v35CollectData(),null,2)});
- await v35Read(r,"Unable to upload the logbook backup.");
-}
-async function v35BackupNow(){
- try{
-  if(!navigator.onLine){alert("The phone is offline. The logbook is safe locally; connect to the internet before backing up.");return;}
-  if(!await v35EnsureToken()){alert("Google Drive authorization is not active. Tap Connect / reconnect Google Drive first.");return;}
-  let id=localStorage.getItem(V35_FILE_ID_KEY);
-  if(!id)id=await v35CreateFile();
-  try{await v35Upload(id);}catch(e){
-   if(/HTTP 404|File not found|not found/i.test(e.message)){localStorage.removeItem(V35_FILE_ID_KEY);id=await v35CreateFile();await v35Upload(id);}else throw e;
+
+function v36ConnectDrive(){
+  if(!v36InitGoogle()){
+    alert("Google sign-in is still loading. Please wait a moment and try again.");
+    return;
   }
-  const t=new Date().toISOString();localStorage.setItem(V35_LAST_BACKUP_KEY,t);
-  v35SetStatus("Google Drive — Up to date","Last backup: "+new Date(t).toLocaleString());
-  alert("Backup completed successfully.");
- }catch(e){console.error("V35 Drive backup",e);v35SetStatus("Backup failed",e.message);alert("Backup failed: "+e.message);}
+  v36TokenClient.requestAccessToken({prompt:""});
 }
-async function v35Restore(){
- try{
-  if(!await v35EnsureToken()){alert("Google Drive authorization is not active. Tap Connect / reconnect Google Drive first.");return;}
-  const id=localStorage.getItem(V35_FILE_ID_KEY);
-  if(!id){alert("No linked EASA Flight Logbook backup is stored on this device. Make a backup first.");return;}
-  const r=await fetch("https://www.googleapis.com/drive/v3/files/"+encodeURIComponent(id)+"?alt=media",{headers:{"Authorization":"Bearer "+v35AccessToken}});
-  const d=await v35Read(r,"Unable to download the Google Drive backup.");
-  if(!d?.localStorage)throw new Error("The backup is not a valid EASA Flight Logbook backup.");
-  if(!confirm("Restore the Google Drive backup? This will replace the current local app data."))return;
-  Object.entries(d.localStorage).forEach(([k,v])=>{try{localStorage.setItem(k,String(v));}catch(e){}});
-  alert("Backup restored. The app will reload.");location.reload();
- }catch(e){console.error("V35 Drive restore",e);alert("Restore failed: "+e.message);}
+
+function v36SilentReconnect(){
+  if(!v36InitGoogle() || v36SilentAttempt)return;
+  v36SilentAttempt=true;
+  try{
+    v36TokenClient.requestAccessToken({prompt:"none"});
+  }catch(e){
+    v36SilentAttempt=false;
+    console.warn("V36 silent reconnect:",e);
+  }
 }
+
+async function v36EnsureToken(){
+  if(v36AccessToken && Date.now()<v36TokenExpiresAt)return true;
+  if(!v36InitGoogle())return false;
+
+  return await new Promise(resolve=>{
+    let done=false;
+    const original=v36TokenClient.callback;
+    const timer=setTimeout(()=>{
+      if(done)return;
+      done=true;
+      v36TokenClient.callback=original;
+      resolve(false);
+    },6000);
+
+    v36TokenClient.callback=(r)=>{
+      if(done)return;
+      done=true;
+      clearTimeout(timer);
+      v36TokenClient.callback=original;
+      if(r?.access_token){
+        v36AccessToken=r.access_token;
+        v36TokenExpiresAt=Date.now()+((Number(r.expires_in)||3600)*1000)-60000;
+        localStorage.setItem(V36_CONNECTED_KEY,"1");
+        resolve(true);
+      }else resolve(false);
+    };
+
+    try{
+      v36TokenClient.requestAccessToken({prompt:"none"});
+    }catch(e){
+      clearTimeout(timer);
+      done=true;
+      v36TokenClient.callback=original;
+      resolve(false);
+    }
+  });
+}
+
+function v36CollectData(){
+  const d={
+    backupVersion:3,
+    appVersion:"V36",
+    createdAt:new Date().toISOString(),
+    source:"EASA Flight Logbook",
+    localStorage:{}
+  };
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k && !k.startsWith("v36_"))d.localStorage[k]=localStorage.getItem(k);
+  }
+  ["flights","aircraftLibrary","crewLibrary","simulatorLibrary","simSessions","airportDatabase","settings","appSettings"].forEach(k=>{
+    try{if(typeof window[k]!=="undefined")d[k]=window[k];}catch(e){}
+  });
+  return d;
+}
+
+async function v36ReadResponse(r,fallback){
+  let text="";try{text=await r.text();}catch(e){}
+  let d=null;try{d=text?JSON.parse(text):null;}catch(e){}
+  if(!r.ok){
+    const er=d?.error;
+    const reason=er?.errors?.[0]?.reason?(" ["+er.errors[0].reason+"]"):"";
+    throw new Error((er?.message||text||fallback)+reason+" (HTTP "+r.status+")");
+  }
+  return d;
+}
+
+async function v36CreateFile(){
+  const r=await fetch("https://www.googleapis.com/drive/v3/files?fields=id,name,mimeType",{
+    method:"POST",
+    headers:{"Authorization":"Bearer "+v36AccessToken,"Content-Type":"application/json"},
+    body:JSON.stringify({name:V36_FILE_NAME,mimeType:"application/json"})
+  });
+  const d=await v36ReadResponse(r,"Unable to create the Google Drive backup file.");
+  if(!d?.id)throw new Error("Google Drive did not return a backup file ID.");
+  localStorage.setItem(V36_FILE_ID_KEY,d.id);
+  return d.id;
+}
+
+async function v36Upload(fileId){
+  const r=await fetch("https://www.googleapis.com/upload/drive/v3/files/"+encodeURIComponent(fileId)+"?uploadType=media",{
+    method:"PATCH",
+    headers:{"Authorization":"Bearer "+v36AccessToken,"Content-Type":"application/json; charset=UTF-8"},
+    body:JSON.stringify(v36CollectData(),null,2)
+  });
+  await v36ReadResponse(r,"Unable to upload the logbook backup.");
+}
+
+async function v36BackupNow(){
+  try{
+    if(!navigator.onLine){alert("The phone is offline. Your logbook remains saved locally; connect to the internet before backing up.");return;}
+    if(!await v36EnsureToken()){
+      alert("Google Drive authorization is not active. Tap Connect / reconnect Google Drive first.");
+      return;
+    }
+    let id=localStorage.getItem(V36_FILE_ID_KEY);
+    if(!id)id=await v36CreateFile();
+
+    try{await v36Upload(id);}
+    catch(e){
+      if(/HTTP 404|File not found|not found/i.test(e.message)){
+        localStorage.removeItem(V36_FILE_ID_KEY);
+        id=await v36CreateFile();
+        await v36Upload(id);
+      }else throw e;
+    }
+
+    const t=new Date().toISOString();
+    localStorage.setItem(V36_LAST_BACKUP_KEY,t);
+    v36SetStatus("Google Drive — Up to date","Last backup: "+new Date(t).toLocaleString());
+    alert("Backup completed successfully.");
+  }catch(e){
+    console.error("V36 Drive backup:",e);
+    v36SetStatus("Backup failed",e.message);
+    alert("Backup failed: "+e.message);
+  }
+}
+
+async function v36Restore(){
+  try{
+    if(!await v36EnsureToken()){
+      alert("Google Drive authorization is not active. Tap Connect / reconnect Google Drive first.");
+      return;
+    }
+    const id=localStorage.getItem(V36_FILE_ID_KEY);
+    if(!id){
+      alert("No linked EASA Flight Logbook backup is stored on this device. Make a backup first.");
+      return;
+    }
+    const r=await fetch("https://www.googleapis.com/drive/v3/files/"+encodeURIComponent(id)+"?alt=media",{
+      headers:{"Authorization":"Bearer "+v36AccessToken}
+    });
+    const d=await v36ReadResponse(r,"Unable to download the Google Drive backup.");
+    if(!d?.localStorage)throw new Error("The backup is not a valid EASA Flight Logbook backup.");
+    if(!confirm("Restore the Google Drive backup? This will replace the current local app data."))return;
+    Object.entries(d.localStorage).forEach(([k,v])=>{try{localStorage.setItem(k,String(v));}catch(e){}});
+    alert("Backup restored. The app will reload.");
+    location.reload();
+  }catch(e){
+    console.error("V36 Drive restore:",e);
+    alert("Restore failed: "+e.message);
+  }
+}
+
 setTimeout(()=>{
- const last=localStorage.getItem(V35_LAST_BACKUP_KEY),id=localStorage.getItem(V35_FILE_ID_KEY);
- if(last||id)v35SetStatus("Google Drive — Connected",last?"Last backup: "+new Date(last).toLocaleString():"Backup file linked.");
- if(localStorage.getItem("v35_drive_connected")==="1")v35SilentReconnect();
-},900);
+  const last=localStorage.getItem(V36_LAST_BACKUP_KEY);
+  const id=localStorage.getItem(V36_FILE_ID_KEY);
+  if(last||id){
+    v36SetStatus("Google Drive — Reconnecting…","Restoring Google authorization…");
+  }
+  if(localStorage.getItem(V36_CONNECTED_KEY)==="1"){
+    v36SilentReconnect();
+  }
+},1000);
 </script>
 </body>
 </html>
