@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#080F27">
-<title>EASA Flight Logbook V37</title>
+<title>EASA Flight Logbook V62</title>
 <style>
 /* ==================================================================
    EASA Flight Logbook — iOS-style visual design system (V21 UI pass)
@@ -274,15 +274,14 @@ tbody tr:hover{background:var(--input-bg)}
    ================================================================== */
 #printArea{display:none}
 @media print{
-  /* Ask the browser for A4 landscape, but do not use page-orientation:
-     iOS/Firefox print preview can hide the page when that property is used. */
-  @page{size:A4 landscape;margin:6mm}
+  @page{size:A4 landscape;margin:5mm 7mm 3mm 7mm}
 
-  body{background:#fff;margin:0}
+  html,body{background:#fff!important;color:#000!important;margin:0!important;padding:0!important;width:100%!important;}
   body>*{display:none!important}
   #printArea{
     display:block!important;
-    width:285mm!important;
+    width:283mm!important;
+    max-width:283mm!important;
     margin:0!important;
     padding:0!important;
   }
@@ -290,16 +289,19 @@ tbody tr:hover{background:var(--input-bg)}
   .print-page{
     position:relative!important;
     display:block!important;
-    width:285mm!important;
-    height:198mm!important;
-    min-height:198mm!important;
-    max-height:198mm!important;
-    box-sizing:border-box;
-    padding:2mm!important;
+    width:283mm!important;
+    box-sizing:border-box!important;
+    padding:1.5mm!important;
     margin:0!important;
+    height:202mm!important;
+    max-height:202mm!important;
     overflow:hidden!important;
+    page-break-before:auto!important;
     page-break-after:always!important;
-    break-after:page!important;
+    page-break-inside:avoid!important;
+    break-before:auto!important;
+    break-after:auto!important;
+    break-inside:avoid!important;
   }
   .print-page:last-child{
     page-break-after:auto!important;
@@ -307,141 +309,197 @@ tbody tr:hover{background:var(--input-bg)}
   }
 
   .print-header{
-    display:flex;
-    justify-content:space-between;
-    border-bottom:1px solid #000;
-    padding-bottom:5px;
-    margin-bottom:5px;
+    display:flex!important;
+    justify-content:space-between!important;
+    border-bottom:1px solid #000!important;
+    padding-bottom:5px!important;
+    margin-bottom:5px!important;
+    height:10mm!important;
+    box-sizing:border-box!important;
   }
   .print-title{font-size:14px;font-weight:800}
   .print-meta{font-size:9px;text-align:right}
 
   .print-table{
-    font-size:var(--print-font,8pt)!important;
-    width:100%!important;
-    max-width:100%!important;
-    box-sizing:border-box;
-    border-collapse:collapse;
-    table-layout:fixed;
+    display:table!important;
+    width:279mm!important;
+    max-width:279mm!important;
+    box-sizing:border-box!important;
+    border-collapse:collapse!important;
+    table-layout:fixed!important;
     margin:0!important;
-    border:1px solid #333;
+    padding:0!important;
+    border:1px solid #333!important;
+    font-size:var(--print-font,7pt)!important;
+    font-family:Arial,Helvetica,sans-serif!important;
   }
-
+  .print-table col{box-sizing:border-box!important}
   .print-table th,.print-table td{
-    border:1px solid #333;
+    border:1px solid #333!important;
     padding:1px 1.5px!important;
-    vertical-align:middle;
-    line-height:1.05;
-    overflow:hidden;
-    text-overflow:clip;
+    vertical-align:middle!important;
+    line-height:1.05!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    color:#000!important;
   }
-  .print-table td{white-space:nowrap}
-  .print-table th:first-child,
-  .print-table td:first-child{
-    border-left:1px solid #333!important;
-  }
-  .print-table th:last-child,
-  .print-table td:last-child{
-    border-right:1px solid #333!important;
-  }
+  .print-table td{white-space:nowrap!important;text-align:center!important}
+  .print-table td.print-left{text-align:left!important}
   .print-table th{
     background:#eee!important;
-    color:#000;
-    font-size:var(--print-header-font,6.5pt);
+    color:#000!important;
+    font-size:var(--print-header-font,6.5pt)!important;
     white-space:normal!important;
-    word-break:normal;
-    overflow-wrap:break-word;
-    text-align:center;
+    overflow-wrap:break-word!important;
+    word-break:normal!important;
+    text-align:center!important;
+    letter-spacing:-0.3px!important;
   }
-  .print-table .carry-row th{
-    background:#fff!important;
-    font-weight:700;
-    text-align:left;
-    height:6mm;
+  .print-table th .date-fmt{display:block;font-weight:400;font-size:0.8em}
+  .print-table th.no-wrap{white-space:nowrap!important}
+  .print-table .carry-row th{background:#fff!important;font-weight:700;text-align:left;height:5mm!important}
+  .print-table .group-row th{height:7mm!important}
+  .print-table .sub-row th{height:4mm!important}
+  .print-table tr.flight-row{height:var(--flight-row-height,auto)!important;page-break-inside:avoid!important;break-inside:avoid!important}
+  .print-table tr.flight-row td{height:var(--flight-row-height,auto)!important;box-sizing:border-box!important}
+  .print-table tr.print-total,.print-table tr.brought-total{height:4mm!important}
+  .print-table tr.acc-total{height:8mm!important}
+  .print-table tr.print-total td,.print-table tr.brought-total td{height:4mm!important;min-height:4mm!important;text-align:center!important}
+  .print-table tr.acc-total td{height:8mm!important;min-height:8mm!important;box-sizing:border-box!important;text-align:center!important}
+  .print-total td{font-weight:800;border-top:2px solid #000!important}
+  .print-table tr.print-total td.print-left,.print-table tr.brought-total td.print-left{text-align:left!important}
+  .print-table tr.compact-total td{
+    font-size:var(--print-font,7pt)!important;
+    letter-spacing:normal!important;
+    padding-left:1px!important;padding-right:1px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
   }
-  .print-table .group-row th{height:7mm}
-  .print-table .sub-row th{height:6mm}
-  .print-table tr.flight-row{
-    height:var(--flight-row-height,auto)!important;
-  }
-  .print-table tr.flight-row td{
-    height:var(--flight-row-height,auto)!important;
-    min-height:var(--flight-row-height,auto)!important;
-    box-sizing:border-box;
-  }
-  .print-table tr.print-total,
-  .print-table tr.brought-total{
-    height:6mm!important;
-  }
-  .print-table tr.acc-total{
-    height:16mm!important;
-  }
-  .print-table tr.print-total td,
-  .print-table tr.brought-total td{
-    height:6mm!important;
-    min-height:6mm!important;
-  }
-  .print-table tr.acc-total td{
-    height:16mm!important;
-    min-height:16mm!important;
-    box-sizing:border-box;
-  }
-  .print-total td{
-    font-weight:800;
-    border-top:2px solid #000;
-  }
+  .print-table tr.acc-total td{font-size:var(--print-font,8pt)!important}
 }
+
 .print-table .signature-cell{
+  position:relative!important;
   padding:1mm!important;
   vertical-align:middle!important;
   text-align:center!important;
   font-weight:400!important;
+  overflow:visible!important;
 }
 .print-table .signature-cell .print-signature{
-  display:flex;
-  width:100%;
-  height:14mm;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+  position:relative!important;
+  display:block!important;
+  width:100%!important;
+  height:15mm!important;
+  min-height:15mm!important;
   pointer-events:none;
 }
+.print-table .signature-cell .sig-certify{
+  position:absolute!important;
+  z-index:1!important;
+  left:0!important;
+  top:1mm!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  padding:0 1mm!important;
+  font-size:calc(var(--print-font,7pt) - 2pt)!important;
+  line-height:1.05!important;
+  text-align:center!important;
+  margin:0!important;
+  white-space:normal!important;
+}
 .print-table .signature-cell .print-signature img{
-  display:block;
-  width:auto;
-  max-width:30mm;
-  max-height:8mm;
-  object-fit:contain;
+  position:absolute!important;
+  z-index:3!important;
+  left:50%!important;
+  top:5.2mm!important;
+  transform:translateX(-50%)!important;
+  display:block!important;
+  width:auto!important;
+  max-width:42mm!important;
+  height:auto!important;
+  max-height:8mm!important;
+  object-fit:contain!important;
+  margin:0!important;
 }
 .print-table .signature-cell .print-signature .sig-label{
-  width:30mm;
-  border-top:1px solid #333;
-  margin-top:1mm;
-  padding-top:1px;
-  text-align:center;
-  font-size:5.5pt;
-  line-height:1;
+  position:absolute!important;
+  z-index:4!important;
+  left:50%!important;
+  bottom:0!important;
+  transform:translateX(-50%)!important;
+  width:30mm!important;
+  border-top:0!important;
+  margin:0!important;
+  padding-top:1px!important;
+  text-align:center!important;
+  font-size:4.2pt!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+}
+.print-table .signature-cell .print-signature .sig-label::before{
+  content:""!important;
+  display:block!important;
+  width:16mm!important;
+  height:0!important;
+  border-top:1px solid #333!important;
+  margin:0 auto 1px auto!important;
 }
 @media print{.modal-overlay{display:none!important}}
-/* Printable remarks */
+/* Printable remarks — single line with ellipsis, so row heights stay
+   predictable (unbounded wrapping here was silently growing rows taller
+   than their calculated height, which pushed tables past the page
+   boundary and caused the blank/cut-off "phantom page" bug). The full
+   remarks text is always still available in the app and JSON/CSV export;
+   this only affects the compact printed grid. */
 @media print{
   .print-table td.print-remarks{
-    white-space:normal!important;
-    overflow:visible!important;
-    text-overflow:clip!important;
-    overflow-wrap:anywhere!important;
-    word-break:normal!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    text-align:left!important;
     vertical-align:middle!important;
     line-height:1.05!important;
     padding:1mm 1.2mm!important;
   }
-  .print-table tr.flight-row:has(.picus-print-remark){height:14mm!important;}
-  .picus-print-remark{width:100%;box-sizing:border-box;white-space:normal!important;overflow-wrap:anywhere;line-height:1.05;font-size:7pt;}
-  .picus-print-remark .picus-captain{display:block;font-size:7pt;font-weight:700;margin-bottom:1mm;}
+    .picus-print-remark{width:100%;box-sizing:border-box;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;line-height:1.05;font-size:7pt;}
+  .picus-print-remark .picus-captain{display:block;font-size:7pt;font-weight:700;margin-bottom:0.4mm;}
   .picus-print-remark img{display:block;width:auto;max-width:100%;height:auto;max-height:7mm;object-fit:contain;margin:0 auto;}
 }
 .picus-print-signature{display:block;width:90px;height:32px;object-fit:contain;margin:2px 0 0 0}
 .picus-remark-print{line-height:1.05;font-size:8px}
+
+
+/* V62: keep certification text fully visible inside the signature cell. */
+@media print{
+  .print-table .signature-cell{position:relative!important;vertical-align:middle!important;
+    overflow:visible!important;
+    padding:1mm!important;
+  }
+  .print-table .signature-cell .certify-text,
+  .print-table .signature-cell .print-certify{
+    display:block!important;
+    position:relative!important;
+    z-index:5!important;
+    font-size:6pt!important;
+    line-height:1.1!important;
+    margin:0 0 0.8mm 0!important;
+    padding:0!important;
+    white-space:normal!important;
+  }
+  .print-table .signature-cell .print-signature,
+  .print-table .signature-cell img{
+    position:relative!important;
+    z-index:4!important;
+    display:block!important;
+    margin:0 auto!important;
+    max-height:8mm!important;
+    height:auto!important;
+  }
+}
+
 </style>
 
 <style>
@@ -463,7 +521,7 @@ tbody tr:hover{background:var(--input-bg)}
 </style>
 </head>
 
-<body><div id="v36VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V37</div><div id="v35VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V35</div>
+<body><div id="v36VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V47</div><div id="v35VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V47</div>
 <header class="v16-header">
   <h1>EASA Flight Logbook</h1>
   <span class="sub">Offline-first digital logbook</span>
@@ -609,18 +667,16 @@ tbody tr:hover{background:var(--input-bg)}
       <div class="actions" style="margin:0">
         <label style="font-size:12px;color:#667085">Flights/page
           <select id="perPage" onchange="renderPrintPreview()" style="width:90px;padding:6px">
-            <option>4</option><option>6</option><option>8</option><option>10</option>
-            <option>12</option><option>14</option><option selected>16</option><option>18</option>
-            <option>20</option><option>22</option><option>24</option><option>26</option>
-            <option>28</option><option>30</option><option>32</option><option>34</option>
-            <option>36</option><option>38</option><option>40</option><option>50</option>
+            <option>6</option><option>8</option><option>10</option><option>12</option>
+            <option>14</option><option>16</option><option>18</option><option>20</option>
+            <option selected>24</option><option>24</option>
           </select>
         </label>
         <label style="font-size:12px;color:#667085">Font
           <select id="printFontSize" onchange="renderPrintPreview()" style="width:80px;padding:6px">
             <option value="6">6 pt</option><option value="6.5">6.5 pt</option>
-            <option value="7">7 pt</option><option value="7.5">7.5 pt</option>
-            <option value="8" selected>8 pt</option><option value="9">9 pt</option><option value="10">10 pt</option>
+            <option value="7" selected>7 pt</option><option value="7.5">7.5 pt</option>
+            <option value="8">8 pt</option><option value="9">9 pt</option><option value="10">10 pt</option>
           </select>
         </label>
         <label style="font-size:12px;color:#667085">From
@@ -630,16 +686,13 @@ tbody tr:hover{background:var(--input-bg)}
           <input id="printDateTo" type="date" onchange="renderPrintPreview()" style="width:135px;padding:6px">
         </label>
         <button class="secondary small" onclick="clearPrintDateWindow()">All dates</button>
-        <label style="font-size:12px;color:#667085;display:flex;align-items:center;gap:5px">
-          <input id="autoScale" type="checkbox" checked onchange="renderPrintPreview()" style="width:auto">
-          Auto-scale
-        </label>
         <button class="primary small" onclick="printLogbook()">Print / Save PDF</button>
         <button class="secondary small" onclick="exportJSON()">Backup JSON</button>
         <button class="secondary small" onclick="document.getElementById('importFile').click()">Restore JSON</button>
         <input id="importFile" type="file" accept=".json,application/json" style="display:none" onchange="importJSON(event)">
         <button class="secondary small" onclick="exportCSV()">Export CSV</button>
       </div>
+      <div style="margin-top:8px;font-size:11.5px;color:#8a94a6">Tip: in your browser's print dialog, turn off "Headers and footers" (usually under "More settings") for the cleanest printout — otherwise the browser adds its own URL/date/page-number strip on top of this layout's margins.</div>
     </div>
     <div id="flightTable"></div>
   </section>
@@ -706,7 +759,7 @@ tbody tr:hover{background:var(--input-bg)}
 </section>
 
 <section class="card">
-  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V37 • local/offline-first test build</div>
+  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V41 • local/offline-first test build</div>
   <div class="notice" style="margin-bottom:12px">Choose what is automatically selected when you start a new flight. You can still change any selection for an individual flight.</div>
   <div class="default-checks">
     <label><input id="defaultIFR" type="checkbox"> IFR</label>
@@ -726,6 +779,38 @@ tbody tr:hover{background:var(--input-bg)}
 </section>
 </div>
 </main>
+<div id="iosPrintNotice" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeIOSPrintNotice()">
+  <div class="modal-card" style="max-width:480px">
+    <div class="section-title">Printing isn't available here</div>
+    <div class="notice" style="margin-bottom:10px">This logbook is currently open as the installed Home Screen app. iOS doesn't let apps installed this way open the print/PDF sheet at all — it's a limitation of iOS itself, not something this app can turn on. Printing only works when the same page is open as a normal tab in Safari.</div>
+    <div class="notice" style="margin-bottom:6px"><b>To print or save as PDF:</b> open Safari, go to this address, then use the Share button → Print (or Save to Files as PDF) from there.</div>
+    <div style="font-size:11.5px;font-family:monospace;background:#f4f5f7;color:#1a1d29;border:1px solid #e3e5ea;border-radius:8px;padding:8px 10px;margin-bottom:10px;word-break:break-all" id="iosPrintUrl"></div>
+    <div class="actions" style="justify-content:flex-end">
+      <button class="secondary" onclick="closeIOSPrintNotice()">Close</button>
+      <button class="primary" id="iosPrintCopyBtn" onclick="copyPrintURL()">Copy link</button>
+    </div>
+  </div>
+</div>
+<div id="printReminderModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closePrintReminder()">
+  <div class="modal-card" style="max-width:480px">
+    <div class="section-title">Before you print</div>
+    <div class="notice" style="margin-bottom:10px">Your browser adds its own URL / date / page-number strip to every printed page on top of this logbook's margins — that's the extra text at the very top and bottom of the pages. This is a browser print-dialog setting; the app can't turn it off for you, but it only needs fixing once.</div>
+    <div class="notice" style="margin-bottom:6px"><b>In the print dialog that's about to open:</b></div>
+    <div class="notice" style="margin-bottom:4px">• <b>Chrome / Edge:</b> click "More settings", then turn off "Headers and footers".</div>
+    <div class="notice" style="margin-bottom:4px">• <b>Safari (Mac):</b> in the print panel, uncheck "Show details" → uncheck the header/footer option, or use the "Show Print Details" checkbox to reveal it.</div>
+    <div class="notice" style="margin-bottom:10px">• <b>iPhone/iPad AirPrint:</b> this option isn't available on iOS — the strip may still appear there.</div>
+    <button type="button" id="hidePrintReminderToggle"
+      class="secondary" style="width:100%;display:flex;align-items:center;justify-content:flex-start;gap:9px;margin-bottom:10px;padding:9px 11px"
+      onclick="togglePrintReminderPreference()">
+      <span id="hidePrintReminderIcon" style="width:18px;height:18px;border:1px solid #98A2B3;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;line-height:1"> </span>
+      <span>Don't show this again on this device</span>
+    </button>
+    <div class="actions" style="justify-content:flex-end">
+      <button class="secondary" onclick="closePrintReminder()">Cancel</button>
+      <button class="primary" onclick="proceedToPrint()">Continue to print</button>
+    </div>
+  </div>
+</div>
 <div id="crewModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeCrewModal()"><div class="modal-card"><div class="section-title" id="crewModalTitle">Add crew member</div><div class="grid"><div class="field"><label>Name</label><input id="crName" autocapitalize="characters"></div><div class="field"><label>Company code</label><input id="crCode" autocapitalize="characters" placeholder="e.g. AB123"></div><div class="field"><label>Function</label><select id="crRole"><option>PIC</option><option>SIC</option><option>Instructor</option><option>Examiner</option><option>Other</option></select></div><div class="field"><label>Licence / ID</label><input id="crLicence"></div><div class="field"><label>Operator</label><input id="crOperator"></div></div><div class="notice">The company code can be used to find this person quickly when entering a flight. You can search by the full name, any part of the name, or the code.</div><div class="actions" style="justify-content:flex-end"><button class="secondary" onclick="closeCrewModal()">Cancel</button><button class="primary" id="crewModalSaveBtn" onclick="saveCrew()">Save crew member</button></div></div></div>
 <div id="simModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeSimModal()"><div class="modal-card"><div class="section-title">Add simulator</div><div class="grid"><div class="field"><label>Name / type</label><input id="simName" placeholder="A320 FFS"></div><div class="field"><label>FSTD ID / registration</label><input id="simReg"></div><div class="field"><label>Operator / training centre</label><input id="simOperator"></div><div class="field"><label>Notes</label><input id="simNotes"></div></div><div class="actions" style="justify-content:flex-end"><button class="secondary" onclick="closeSimModal()">Cancel</button><button class="primary" onclick="saveSim()">Save simulator</button></div></div></div>
 <div id="signatureModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeSignatureModal()">
@@ -1787,11 +1872,7 @@ function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 
 function getPrintFontSize(){
   const el=document.getElementById("printFontSize");
-  return el ? Number(el.value || 8) : 8;
-}
-function getAutoScale(){
-  const el=document.getElementById("autoScale");
-  return el ? el.checked : true;
+  return el ? Number(el.value || 7) : 7;
 }
 
 function getPrintDateWindow(){
@@ -1799,11 +1880,41 @@ function getPrintDateWindow(){
   const to=(document.getElementById("printDateTo")?.value||"").trim();
   return {from,to};
 }
+function simSessionToPseudoFlight(s){
+  const sp=simulatorLibrary.find(x=>x.id===s.simulatorProfileId);
+  const simName=String(sp?.name||"FSTD").trim().toUpperCase();
+  // Printed aircraft TYPE should remain the aircraft family/type only
+  // (A320, C152, C172, PA34, etc.), never "A320 FFS"/"C172 FSTD".
+  const aircraftType=(simName.match(/^(?:[A-Z]{1,4}-?\\d{2,4}[A-Z]?|PA\\d{2}|KING ?AIR|BE\\d{2}|B\\d{3}[A-Z]?|ATR ?\\d{2,3})/)||[simName.split(/\\s+/)[0]||"FSTD"])[0];
+  return {
+    id:"sim_"+s.id,
+    date:s.date,
+    pic:s.instructor||s.crew||"",
+    otherCrewName:"",
+    aircraft:aircraftType,reg:sp?.reg||"",
+    dep:"",arr:"",dt:"",at:"",
+    engine:"",role:"",
+    duration:0,night:0,ifr:false,ifrTime:0,
+    picTime:0,sicTime:0,dualTime:0,instructorTime:0,
+    ldgDay:0,ldgNight:0,
+    remarks:s.remarks||"",
+    isSimSession:true,
+    simDuration:Number(s.duration||0)
+  };
+}
 function getPrintFlights(){
   const {from,to}=getPrintDateWindow();
-  return flights.filter(f=>{
-    const d=String(f.date||"").slice(0,10);
-    return (!from||d>=from)&&(!to||d<=to);
+  const inRange=d=>(!from||d>=from)&&(!to||d<=to);
+  const realFlights=flights.filter(f=>inRange(String(f.date||"").slice(0,10)));
+  const simEntries=(Array.isArray(simSessions)?simSessions:[])
+    .filter(s=>inRange(String(s.date||"").slice(0,10)))
+    .map(simSessionToPseudoFlight);
+  // Merge FSTD sessions in with real flights, ordered chronologically —
+  // a printed logbook page should read as one continuous timeline
+  // regardless of which tab an entry was originally logged from.
+  return [...realFlights,...simEntries].sort((a,b)=>{
+    const da=String(a.date||""), db=String(b.date||"");
+    return da<db?-1:da>db?1:0;
   });
 }
 function clearPrintDateWindow(){
@@ -1813,8 +1924,8 @@ function clearPrintDateWindow(){
   if(b)b.value="";
   renderPrintPreview();
 }
-function pageChunks(printFlights=getPrintFlights()){
-  const n=Number(document.getElementById("perPage").value||16);
+function pageChunks(printFlights=getPrintFlights(),perPage){
+  const n=Number(perPage||document.getElementById("perPage").value||16);
   let out=[];
   for(let i=0;i<printFlights.length;i+=n)out.push(printFlights.slice(i,i+n));
   return out;
@@ -1822,13 +1933,20 @@ function pageChunks(printFlights=getPrintFlights()){
 function printTimeBuckets(arr){
   const t={
     spSE:0, spME:0, multi:0, duration:0, night:0, ifr:0,
-    pic:0, co:0, dual:0, instructor:0, simulator:0
+    pic:0, co:0, dual:0, instructor:0, simulator:0,
+    ldgDay:0, ldgNight:0
   };
   arr.forEach(f=>{
+    if(f.isSimSession){
+      t.simulator+=Number(f.simDuration||0);
+      return;
+    }
     const d=Number(f.duration||0);
     t.duration+=d;
     t.night+=Number(f.night||0);
     t.ifr+=Number(f.ifrTime??(f.ifr?d:0));
+    t.ldgDay+=Number(f.ldgDay||0);
+    t.ldgNight+=Number(f.ldgNight||0);
 
     const ap=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);
     const operation=ap?.operation||(f.engine==="SE"?"SP":"MP"), engine=ap?.engine||f.engine||"ME";
@@ -1844,13 +1962,29 @@ function printTimeBuckets(arr){
 }
 
 function printRemarksV12(f){
-  const base=String(f.remarks||'').replace(/\s*PICUS\s*[—-].*$/i,'').trim();
+  // Never print PICUS from free-text remarks; PICUS is rendered once from
+  // the structured picusLog flag below. Also remove legacy generated PICUS
+  // lines from older imported records.
+  const base=String(f.remarks||'').split(/\r?\n/).map(line=>line.trim()).filter(line=>line && !/^PICUS(?:\s*[—-].*)?$/i.test(line)).join('\n').trim();
   const baseHtml=base?esc(base).replace(/\n/g,'<br>'):'';
   if(!f.picusLog)return baseHtml;
-  const captain=f.picusCaptain?`Captain: ${esc(f.picusCaptain)}`:'PICUS';
+  const captainRaw=String(f?.picusCaptain||'').trim();
+  const captain=(captainRaw && !/^PICUS(?:\s*[—-].*)?$/i.test(captainRaw))?`Captain: ${esc(captainRaw)}`:'';
   const sig=(f.picusSignature&&String(f.picusSignature).startsWith('data:image/'))
     ? `<img src="${f.picusSignature}" alt="Captain signature">` : '';
-  return `<div class="picus-print-remark">${baseHtml?`<div>${baseHtml}</div>`:''}<span class="picus-captain">PICUS — ${captain}</span>${sig}</div>`;
+  return `<div class="picus-print-remark">${baseHtml?`<div>${baseHtml}</div>`:''}<span class="picus-captain">${captain?`PICUS — ${captain}`:'PICUS'}</span>${sig}</div>`;
+}
+
+function formatPrintCrewName(name){
+  const raw=String(name||'').trim();
+  if(!raw)return '';
+  // Preserve already abbreviated names such as "M. Mouse".
+  if(/^[A-Za-zÀ-ÖØ-öø-ÿ]\.\s+.+/.test(raw))return raw;
+  const parts=raw.split(/\s+/).filter(Boolean);
+  if(parts.length<2)return raw;
+  const first=parts[0];
+  const last=parts[parts.length-1];
+  return `${first.charAt(0).toUpperCase()}. ${last}`;
 }
 
 function printRows(chunk,startIndex,rowsPerPage,before){
@@ -1859,39 +1993,28 @@ function printRows(chunk,startIndex,rowsPerPage,before){
   const acc={};
   Object.keys(page).forEach(k=>acc[k]=(before[k]||0)+(page[k]||0));
 
-  const dayLandings=chunk.reduce((n,f)=>n+Number(f.ldgDay||0),0);
-  const nightLandings=chunk.reduce((n,f)=>n+Number(f.ldgNight||0),0);
-
   return `<table class="print-table">
+  <!-- Exact 100% width allocation. Simulator session time and Remarks were
+       trimmed slightly (session time is always well under 10 hours; long
+       remarks are single-line/ellipsis anyway) and that space was moved to
+       Aircraft Type/Registration, which were wrapping mid-word before. -->
   <colgroup>
-    <col style="width:3.8%"><col style="width:3.2%"><col style="width:3%">
-    <col style="width:3.2%"><col style="width:3%">
-    <col style="width:7.5%"><col style="width:5.5%">
-    <col style="width:2.7%"><col style="width:2.7%">
-    <col style="width:4.5%"><col style="width:4.5%"><col style="width:6%">
-    <col style="width:2.7%"><col style="width:2.7%">
-    <col style="width:3.5%"><col style="width:3.5%">
-    <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-    <col style="width:3.5%"><col style="width:3.5%"><col style="width:3.5%">
-    <col style="width:13.5%">
+    <col style="width:5.5%">
+    <col style="width:3.8%"><col style="width:3.4%">
+    <col style="width:3.8%"><col style="width:3.4%">
+    <col style="width:3.5%"><col style="width:6.5%">
+    <col style="width:3.8%"><col style="width:3.8%">
+    <col style="width:4.4%"><col style="width:4.4%">
+    <col style="width:10.2%">
+    <col style="width:3.2%"><col style="width:3.2%">
+    <col style="width:4.5%"><col style="width:4.5%">
+    <col style="width:4.5%"><col style="width:4.5%"><col style="width:4.5%"><col style="width:4.5%">
+    <col style="width:3.5%">
+    <col style="width:6.7%">
   </colgroup>
   <thead>
-    <tr class="carry-row">
-      <th colspan="9">TOTALS BROUGHT FORWARD</th>
-      <th>${minsToHM(before.multi)}</th>
-      <th>${minsToHM(before.duration)}</th>
-      <th></th>
-      <th colspan="2"></th>
-      <th>${minsToHM(before.night)}</th>
-      <th>${minsToHM(before.ifr)}</th>
-      <th>${minsToHM(before.pic)}</th>
-      <th>${minsToHM(before.co)}</th>
-      <th>${minsToHM(before.dual)}</th>
-      <th>${minsToHM(before.instructor)}</th>
-      <th colspan="4"></th>
-    </tr>
     <tr class="group-row">
-      <th rowspan="2">Date</th>
+      <th rowspan="2">Date<br><span class="date-fmt">DD/MM/YY</span></th>
       <th colspan="2">Departure</th>
       <th colspan="2">Arrival</th>
       <th colspan="2">Aircraft</th>
@@ -1902,73 +2025,69 @@ function printRows(chunk,startIndex,rowsPerPage,before){
       <th colspan="2">Landings</th>
       <th colspan="2">Operational<br>Condition Time</th>
       <th colspan="4">Pilot Function Time</th>
-      <th colspan="3">Simulator (FSTD SESSION)</th>
-      <th rowspan="2">Remarks &amp;<br>Endorsements</th>
+      <th rowspan="2">Simulator<br>(FSTD)</th>
+      <th rowspan="2">Remarks</th>
     </tr>
     <tr class="sub-row">
       <th>Place</th><th>Time</th>
       <th>Place</th><th>Time</th>
-      <th>Make, Model, Var.</th><th>Registration</th>
+      <th>Type</th><th>Reg.</th>
       <th>SE</th><th>ME</th>
-      <th>Day</th><th>Night</th>
+      <th class="no-wrap">Day</th><th class="no-wrap">Night</th>
       <th>Night</th><th>IFR</th>
       <th>PIC</th><th>Co-Pilot</th><th>Dual</th><th>Instructor</th>
-      <th>Date</th><th>Type</th><th>Session Time</th>
     </tr>
   </thead>
   <tbody>
-    ${chunk.map(f=>`<tr class="flight-row">
+    ${chunk.map(f=>`<tr class="flight-row${f.isSimSession?' sim-session-row':''}">
       <td>${fmtDate(f.date)}</td>
       <td>${f.dep}</td><td>${f.dt}</td>
       <td>${f.arr}</td><td>${f.at}</td>
-      <td>${esc(f.aircraft)}</td><td>${esc(f.reg)}</td>
-      <td>${(()=>{const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return(a?.operation==="SP"&&(a?.engine||f.engine)==="SE")?minsToHM(f.duration):"0:00";})()}</td>
-      <td>${(()=>{const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return(a?.operation==="SP"&&(a?.engine||f.engine)==="ME")?minsToHM(f.duration):"0:00";})()}</td>
-      <td>${(()=>{const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return(a?.operation==="MP"&&!a?.simulator)?minsToHM(f.duration):"0:00";})()}</td>
-      <td>${(()=>{const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return a?.simulator?"0:00":minsToHM(f.duration);})()}</td>
-      <td>${esc(f.pic)}</td>
+      <td class="print-left">${esc(f.aircraft)}</td><td>${esc(f.reg)}</td>
+      <td>${(()=>{if(f.isSimSession)return"0:00";const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return(a?.operation==="SP"&&(a?.engine||f.engine)==="SE")?minsToHM(f.duration):"0:00";})()}</td>
+      <td>${(()=>{if(f.isSimSession)return"0:00";const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return(a?.operation==="SP"&&(a?.engine||f.engine)==="ME")?minsToHM(f.duration):"0:00";})()}</td>
+      <td>${(()=>{if(f.isSimSession)return"0:00";const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return(a?.operation==="MP"&&!a?.simulator)?minsToHM(f.duration):"0:00";})()}</td>
+      <td>${(()=>{if(f.isSimSession)return"0:00";const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return a?.simulator?"0:00":minsToHM(f.duration);})()}</td>
+      <td class="print-left">${esc(formatPrintCrewName(f.pic))}</td>
       <td>${f.ldgDay||0}</td><td>${f.ldgNight||0}</td>
       <td>${minsToHM(f.night||0)}</td><td>${minsToHM(f.ifrTime??(f.ifr?f.duration:0))}</td>
       <td>${["PIC","PICUS"].includes(f.role)?minsToHM(f.duration):"0:00"}</td>
       <td>${f.role==="Co-pilot"?minsToHM(f.duration):"0:00"}</td>
       <td>${f.role==="Dual"?minsToHM(f.duration):"0:00"}</td>
       <td>${["Instructor","Examiner"].includes(f.role)?minsToHM(f.duration):"0:00"}</td>
-      <td>${(()=>{const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return a?.simulator?fmtDate(f.date):"";})()}</td>
-      <td>${(()=>{const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return a?.simulator?"FSTD":"";})()}</td>
-      <td>${(()=>{const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return a?.simulator?minsToHM(f.duration):"0:00";})()}</td>
+      <td>${(()=>{if(f.isSimSession)return minsToHM(f.simDuration||0);const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return a?.simulator?minsToHM(f.duration):"0:00";})()}</td>
       <td class="print-remarks">${printRemarksV12(f)}</td>
     </tr>`).join("")}
     ${Array.from(
       {length:Math.max(0,(rowsPerPage||chunk.length)-chunk.length)},
-      ()=>`<tr class="flight-row blank-flight-row">${Array.from({length:24},()=>"<td></td>").join("")}</tr>`
+      ()=>`<tr class="flight-row blank-flight-row">${Array.from({length:22},()=>"<td></td>").join("")}</tr>`
     ).join("")}
 
     <tr class="print-total">
-      <td colspan="7">PAGE TOTAL</td>
+      <td colspan="7" class="print-left">PAGE TOTAL</td>
       <td>${minsToHM(page.spSE)}</td><td>${minsToHM(page.spME)}</td>
       <td>${minsToHM(page.multi)}</td><td>${minsToHM(page.duration)}</td><td></td>
-      <td>${dayLandings}</td><td>${nightLandings}</td>
+      <td>${page.ldgDay}</td><td>${page.ldgNight}</td>
       <td>${minsToHM(page.night)}</td><td>${minsToHM(page.ifr)}</td>
       <td>${minsToHM(page.pic)}</td><td>${minsToHM(page.co)}</td>
       <td>${minsToHM(page.dual)}</td><td>${minsToHM(page.instructor)}</td>
-      <td></td><td></td><td>${minsToHM(page.simulator)}</td><td></td>
+      <td>${minsToHM(page.simulator)}</td><td class="signature-cell" rowspan="3">${signatureForPrint()}</td>
     </tr>
-    <tr class="brought-total">
-      <td colspan="7"><b>BROUGHT FORWARD</b></td>
+    <tr class="brought-total compact-total">
+      <td colspan="7" class="print-left"><b>BROUGHT FORWARD</b></td>
       <td>${minsToHM(before.spSE)}</td><td>${minsToHM(before.spME)}</td>
       <td>${minsToHM(before.multi)}</td><td>${minsToHM(before.duration)}</td><td></td>
-      <td></td><td></td><td>${minsToHM(before.night)}</td><td>${minsToHM(before.ifr)}</td>
+      <td>${before.ldgDay||0}</td><td>${before.ldgNight||0}</td><td>${minsToHM(before.night)}</td><td>${minsToHM(before.ifr)}</td>
       <td>${minsToHM(before.pic)}</td><td>${minsToHM(before.co)}</td><td>${minsToHM(before.dual)}</td><td>${minsToHM(before.instructor)}</td>
-      <td></td><td></td><td>${minsToHM(before.simulator)}</td><td></td>
+      <td>${minsToHM(before.simulator)}</td>
     </tr>
-    <tr class="print-total">
-      <td colspan="7">ACCUMULATED TOTAL</td>
+    <tr class="print-total compact-total acc-total">
+      <td colspan="7" class="print-left">ACCUMULATED TOTAL</td>
       <td>${minsToHM(acc.spSE)}</td><td>${minsToHM(acc.spME)}</td>
       <td>${minsToHM(acc.multi)}</td><td>${minsToHM(acc.duration)}</td><td></td>
-      <td></td><td></td><td>${minsToHM(acc.night)}</td><td>${minsToHM(acc.ifr)}</td>
+      <td>${acc.ldgDay||0}</td><td>${acc.ldgNight||0}</td><td>${minsToHM(acc.night)}</td><td>${minsToHM(acc.ifr)}</td>
       <td>${minsToHM(acc.pic)}</td><td>${minsToHM(acc.co)}</td><td>${minsToHM(acc.dual)}</td><td>${minsToHM(acc.instructor)}</td>
-      <td></td><td></td><td>${minsToHM(acc.simulator)}</td>
-      <td class="signature-cell">${signatureForPrint()}</td>
+      <td>${minsToHM(acc.simulator)}</td>
     </tr>
   </tbody></table>`;
 }
@@ -1983,52 +2102,35 @@ function renderPrintPreview(){
     document.getElementById("printArea").innerHTML="";
     return;
   }
-  const pages=pageChunks(printFlights);
   const area=document.getElementById("printArea");
   const baseFont=getPrintFontSize();
-  const auto=getAutoScale();
   const perPageEl=document.getElementById("perPage");
-  const selectedPerPage=Number(perPageEl ? perPageEl.value : 16);
-
-  /*
-    A4 landscape = 297 x 210 mm.
-    With 6 mm print margins the usable page height is ~198 mm.
-    The page itself is fixed at 198 mm so the browser cannot move the
-    bottom totals onto another physical page.
-
-    For a full page, reserve space for:
-      header + table header + 3 total rows + footer.
-    The remainder is divided equally among the flight rows.
-    The last partial page is deliberately not stretched.
-  */
-  /*
-    Fixed A4 landscape print layout.
-    The old version only applied a minimum height to flight cells, so
-    Firefox/iOS could make rows taller than calculated and push the table
-    outside the page. The table now receives an explicit height and every
-    flight row receives an explicit height.
-
-    Partial pages are also stretched so they use the available page area.
-  */
-  // A4 landscape. Every page has exactly selectedPerPage ruled flight rows.
-  // The last page is padded with blank rows, so totals never have to expand.
-  const pageHeight=198;
-  const pagePadding=4;
-  const headerArea=12;
-  // A signature needs its own area below the table. Without reserving it,
-  // an absolutely positioned signature can overlap the final logbook rows.
-  const signatureArea=0;
-  const footerArea=7;
-  const tableHeight=pageHeight-pagePadding-headerArea-footerArea-signatureArea;
-
-  // Carry-forward + 2 header rows + PAGE/BROUGHT/ACCUMULATED TOTAL.
-  // These are deliberately fixed; all remaining space belongs to flight rows.
-  const structuralHeight=6+7+6+6+6+16;
-  const rowHeight=Math.max(5,(tableHeight-structuralHeight)/selectedPerPage);
+  const requestedPerPage=Number(perPageEl ? perPageEl.value : 22);
+  // Flights/page is deliberately capped at 24. There is no readability
+  // auto-cap anymore; the page geometry below is sized to fit 24 rows.
+  const effectivePerPage=Math.max(6,Math.min(24,requestedPerPage));
+  // A4 landscape: 210mm high minus 7mm top/bottom @page margins = 196mm.
+  // The page container is fixed to that physical height, so 24 rows cannot
+  // spill onto a second browser page.
+  // Compact fixed geometry: 24 flights are intentionally allowed to use
+  // the page. The total rows and signature are included in the calculation.
+  const pageUsableHeight=198;
+  const pagePadding=2;
+  const headerArea=10;
+  const structuralRows=7+4+5+4+4+8; // table header + total rows
+  const availableForRows=Math.max(1,pageUsableHeight-pagePadding-headerArea-structuralRows);
+  // Deliberately use the available height. This keeps 24 rows compact but
+  // removes the large unused lower portion of the printed A4 page.
+  const actualRowHeight=Math.min(6.5,Math.max(5.2,availableForRows/effectivePerPage));
+  const pages=pageChunks(printFlights,effectivePerPage);
 
   area.innerHTML=pages.map((chunk,i)=>{
-    const start=i*selectedPerPage;
-    const actualRowHeight=rowHeight;
+    const start=i*effectivePerPage;
+    // Every page always shows exactly effectivePerPage ruled rows — real
+    // flights first, then blank rows to fill out the page — so a
+    // lightly-populated last page still looks like a complete logbook
+    // page instead of leaving a chunk of empty white space.
+    const rowsOnPage=effectivePerPage;
 
     const pageStyle=[
       `--print-font:${baseFont}pt`,
@@ -2050,14 +2152,24 @@ function renderPrintPreview(){
           <div class="print-title">FLIGHT CREW LOGBOOK — EASA / PART-FCL</div>
           <div style="font-size:8px">${esc(settings.pilotName||"Pilot")} ${settings.address?"• "+esc(settings.address):""}</div>
         </div>
-        <div class="print-meta">Page ${i+1} of ${pages.length}<br>Generated ${new Date().toLocaleDateString()}</div>
+
       </div>
-      ${printRows(chunk,start,selectedPerPage,carry)}
+      ${printRows(chunk,start,rowsOnPage,carry)}
     </div>`;
   }).join("");
 }
+function isIOSStandalone(){
+  // iOS Safari exposes navigator.standalone only when the page was
+  // launched from a Home Screen icon (i.e. running as an installed PWA).
+  // window.print() is a documented no-op in that mode on iOS — there is
+  // no WebKit API to trigger printing/PDF export from a standalone web
+  // app; the browser chrome that owns the print/share sheet simply isn't
+  // present. This can only be worked around by using the page in an
+  // actual Safari tab.
+  return window.navigator.standalone === true;
+}
 function printLogbook(){
-  if(!flights.length){
+  if(!flights.length && !(Array.isArray(simSessions)&&simSessions.length)){
     alert("There are no flights to print.");
     return;
   }
@@ -2070,7 +2182,57 @@ function printLogbook(){
     alert("There are no flights in the selected date range.");
     return;
   }
-
+  if(isIOSStandalone()){
+    document.getElementById("iosPrintUrl").textContent=location.href;
+    document.getElementById("iosPrintNotice").style.display="flex";
+    return;
+  }
+  let hideReminder=window.__hidePrintReminder===true;
+  try { hideReminder=hideReminder || localStorage.getItem("hidePrintReminder")==="1"; } catch(e) {}
+  if(hideReminder){
+    proceedToPrint();
+  } else {
+    syncPrintReminderToggle();
+    document.getElementById("printReminderModal").style.display="flex";
+  }
+}
+function closePrintReminder(){
+  document.getElementById("printReminderModal").style.display="none";
+}
+function syncPrintReminderToggle(){
+  let enabled=window.__hidePrintReminder===true;
+  try { enabled=localStorage.getItem("hidePrintReminder")==="1"; } catch(e) {}
+  window.__hidePrintReminder=enabled;
+  const btn=document.getElementById("hidePrintReminderToggle");
+  const icon=document.getElementById("hidePrintReminderIcon");
+  if(btn) {
+    btn.setAttribute("aria-pressed",enabled?"true":"false");
+    btn.style.borderColor=enabled?"var(--accent)":"var(--input-border)";
+    btn.style.background=enabled?"rgba(61,111,245,.12)":"var(--chip-bg)";
+  }
+  if(icon){
+    icon.textContent=enabled?"✓":"";
+    icon.style.background=enabled?"var(--accent)":"transparent";
+    icon.style.color=enabled?"#fff":"transparent";
+    icon.style.borderColor=enabled?"var(--accent)":"#98A2B3";
+  }
+}
+function togglePrintReminderPreference(){
+  let enabled=!(window.__hidePrintReminder===true);
+  window.__hidePrintReminder=enabled;
+  try {
+    if(enabled) localStorage.setItem("hidePrintReminder","1");
+    else localStorage.removeItem("hidePrintReminder");
+  } catch(e) {}
+  syncPrintReminderToggle();
+}
+function proceedToPrint(){
+  const enabled=window.__hidePrintReminder===true;
+  try {
+    if(enabled) localStorage.setItem("hidePrintReminder","1");
+    else localStorage.removeItem("hidePrintReminder");
+  } catch(e) {}
+  closePrintReminder();
   try {
     // Render first, then invoke print directly from the button click.
     // This is more reliable in Firefox/iOS than using setTimeout(), which
@@ -2087,6 +2249,18 @@ function printLogbook(){
   } catch(err) {
     console.error("Print failed:", err);
     alert("The print dialog could not be opened. Please try the Print button again.");
+  }
+}
+function closeIOSPrintNotice(){
+  document.getElementById("iosPrintNotice").style.display="none";
+}
+function copyPrintURL(){
+  const url=location.href;
+  const done=()=>{const btn=document.getElementById("iosPrintCopyBtn");if(btn){const old=btn.textContent;btn.textContent="Copied";setTimeout(()=>btn.textContent=old,1500);}};
+  if(navigator.clipboard?.writeText){
+    navigator.clipboard.writeText(url).then(done).catch(()=>{prompt("Copy this link and open it in Safari:",url);});
+  } else {
+    prompt("Copy this link and open it in Safari:",url);
   }
 }
 function exportJSON(){
@@ -2194,6 +2368,7 @@ function removeSignature(){
 }
 function signatureForPrint(){
   return settings.signature ? `<div class="print-signature">
+    <div class="sig-certify">I certify that the entries in this log are true</div>
     <img src="${settings.signature}" alt="Pilot signature">
     <div class="sig-label">PILOT SIGNATURE</div>
   </div>` : "";
@@ -2212,10 +2387,10 @@ loadData();renderAircraftSelector();renderCrewSelectors();renderSimSelector();cl
 <div id="picusModal" class="modal-overlay" style="display:none">
   <div class="modal-card">
     <div class="section-title">PICUS — Captain signature</div>
-    <p class="notice">PICUS is selected. Enter the captain's name and obtain the captain's signature before saving this flight.</p>
+    <p class="notice">PICUS is selected. The captain is taken automatically from the Other crew member field. Obtain the captain's signature before saving this flight.</p>
     <div class="field">
-      <label>Captain name</label>
-      <input id="picusCaptainName" placeholder="Captain name">
+      <label>Captain</label>
+      <div id="picusCaptainDisplay" style="min-height:36px;padding:9px 10px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:8px;font-weight:650;color:var(--ink)">—</div>
     </div>
     <div class="field" style="margin-top:10px">
       <label>Captain signature</label>
@@ -2320,9 +2495,18 @@ function setupPicusCanvasV8(){
 function clearPicusCanvas(){
   const c=document.getElementById("picusCanvas");if(c)c.getContext("2d").clearRect(0,0,c.width,c.height);
 }
+function currentOtherCrewNameV41(){
+  const c=(typeof selectedCrewProfileId!=="undefined"&&selectedCrewProfileId)
+    ? crewLibrary.find(x=>x.id===selectedCrewProfileId) : null;
+  const input=(document.getElementById("crewSearch")?.value||document.getElementById("pic")?.value||"").trim();
+  return String(c?.name||input||"").trim().toUpperCase();
+}
 function openPicusForSave(continuation){
   picusSaveContinuation=continuation;
-  document.getElementById("picusCaptainName").value=picusCaptainV8||"";
+  const captain=currentOtherCrewNameV41();
+  picusCaptainV8=captain;
+  const display=document.getElementById("picusCaptainDisplay");
+  if(display)display.textContent=captain||"No other crew member selected";
   clearPicusCanvas();
   document.getElementById("picusModal").style.display="flex";
 }
@@ -2331,8 +2515,8 @@ function cancelPicusSave(){
   document.getElementById("picusModal").style.display="none";
 }
 function acceptPicusSignature(){
-  const c=document.getElementById("picusCanvas"), name=document.getElementById("picusCaptainName").value.trim();
-  if(!name){alert("Please enter the captain's name.");return}
+  const c=document.getElementById("picusCanvas"), name=currentOtherCrewNameV41();
+  if(!name){alert("Please select the captain in the Other crew member field first.");return}
   const data=c.getContext("2d").getImageData(0,0,c.width,c.height).data;
   let ink=false;for(let i=3;i<data.length;i+=4){if(data[i]>0){ink=true;break}}
   if(!ink){alert("Please add the captain's signature.");return}
@@ -2343,12 +2527,12 @@ function acceptPicusSignature(){
   if(fn)fn();
 }
 function picusRemarkV8(existing){
-  let r=(existing||"").trim();
-  if(document.getElementById("picusLog")?.checked){
-    const extra="PICUS — Captain: "+picusCaptainV8+" — Captain signature recorded";
-    if(!r.includes("PICUS"))r=r?(r+"\n"+extra):extra;
-  }
-  return r.toUpperCase();
+  // PICUS is a structured field and must NEVER be stored in free-text remarks.
+  // Strip both the old standalone marker and the legacy generated
+  // "PICUS — Captain: ..." line. Keep every genuine user remark unchanged.
+  return String(existing||"").split(/\r?\n/).map(line=>line.trim())
+    .filter(line=>line && !/^PICUS(?:\s*[—-].*)?$/i.test(line))
+    .join("\n").trim().toUpperCase();
 }
 function getV8Allocation(){
   return {
@@ -2449,9 +2633,7 @@ function v11FlightObject(existing){
   f.picusTime=0;
   f.picusCaptain=picusCaptainV8||"";f.picusSignature=picusSignatureV8||"";
   f.ldgDay=Number(document.getElementById("ldgDay")?.value||0);f.ldgNight=Number(document.getElementById("ldgNight")?.value||0);
-  let remarks=(document.getElementById("remarks")?.value||"").trim();
-  if(f.picusLog){const extra="PICUS — Captain: "+f.picusCaptain+" — Captain signature recorded";remarks=remarks.replace(/PICUS\s*[—-].*?(?=\n|$)/i,"").trim();remarks=remarks?remarks+"\n"+extra:extra;}
-  f.remarks=remarks.toUpperCase();
+  f.remarks=picusRemarkV8(document.getElementById("remarks")?.value||"");
   return f;
 }
 function v11FinishEditMode(){
@@ -2690,7 +2872,13 @@ const v15OldPrintTimeBuckets=window.printTimeBuckets;
 window.printTimeBuckets=function(arr){
   const t=v15OldPrintTimeBuckets(arr);
   t.pic=0;t.co=0;t.dual=0;t.instructor=0;
-  arr.forEach(f=>{t.pic+=Number(f.picTime||((v15StoredRole(f)==='PIC'||v15StoredRole(f)==='PICUS')?f.duration:0));t.co+=Number(f.sicTime||0);t.dual+=Number(f.dualTime||0);t.instructor+=Number(f.instructorTime||0);});
+  arr.forEach(f=>{
+    const r=v15StoredRole(f);
+    t.pic+=Number(f.picTime??((r==='PIC'||r==='PICUS')?f.duration:0));
+    t.co+=Number(f.sicTime??(r==='SIC'?f.duration:0));
+    t.dual+=Number(f.dualTime??(r==='Dual'?f.duration:0));
+    t.instructor+=Number(f.instructorTime??(r==='Instructor'?f.duration:0));
+  });
   return t;
 };
 // Replace the print row generator with a V15 version based on stored allocation fields.
@@ -2701,8 +2889,9 @@ window.printRows=function(chunk,startIndex,rowsPerPage,before){
   chunk.forEach(f=>{
     // Original function cells are role-derived; rewrite only the row segment.
     const name=esc(v15PrintPicName(f));
-    const pic=minsToHM(f.picTime||((v15StoredRole(f)==='PIC'||v15StoredRole(f)==='PICUS')?f.duration:0));
-    const sic=minsToHM(f.sicTime||0), dual=minsToHM(f.dualTime||0), instr=minsToHM(f.instructorTime||0);
+    const r=v15StoredRole(f);
+    const pic=minsToHM(f.picTime??((r==='PIC'||r==='PICUS')?f.duration:0));
+    const sic=minsToHM(f.sicTime??(r==='SIC'?f.duration:0)), dual=minsToHM(f.dualTime??(r==='Dual'?f.duration:0)), instr=minsToHM(f.instructorTime??(r==='Instructor'?f.duration:0));
     const re=new RegExp(`<td>${esc(f.pic||'')}</td>[\\s\\S]*?<td class="print-remarks">`);
     const replacement=`<td>${name}</td>`;
     // Only replace the PIC-name cell; function columns are patched below using row-local DOM later.
@@ -2717,12 +2906,13 @@ window.renderPrintPreview=function(){
   v15OldRenderPrint();
   const rows=document.querySelectorAll('#printArea .flight-row');
   const pf=getPrintFlights();
-  pf.forEach((f,i)=>{const r=rows[i];if(!r)return;const cells=r.children;if(cells.length<24)return;
+  pf.forEach((f,i)=>{const r0=rows[i];if(!r0)return;const cells=r0.children;if(cells.length<24)return;
+    const r=v15StoredRole(f);
     cells[11].textContent=v15PrintPicName(f);
-    cells[16].textContent=minsToHM(f.picTime||((v15StoredRole(f)==='PIC'||v15StoredRole(f)==='PICUS')?f.duration:0));
-    cells[17].textContent=minsToHM(f.sicTime||0);
-    cells[18].textContent=minsToHM(f.dualTime||0);
-    cells[19].textContent=minsToHM(f.instructorTime||0);
+    cells[16].textContent=minsToHM(f.picTime??((r==='PIC'||r==='PICUS')?f.duration:0));
+    cells[17].textContent=minsToHM(f.sicTime??(r==='SIC'?f.duration:0));
+    cells[18].textContent=minsToHM(f.dualTime??(r==='Dual'?f.duration:0));
+    cells[19].textContent=minsToHM(f.instructorTime??(r==='Instructor'?f.duration:0));
   });
 };
 
@@ -3275,11 +3465,11 @@ setTimeout(updateTotalsPeriodV23,300);
   // Initial state: PF unless this is an explicitly loaded PM flight.
   sync(pm.checked ? 'pm' : 'pf');
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V37 • local/offline-first test build');
-  document.title='EASA Flight Logbook V37';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V62 • local/offline-first test build');
+  document.title='EASA Flight Logbook V36';
 })();
 </script>
-<script id="V37_GOOGLE_DRIVE">
+<script id="V36_GOOGLE_DRIVE">
 /* V36 Google Drive backup/session persistence */
 const V36_CLIENT_ID="910959620041-8dld34q4vuu13rhm3jujj2ubo8qv17p9.apps.googleusercontent.com";
 const V36_SCOPE="https://www.googleapis.com/auth/drive.file";
@@ -3400,7 +3590,7 @@ async function v36EnsureToken(){
 function v36CollectData(){
   const d={
     backupVersion:3,
-    appVersion:"V37",
+    appVersion:"V36",
     createdAt:new Date().toISOString(),
     source:"EASA Flight Logbook",
     localStorage:{}
@@ -3513,6 +3703,229 @@ setTimeout(()=>{
     v36SilentReconnect();
   }
 },1000);
+</script>
+
+<script>
+/* ================= V42: print layout + PICUS semantics + pagination ================= */
+(function(){
+  // Print names: first initial + surname, e.g. Mickey Mouse -> M. Mouse.
+  function abbreviatedName(name){
+    const raw=String(name||'').trim();
+    if(!raw)return '';
+    if(/^[A-Za-zÀ-ÖØ-öø-ÿ]\.\s+.+/.test(raw))return raw;
+    const parts=raw.split(/\s+/).filter(Boolean);
+    if(parts.length<2)return raw;
+    return parts[0].charAt(0).toUpperCase()+'. '+parts[parts.length-1];
+  }
+
+  function picusCrewName(f){
+    const ids=[f.otherCrewProfileId,f.crewProfileId].filter(Boolean);
+    let c=null;
+    if(typeof crewLibrary!=='undefined') for(const id of ids){ c=crewLibrary.find(x=>x.id===id); if(c)break; }
+    return String(f.otherCrewName||c?.name||f.pic||'').trim();
+  }
+
+  function normalizeFlight(f){
+    if(!f)return f;
+    const isPicus=!!f.picusLog || String(f.role||'').toUpperCase()==='PICUS';
+    if(isPicus){
+      const other=picusCrewName(f);
+      if(other){
+        f.otherCrewName=other.toUpperCase();
+        f.pic=f.otherCrewName;
+      }
+      f.role='PICUS';
+      f.picLog=true;
+    }
+    return f;
+  }
+
+  // Repair existing PICUS records immediately, so older entries also print correctly.
+  if(Array.isArray(flights)){
+    let changed=false;
+    flights.forEach(f=>{
+      const before=f.pic; normalizeFlight(f); if(f.pic!==before)changed=true;
+    });
+    if(changed && typeof saveData==='function')saveData();
+  }
+
+  // Ensure every normal save path applies the same PICUS rule.
+  const oldObject=window.v11FlightObject;
+  if(typeof oldObject==='function'){
+    window.v11FlightObject=function(existing){
+      const f=oldObject(existing);
+      return normalizeFlight(f);
+    };
+  }
+
+  // The Create Return / 3rd Leg snapshot path builds its own object. Patch the
+  // resulting stored flight after each action without changing its other behavior.
+  const oldCreateReturn=window.createReturnLeg;
+  if(typeof oldCreateReturn==='function'){
+    window.createReturnLeg=function(){
+      const before=flights.length; oldCreateReturn();
+      if(flights.length>before){normalizeFlight(flights[flights.length-1]);saveData();}
+    };
+  }
+  const oldThird=window.createThirdLeg;
+  if(typeof oldThird==='function'){
+    window.createThirdLeg=function(){
+      const before=flights.length; oldThird();
+      if(flights.length>before){normalizeFlight(flights[flights.length-1]);saveData();}
+    };
+  }
+
+  // Replace the later V15 printer patch so it also uses the requested abbreviated name.
+  if(typeof window.v15PrintPicName==='undefined'){}
+  window.v15PrintPicName=function(f){
+    const role=String(f?.role||'').toUpperCase();
+    const isPicus=!!f?.picusLog || role==='PICUS';
+    const raw=isPicus ? picusCrewName(f) : (role==='PIC' && !f?.picusLog ? 'SELF' : (f?.otherCrewName||f?.pic||''));
+    return abbreviatedName(raw);
+  };
+
+  // Patch the rendered print rows after all earlier render wrappers have run.
+  const oldRender=window.renderPrintPreview;
+  if(typeof oldRender==='function'){
+    window.renderPrintPreview=function(){
+      oldRender();
+      const rows=document.querySelectorAll('#printArea .flight-row');
+      const pf=typeof getPrintFlights==='function'?getPrintFlights():[];
+      pf.forEach((f,i)=>{
+        const r=rows[i]; if(!r)return;
+        const cell=r.children[11];
+        if(cell){
+          const role=String(f?.role||'').toUpperCase();
+          const raw=(!!f?.picusLog||role==='PICUS')?picusCrewName(f):(role==='PIC'&&!f?.picusLog?'SELF':(f?.otherCrewName||f?.pic||''));
+          cell.textContent=abbreviatedName(raw);
+        }
+      });
+    };
+  }
+
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V62 • local/offline-first test build');
+  document.title='EASA Flight Logbook V62';
+})();
+</script>
+
+<script>
+/* ================= V43: PICUS remarks hardening ================= */
+(function(){
+  function cleanPicusRemarks(value){
+    return String(value||'').split(/\r?\n/).map(line=>line.trim())
+      .filter(line=>line && !/^PICUS(?:\s*[—-].*)?$/i.test(line))
+      .join('\n').trim().toUpperCase();
+  }
+
+  // Clean all existing records immediately. This fixes imports created by
+  // V40/V41/V42 where PICUS was incorrectly persisted inside remarks.
+  if(Array.isArray(window.flights)){
+    let changed=false;
+    window.flights.forEach(f=>{
+      const cleaned=cleanPicusRemarks(f.remarks);
+      if(cleaned!==String(f.remarks||'')){f.remarks=cleaned;changed=true;}
+    });
+    if(changed && typeof window.saveData==='function')window.saveData();
+  }
+
+  // Prevent every save/edit/import path from putting PICUS back into remarks.
+  const oldFlightObject=window.v11FlightObject;
+  if(typeof oldFlightObject==='function')window.v11FlightObject=function(existing){
+    const f=oldFlightObject(existing);
+    f.remarks=cleanPicusRemarks(f.remarks);
+    return f;
+  };
+
+  const oldCommit=window.v11CommitEditedFlight;
+  if(typeof oldCommit==='function')window.v11CommitEditedFlight=function(){
+    const r=oldCommit.apply(this,arguments);
+    if(Array.isArray(window.flights)){window.flights.forEach(f=>f.remarks=cleanPicusRemarks(f.remarks));}
+    if(typeof window.saveData==='function')window.saveData();
+    return r;
+  };
+
+  // Print exactly one PICUS indication from the structured flag.
+  if(typeof window.printRemarksV12==='function')window.printRemarksV12=function(f){
+    const base=cleanPicusRemarks(f?.remarks);
+    const baseHtml=base?window.esc(base).replace(/\n/g,'<br>'):'';
+    if(!f?.picusLog)return baseHtml;
+    const captainRaw=String(f?.picusCaptain||'').trim();
+    const captain=(captainRaw && !/^PICUS(?:\s*[—-].*)?$/i.test(captainRaw))?`Captain: ${window.esc(captainRaw)}`:'';
+    const sig=(f.picusSignature&&String(f.picusSignature).startsWith('data:image/'))
+      ? `<img src="${f.picusSignature}" alt="Captain signature">` : '';
+    return `<div class="picus-print-remark">${baseHtml?`<div>${baseHtml}</div>`:''}<span class="picus-captain">${captain?`PICUS — ${captain}`:'PICUS'}</span>${sig}</div>`;
+  };
+
+  document.title='EASA Flight Logbook V44';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V62 • local/offline-first test build');
+})();
+</script>
+
+<script>
+/* ================= V45: PICUS captain source fix ================= */
+(function(){
+  // The captain for a PICUS flight is ALWAYS the person in Other Crew Member.
+  // Never use picusCaptain as the source for the printed captain name.
+  function picusCaptainFromOtherCrew(f){
+    const id=String(f?.crewProfileId||f?.otherCrewProfileId||'');
+    if(id && Array.isArray(window.crewLibrary)){
+      const c=window.crewLibrary.find(x=>String(x.id)===id);
+      if(c?.name)return String(c.name).trim();
+    }
+    // Fallback for older records that may have stored the name directly.
+    const direct=String(f?.otherCrewName||'').trim();
+    if(direct && !/^PICUS(?:\s*[—-].*)?$/i.test(direct))return direct;
+    return '';
+  }
+
+  function cleanPicusRemarkText(value){
+    return String(value||'').split(/\r?\n/)
+      .map(line=>line.trim())
+      .filter(line=>line && !/^PICUS(?:\s*[—-].*)?$/i.test(line))
+      .join('\n').trim();
+  }
+
+  window.currentOtherCrewNameV41=function(){
+    const id=String(window.selectedCrewProfileId||'');
+    if(id && Array.isArray(window.crewLibrary)){
+      const c=window.crewLibrary.find(x=>String(x.id)===id);
+      if(c?.name)return String(c.name).trim().toUpperCase();
+    }
+    return '';
+  };
+
+  window.printRemarksV12=function(f){
+    const base=cleanPicusRemarkText(f?.remarks);
+    const baseHtml=base?window.esc(base).replace(/\n/g,'<br>'):'';
+    if(!f?.picusLog)return baseHtml;
+
+    const captain=picusCaptainFromOtherCrew(f);
+    const captainHtml=captain?`PICUS — Captain: ${window.esc(captain)}`:'PICUS';
+    const sig=(f?.picusSignature&&String(f.picusSignature).startsWith('data:image/'))
+      ? `<img src="${f.picusSignature}" alt="Captain signature">` : '';
+
+    return `<div class="picus-print-remark">${baseHtml?`<div>${baseHtml}</div>`:''}<span class="picus-captain">${captainHtml}</span>${sig}</div>`;
+  };
+
+  // Repair stored PICUS captain values so editing/exporting no longer carries
+  // the erroneous PICUS text as the captain name. The Other Crew Member ID is
+  // the authoritative source.
+  if(Array.isArray(window.flights) && Array.isArray(window.crewLibrary)){
+    let changed=false;
+    window.flights.forEach(f=>{
+      if(f?.picusLog){
+        const captain=picusCaptainFromOtherCrew(f);
+        if(captain && f.picusCaptain!==captain){f.picusCaptain=captain;changed=true;}
+        const cleaned=cleanPicusRemarkText(f.remarks);
+        if(cleaned!==String(f.remarks||'')){f.remarks=cleaned;changed=true;}
+      }
+    });
+    if(changed && typeof window.saveData==='function')window.saveData();
+  }
+
+  document.title='EASA Flight Logbook V62';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V62 • local/offline-first test build');
+})();
 </script>
 </body>
 </html>

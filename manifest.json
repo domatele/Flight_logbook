@@ -1,6 +1,6 @@
 {
-  "name": "EASA Flight Logbook V37",
-  "short_name": "Logbook V37",
+  "name": "EASA Flight Logbook V45",
+  "short_name": "Logbook V45",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#07152f",
@@ -9,14 +9,7 @@
     {
       "src": "icon-180.png",
       "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
