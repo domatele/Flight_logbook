@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#080F27">
-<title>EASA Flight Logbook V62</title>
+<title>EASA Flight Logbook V63</title>
 <style>
 /* ==================================================================
    EASA Flight Logbook — iOS-style visual design system (V21 UI pass)
@@ -472,7 +472,7 @@ tbody tr:hover{background:var(--input-bg)}
 .picus-remark-print{line-height:1.05;font-size:8px}
 
 
-/* V62: keep certification text fully visible inside the signature cell. */
+/* V63: keep certification text fully visible inside the signature cell. */
 @media print{
   .print-table .signature-cell{position:relative!important;vertical-align:middle!important;
     overflow:visible!important;
@@ -521,10 +521,9 @@ tbody tr:hover{background:var(--input-bg)}
 </style>
 </head>
 
-<body><div id="v36VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V47</div><div id="v35VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V47</div>
+<body><div id="v36VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V47</div>
 <header class="v16-header">
   <h1>EASA Flight Logbook</h1>
-  <span class="sub">Offline-first digital logbook</span>
 </header>
 <nav class="v16-bottom-nav" aria-label="Logbook sections">
   <button id="newFlightTab" class="tab active" onclick="showTab('flightsPage',this)"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h6.5l-2 7h2.2l4.1-7h5.7c1.1 0 2.5-.9 2.5-1.9s-1.4-1.6-2.5-1.6h-5.7l-4.1-7H7.5l2 7H3z"/></svg></span><span>New Flight</span></button>
@@ -759,7 +758,7 @@ tbody tr:hover{background:var(--input-bg)}
 </section>
 
 <section class="card">
-  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V41 • local/offline-first test build</div>
+  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V63 • local/offline-first test build</div>
   <div class="notice" style="margin-bottom:12px">Choose what is automatically selected when you start a new flight. You can still change any selection for an individual flight.</div>
   <div class="default-checks">
     <label><input id="defaultIFR" type="checkbox"> IFR</label>
@@ -3076,7 +3075,6 @@ setTimeout(updateTotalsPeriodV23,300);
 
   // Ensure the visible build number is V32 even if an older script wrote V20/V23 into the subtitle.
   document.title='EASA Flight Logbook V32';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V32 • local/offline-first test build');
   document.querySelectorAll('[data-version]').forEach(e=>e.textContent='V28');
 })();
 </script>
@@ -3465,7 +3463,7 @@ setTimeout(updateTotalsPeriodV23,300);
   // Initial state: PF unless this is an explicitly loaded PM flight.
   sync(pm.checked ? 'pm' : 'pf');
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V62 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V63 • local/offline-first test build');
   document.title='EASA Flight Logbook V36';
 })();
 </script>
@@ -3803,8 +3801,8 @@ setTimeout(()=>{
     };
   }
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V62 • local/offline-first test build');
-  document.title='EASA Flight Logbook V62';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V63 • local/offline-first test build');
+  document.title='EASA Flight Logbook V63';
 })();
 </script>
 
@@ -3857,7 +3855,7 @@ setTimeout(()=>{
   };
 
   document.title='EASA Flight Logbook V44';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V62 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V63 • local/offline-first test build');
 })();
 </script>
 
@@ -3923,8 +3921,8 @@ setTimeout(()=>{
     if(changed && typeof window.saveData==='function')window.saveData();
   }
 
-  document.title='EASA Flight Logbook V62';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V62 • local/offline-first test build');
+  document.title='EASA Flight Logbook V63';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V63 • local/offline-first test build');
 })();
 </script>
 </body>
