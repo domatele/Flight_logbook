@@ -1,12 +1,15 @@
 {
-  "name":"Flight Logbook",
-  "short_name":"Logbook",
-  "start_url":"./",
-  "display":"standalone",
-  "background_color":"#f3f4f6",
-  "theme_color":"#111827",
-  "description":"Private offline EASA-style pilot flight logbook",
-  "icons":[
-    {"src":"icon-180.png","sizes":"180x180","type":"image/png","purpose":"any maskable"}
+  "name": "EASA Flight Logbook V34",
+  "short_name": "Logbook V34",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#07152f",
+  "theme_color": "#07152f",
+  "icons": [
+    {
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
   ]
 }
