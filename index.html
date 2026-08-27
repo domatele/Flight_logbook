@@ -463,7 +463,7 @@ tbody tr:hover{background:var(--input-bg)}
 </style>
 </head>
 
-<body>
+<body><div id="v35VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V35</div>
 <header class="v16-header">
   <h1>EASA Flight Logbook</h1>
   <span class="sub">Offline-first digital logbook</span>
@@ -698,9 +698,9 @@ tbody tr:hover{background:var(--input-bg)}
 <div class="section-title">Google Drive Backup</div>
 <div id="v34DriveStatus" class="v34-drive-status">Not connected</div>
 <div class="v34-drive-actions">
-<button type="button" onclick="v35ConnectDrive()">Connect / reconnect Google Drive</button>
-<button type="button" onclick="v35BackupNow()">Backup now</button>
-<button type="button" onclick="v35Restore()">Restore backup</button>
+<button type="button" onclick="v34ConnectDrive()">Connect Google Drive</button>
+<button type="button" onclick="v34BackupNow()">Backup now</button>
+<button type="button" onclick="v34Restore()">Restore backup</button>
 </div>
 <div id="v34BackupMeta" class="v34-backup-meta">Your logbook remains available offline.</div>
 </section>
@@ -3275,316 +3275,120 @@ setTimeout(updateTotalsPeriodV23,300);
   // Initial state: PF unless this is an explicitly loaded PM flight.
   sync(pm.checked ? 'pm' : 'pf');
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V33 • local/offline-first test build');
-  document.title='EASA Flight Logbook V33';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V35 • local/offline-first test build');
+  document.title='EASA Flight Logbook V35';
 })();
 </script>
 <script id="V35_GOOGLE_DRIVE">
-/* V35_GOOGLE_DRIVE
-   - Uses drive.file and creates one app-owned backup file.
-   - Stores the Drive file ID locally after the first successful backup.
-   - Avoids the fragile Drive lookup before the first backup.
-   - Re-acquires an access token silently on page load when Google can do so.
-   - Falls back to a user-driven Connect/Reconnect button when silent authorization is unavailable.
-*/
+/* V35 Google Drive backup */
 const V35_CLIENT_ID="910959620041-8dld34q4vuu13rhm3jujj2ubo8qv17p9.apps.googleusercontent.com";
 const V35_SCOPE="https://www.googleapis.com/auth/drive.file";
 const V35_FILE_NAME="EASA Flight Logbook - backup.json";
 const V35_FILE_ID_KEY="v35_drive_file_id";
 const V35_LAST_BACKUP_KEY="v35_last_backup";
-let v35TokenClient=null;
-let v35AccessToken=null;
-let v35TokenExpiresAt=0;
-let v35GoogleReady=false;
+let v35AccessToken=null,v35TokenExpiresAt=0,v35TokenClient=null;
 
-function v35SetStatus(title, detail){
-  const s=document.getElementById("v34DriveStatus");
-  const m=document.getElementById("v34BackupMeta");
-  if(s) s.textContent=title;
-  if(m) m.textContent=detail || "";
+function v35SetStatus(title,detail){
+ const a=document.getElementById("v34DriveStatus"),b=document.getElementById("v34BackupMeta");
+ if(a)a.textContent=title;if(b)b.textContent=detail||"";
 }
-
 function v35InitGoogle(){
-  if(!window.google?.accounts?.oauth2) return false;
-  if(v35TokenClient) return true;
-
-  v35TokenClient=google.accounts.oauth2.initTokenClient({
-    client_id:V35_CLIENT_ID,
-    scope:V35_SCOPE,
-    callback:(r)=>{
-      if(!r || r.error){
-        console.warn("Google token request:", r);
-        v35AccessToken=null;
-        v35TokenExpiresAt=0;
-        if(r?.error) v35SetStatus("Google Drive — Sign-in needed","Tap Connect Google Drive to authorize access.");
-        return;
-      }
-      v35AccessToken=r.access_token;
-      v35TokenExpiresAt=Date.now()+((Number(r.expires_in)||3600)*1000)-60000;
-      localStorage.setItem("v35_drive_connected","1");
-      v35SetStatus(
-        "Google Drive — Connected",
-        localStorage.getItem(V35_LAST_BACKUP_KEY)
-          ? "Last backup: "+new Date(localStorage.getItem(V35_LAST_BACKUP_KEY)).toLocaleString()
-          : "Google authorization is ready."
-      );
-    },
-    error_callback:(e)=>{
-      console.warn("Google authorization UI:", e);
-      v35SetStatus("Google Drive — Sign-in needed","Tap Connect Google Drive to authorize access.");
-    }
-  });
-  v35GoogleReady=true;
-  return true;
+ if(!window.google?.accounts?.oauth2)return false;
+ if(v35TokenClient)return true;
+ v35TokenClient=google.accounts.oauth2.initTokenClient({
+  client_id:V35_CLIENT_ID,scope:V35_SCOPE,
+  callback:(r)=>{
+   if(r?.error){console.warn("Google OAuth",r);v35AccessToken=null;v35TokenExpiresAt=0;v35SetStatus("Google Drive — Sign-in needed","Tap Connect / reconnect Google Drive.");return;}
+   v35AccessToken=r.access_token;
+   v35TokenExpiresAt=Date.now()+((Number(r.expires_in)||3600)*1000)-60000;
+   localStorage.setItem("v35_drive_connected","1");
+   const last=localStorage.getItem(V35_LAST_BACKUP_KEY);
+   v35SetStatus("Google Drive — Connected",last?"Last backup: "+new Date(last).toLocaleString():"Authorization is active.");
+  },
+  error_callback:(e)=>{console.warn("Google OAuth UI",e);v35SetStatus("Google Drive — Sign-in needed","Tap Connect / reconnect Google Drive.");}
+ });
+ return true;
 }
-
 function v35ConnectDrive(){
-  if(!v35InitGoogle()){
-    alert("Google sign-in is still loading. Please wait a moment and try again.");
-    return;
-  }
-  // User-driven authorization. Consent is normally only shown the first time.
-  v35TokenClient.requestAccessToken({prompt:""});
+ if(!v35InitGoogle()){alert("Google sign-in is still loading. Please wait a moment and try again.");return;}
+ v35TokenClient.requestAccessToken({prompt:""});
 }
-
-function v35TrySilentReconnect(){
-  if(!v35InitGoogle()) return false;
-  try{
-    // Google Identity Services can reuse an existing grant without showing
-    // account/consent UI. If that is unavailable, the callback reports the
-    // need for a user-driven authorization.
-    v35TokenClient.requestAccessToken({prompt:"none"});
-    return true;
-  }catch(e){
-    console.warn("Silent Google authorization unavailable:",e);
-    return false;
-  }
+function v35SilentReconnect(){
+ if(!v35InitGoogle())return;
+ try{v35TokenClient.requestAccessToken({prompt:"none"});}catch(e){console.warn(e);}
 }
-
-function v35GetFileId(){
-  return localStorage.getItem(V35_FILE_ID_KEY) || "";
-}
-
-function v35CollectData(){
-  const d={
-    backupVersion:2,
-    appVersion:"V35",
-    createdAt:new Date().toISOString(),
-    source:"EASA Flight Logbook"
-  };
-
-  // The app is offline-first. The localStorage snapshot is the authoritative
-  // portable copy, so this remains independent of internal variable names.
-  d.localStorage={};
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(!k) continue;
-    if(k.startsWith("v35_")) continue;
-    d.localStorage[k]=localStorage.getItem(k);
-  }
-
-  // Keep a few known globals too, when available, for compatibility with
-  // future/older versions of the app.
-  ["flights","aircraftLibrary","crewLibrary","simulatorLibrary","simSessions","airportDatabase","settings","appSettings"].forEach(k=>{
-    try{
-      if(typeof window[k]!=="undefined") d[k]=window[k];
-    }catch(e){}
-  });
-
-  return d;
-}
-
-async function v35ReadResponse(r, fallback){
-  let text="";
-  try{ text=await r.text(); }catch(e){}
-  let parsed=null;
-  try{ parsed=text?JSON.parse(text):null; }catch(e){}
-  if(parsed?.error){
-    const er=parsed.error;
-    const reason=Array.isArray(er.errors)&&er.errors[0]?.reason ? " ["+er.errors[0].reason+"]" : "";
-    throw new Error((er.message||fallback)+reason+" (HTTP "+r.status+")");
-  }
-  if(!r.ok) throw new Error((text||fallback)+" (HTTP "+r.status+")");
-  return parsed;
-}
-
-async function v35CreateBackupFile(){
-  const r=await fetch("https://www.googleapis.com/drive/v3/files?fields=id,name,mimeType", {
-    method:"POST",
-    headers:{
-      "Authorization":"Bearer "+v35AccessToken,
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      name:V35_FILE_NAME,
-      mimeType:"application/json"
-    })
-  });
-  const d=await v35ReadResponse(r,"Unable to create the Google Drive backup file.");
-  if(!d?.id) throw new Error("Google Drive did not return a file ID.");
-  localStorage.setItem(V35_FILE_ID_KEY,d.id);
-  return d.id;
-}
-
-async function v35UploadToFile(fileId){
-  const r=await fetch(
-    "https://www.googleapis.com/upload/drive/v3/files/"+encodeURIComponent(fileId)+"?uploadType=media",
-    {
-      method:"PATCH",
-      headers:{
-        "Authorization":"Bearer "+v35AccessToken,
-        "Content-Type":"application/json; charset=UTF-8"
-      },
-      body:JSON.stringify(v35CollectData(),null,2)
-    }
-  );
-  await v35ReadResponse(r,"Unable to upload the logbook backup to Google Drive.");
-}
-
 async function v35EnsureToken(){
-  if(v35AccessToken && Date.now()<v35TokenExpiresAt) return true;
-  // Try to refresh/reacquire silently after an access token expires.
-  if(v35InitGoogle()){
-    return await new Promise(resolve=>{
-      let finished=false;
-      const oldCallback=v35TokenClient.callback;
-      const timeout=setTimeout(()=>{
-        if(!finished){
-          finished=true;
-          v35TokenClient.callback=oldCallback;
-          resolve(!!v35AccessToken && Date.now()<v35TokenExpiresAt);
-        }
-      },5000);
-
-      v35TokenClient.callback=(r)=>{
-        if(!finished){
-          finished=true;
-          clearTimeout(timeout);
-          v35TokenClient.callback=oldCallback;
-          if(r?.access_token){
-            v35AccessToken=r.access_token;
-            v35TokenExpiresAt=Date.now()+((Number(r.expires_in)||3600)*1000)-60000;
-            resolve(true);
-          }else resolve(false);
-        }
-      };
-      try{ v35TokenClient.requestAccessToken({prompt:"none"}); }
-      catch(e){ clearTimeout(timeout); finished=true; v35TokenClient.callback=oldCallback; resolve(false); }
-    });
-  }
-  return false;
+ if(v35AccessToken&&Date.now()<v35TokenExpiresAt)return true;
+ if(!v35InitGoogle())return false;
+ return new Promise(resolve=>{
+  let done=false;
+  const old=v35TokenClient.callback;
+  const timer=setTimeout(()=>{if(done)return;done=true;v35TokenClient.callback=old;resolve(false);},5000);
+  v35TokenClient.callback=(r)=>{
+   if(done)return;done=true;clearTimeout(timer);v35TokenClient.callback=old;
+   if(r?.access_token){v35AccessToken=r.access_token;v35TokenExpiresAt=Date.now()+((Number(r.expires_in)||3600)*1000)-60000;resolve(true);}
+   else resolve(false);
+  };
+  try{v35TokenClient.requestAccessToken({prompt:"none"});}catch(e){clearTimeout(timer);done=true;v35TokenClient.callback=old;resolve(false);}
+ });
 }
-
+function v35CollectData(){
+ const d={backupVersion:2,appVersion:"V35",createdAt:new Date().toISOString(),source:"EASA Flight Logbook",localStorage:{}};
+ for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&!k.startsWith("v35_"))d.localStorage[k]=localStorage.getItem(k);}
+ ["flights","aircraftLibrary","crewLibrary","simulatorLibrary","simSessions","airportDatabase","settings","appSettings"].forEach(k=>{try{if(typeof window[k]!=="undefined")d[k]=window[k];}catch(e){}});
+ return d;
+}
+async function v35Read(r,fallback){
+ let text="";try{text=await r.text();}catch(e){}
+ let d=null;try{d=text?JSON.parse(text):null;}catch(e){}
+ if(!r.ok){
+  const er=d?.error,reason=er?.errors?.[0]?.reason?(" ["+er.errors[0].reason+"]"):"";
+  throw new Error((er?.message||text||fallback)+reason+" (HTTP "+r.status+")");
+ }
+ return d;
+}
+async function v35CreateFile(){
+ const r=await fetch("https://www.googleapis.com/drive/v3/files?fields=id,name,mimeType",{method:"POST",headers:{"Authorization":"Bearer "+v35AccessToken,"Content-Type":"application/json"},body:JSON.stringify({name:V35_FILE_NAME,mimeType:"application/json"})});
+ const d=await v35Read(r,"Unable to create the Google Drive backup file.");
+ if(!d?.id)throw new Error("Google Drive did not return a file ID.");
+ localStorage.setItem(V35_FILE_ID_KEY,d.id);return d.id;
+}
+async function v35Upload(id){
+ const r=await fetch("https://www.googleapis.com/upload/drive/v3/files/"+encodeURIComponent(id)+"?uploadType=media",{method:"PATCH",headers:{"Authorization":"Bearer "+v35AccessToken,"Content-Type":"application/json; charset=UTF-8"},body:JSON.stringify(v35CollectData(),null,2)});
+ await v35Read(r,"Unable to upload the logbook backup.");
+}
 async function v35BackupNow(){
-  try{
-    const ok=await v35EnsureToken();
-    if(!ok){
-      alert("Google Drive authorization is not active. Tap Connect Google Drive first.");
-      return;
-    }
-
-    let fileId=v35GetFileId();
-    if(!fileId){
-      // First backup: create the file, then upload the JSON to that exact file.
-      fileId=await v35CreateBackupFile();
-    }
-
-    try{
-      await v35UploadToFile(fileId);
-    }catch(e){
-      // If the locally stored file was deleted/revoked, create a fresh one.
-      if(/HTTP 404|not found|File not found/i.test(String(e.message))){
-        localStorage.removeItem(V35_FILE_ID_KEY);
-        fileId=await v35CreateBackupFile();
-        await v35UploadToFile(fileId);
-      }else throw e;
-    }
-
-    const t=new Date().toISOString();
-    localStorage.setItem(V35_LAST_BACKUP_KEY,t);
-    v35SetStatus("Google Drive — Up to date","Last backup: "+new Date(t).toLocaleString());
-    alert("Backup completed successfully.");
-  }catch(e){
-    console.error("Google Drive backup:",e);
-    v35SetStatus("Backup failed",e.message);
-    alert("Backup failed: "+e.message);
+ try{
+  if(!navigator.onLine){alert("The phone is offline. The logbook is safe locally; connect to the internet before backing up.");return;}
+  if(!await v35EnsureToken()){alert("Google Drive authorization is not active. Tap Connect / reconnect Google Drive first.");return;}
+  let id=localStorage.getItem(V35_FILE_ID_KEY);
+  if(!id)id=await v35CreateFile();
+  try{await v35Upload(id);}catch(e){
+   if(/HTTP 404|File not found|not found/i.test(e.message)){localStorage.removeItem(V35_FILE_ID_KEY);id=await v35CreateFile();await v35Upload(id);}else throw e;
   }
+  const t=new Date().toISOString();localStorage.setItem(V35_LAST_BACKUP_KEY,t);
+  v35SetStatus("Google Drive — Up to date","Last backup: "+new Date(t).toLocaleString());
+  alert("Backup completed successfully.");
+ }catch(e){console.error("V35 Drive backup",e);v35SetStatus("Backup failed",e.message);alert("Backup failed: "+e.message);}
 }
-
 async function v35Restore(){
-  try{
-    const ok=await v35EnsureToken();
-    if(!ok){
-      alert("Google Drive authorization is not active. Tap Connect Google Drive first.");
-      return;
-    }
-
-    let fileId=v35GetFileId();
-
-    // If this device has forgotten the file ID, try to locate the app-created
-    // file by its exact name. If this is not permitted, we give a clear error.
-    if(!fileId){
-      const q="name='"+V35_FILE_NAME.replace(/'/g,"\\'")+"' and trashed=false";
-      const r=await fetch("https://www.googleapis.com/drive/v3/files?q="+encodeURIComponent(q)+"&spaces=drive&fields=files(id,name,modifiedTime)&pageSize=10", {
-        headers:{"Authorization":"Bearer "+v35AccessToken}
-      });
-      const d=await v35ReadResponse(r,"Unable to find the Google Drive backup.");
-      if(d?.files?.length) fileId=d.files[0].id;
-    }
-
-    if(!fileId){
-      alert("No EASA Flight Logbook backup was found in Google Drive.");
-      return;
-    }
-
-    const r=await fetch(
-      "https://www.googleapis.com/drive/v3/files/"+encodeURIComponent(fileId)+"?alt=media",
-      {headers:{"Authorization":"Bearer "+v35AccessToken}}
-    );
-    const d=await v35ReadResponse(r,"Unable to download the Google Drive backup.");
-
-    if(!d || typeof d!=="object" || !d.localStorage) throw new Error("The selected backup is not a valid EASA Flight Logbook backup.");
-    if(!confirm("Restore the Google Drive backup? This will replace the current local app data.")) return;
-
-    Object.entries(d.localStorage).forEach(([k,v])=>{
-      try{ localStorage.setItem(k,String(v)); }catch(e){}
-    });
-
-    localStorage.setItem(V35_FILE_ID_KEY,fileId);
-    alert("Backup restored. The app will reload.");
-    location.reload();
-  }catch(e){
-    console.error("Google Drive restore:",e);
-    alert("Restore failed: "+e.message);
-  }
+ try{
+  if(!await v35EnsureToken()){alert("Google Drive authorization is not active. Tap Connect / reconnect Google Drive first.");return;}
+  const id=localStorage.getItem(V35_FILE_ID_KEY);
+  if(!id){alert("No linked EASA Flight Logbook backup is stored on this device. Make a backup first.");return;}
+  const r=await fetch("https://www.googleapis.com/drive/v3/files/"+encodeURIComponent(id)+"?alt=media",{headers:{"Authorization":"Bearer "+v35AccessToken}});
+  const d=await v35Read(r,"Unable to download the Google Drive backup.");
+  if(!d?.localStorage)throw new Error("The backup is not a valid EASA Flight Logbook backup.");
+  if(!confirm("Restore the Google Drive backup? This will replace the current local app data."))return;
+  Object.entries(d.localStorage).forEach(([k,v])=>{try{localStorage.setItem(k,String(v));}catch(e){}});
+  alert("Backup restored. The app will reload.");location.reload();
+ }catch(e){console.error("V35 Drive restore",e);alert("Restore failed: "+e.message);}
 }
-
-function v35InitStatus(){
-  const last=localStorage.getItem(V35_LAST_BACKUP_KEY);
-  const id=v35GetFileId();
-  if(last){
-    v35SetStatus("Google Drive — Connected","Last backup: "+new Date(last).toLocaleString());
-  }else if(id){
-    v35SetStatus("Google Drive — Connected","Backup file is linked. No backup recorded yet.");
-  }
-}
-
-// Google Identity Services loads asynchronously. Try a silent token request
-// shortly after page load. This does not display a login/consent dialog when
-// the existing Google grant can be reused.
-(function(){
-  v35InitStatus();
-  let attempts=0;
-  const timer=setInterval(()=>{
-    attempts++;
-    if(v35InitGoogle()){
-      clearInterval(timer);
-      // Only attempt silent reconnection if the app was previously connected.
-      if(localStorage.getItem("v35_drive_connected")==="1") v35TrySilentReconnect();
-    }
-    if(attempts>40) clearInterval(timer);
-  },250);
-})();
+setTimeout(()=>{
+ const last=localStorage.getItem(V35_LAST_BACKUP_KEY),id=localStorage.getItem(V35_FILE_ID_KEY);
+ if(last||id)v35SetStatus("Google Drive — Connected",last?"Last backup: "+new Date(last).toLocaleString():"Backup file linked.");
+ if(localStorage.getItem("v35_drive_connected")==="1")v35SilentReconnect();
+},900);
 </script>
 </body>
 </html>
