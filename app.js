@@ -35,5 +35,12 @@ $("backupBtn").onclick=$("backupBtn2").onclick=backup;$("csvBtn").onclick=csv;
 $("importInput").onchange=e=>e.target.files[0]&&importFile(e.target.files[0]);$("importInput2").onchange=e=>e.target.files[0]&&importFile(e.target.files[0]);
 $("clearData").onclick=async()=>{if(confirm("Delete ALL flights and aircraft? Export a backup first.")){let d=await openDB();for(let s of [STORE,ASTORE])await new Promise(r=>{let q=d.transaction(s,"readwrite").objectStore(s).clear();q.onsuccess=r});refresh();toast("All data deleted")}};
 let settings=JSON.parse(localStorage.getItem("settings")||"{}");$("ownerName").value=settings.name||"";$("ownerNotes").value=settings.notes||"";$("saveSettings").onclick=()=>{localStorage.setItem("settings",JSON.stringify({name:$("ownerName").value,notes:$("ownerNotes").value}));toast("Settings saved")};
-if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+if("serviceWorker"in navigator){
+  navigator.serviceWorker.register("sw.js",{updateViaCache:"none"})
+    .then(reg=>{
+      // Check for a newer worker when the app is opened online.
+      if(navigator.onLine) reg.update().catch(()=>{});
+    })
+    .catch(()=>{});
+}
 refresh();
