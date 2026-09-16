@@ -532,7 +532,7 @@ tbody tr:hover{background:var(--input-bg)}
 </style>
 
 <style id="v71-no-headline">
-/* V75: no visible app headline; retain the compact version mark. */
+/* No main headline. Keep normal page scrolling everywhere except New Flight. */
 .app-header h1,
 .app-header .app-title,
 .app-header .brand-title,
@@ -541,25 +541,13 @@ header h1,
 header .app-title,
 header .brand-title,
 header .header-title {
-  display: none !important;
-}
-/* V75: prevent the small outer-page scroll caused by header/viewport rounding. */
-html, body {
-  overflow: hidden !important;
-  height: 100% !important;
-  overscroll-behavior: none !important;
-}
-body {
-  min-height: 100dvh !important;
-}
-#app, .app, .shell, .page, .app-shell {
-  max-height: 100dvh !important;
+  display:none !important;
 }
 </style>
 
 
 <style id="v73-tabs">
-/* V75: thinner, separated bottom navigation buttons. */
+/* V76: thinner, separated bottom navigation buttons. */
 .bottom-tabs,
 .bottom-nav,
 .tab-bar,
@@ -587,7 +575,7 @@ nav.bottom-nav > * {
 
 
 <style id="v74-bottom-tabs">
-/* V75: compact, separated bottom tabs */
+/* V76: compact, separated bottom tabs */
 .v16-bottom-nav {
   gap: 8px !important;
   padding: 6px 10px !important;
@@ -606,7 +594,7 @@ nav.bottom-nav > * {
 
 
 <style id="v75-bottom-tabs">
-/* V75: each bottom tab is an independent floating liquid-glass button. */
+/* V76: each bottom tab is an independent floating liquid-glass button. */
 .v16-bottom-nav {
   display: flex !important;
   align-items: center !important;
@@ -668,9 +656,55 @@ nav.bottom-nav > * {
 }
 </style>
 
+
+<style id="v76-scroll-and-tabs">
+/* V76: only the New Flight entry screen is locked to the viewport.
+   Flight list, Settings and library pages retain normal scrolling. */
+html, body {
+  overflow-x: hidden !important;
+  height: auto !important;
+}
+body {
+  min-height: 100dvh !important;
+}
+body.v76-entry-page {
+  overflow: hidden !important;
+  height: 100dvh !important;
+}
+body.v76-entry-page main {
+  overflow: hidden !important;
+}
+
+/* Keep the already-requested floating liquid-glass tabs. */
+.v16-bottom-nav {
+  gap: 10px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.v16-bottom-nav .tab {
+  height: 38px !important;
+  min-height: 38px !important;
+  border-radius: 19px !important;
+  border: 1px solid rgba(255,255,255,.70) !important;
+  background: rgba(255,255,255,.66) !important;
+  box-shadow: 0 8px 22px rgba(30,41,59,.12),
+              0 2px 7px rgba(30,41,59,.06),
+              inset 0 1px 0 rgba(255,255,255,.78) !important;
+  backdrop-filter: saturate(180%) blur(20px) !important;
+  -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
+}
+.v16-bottom-nav .nav-icon {
+  display: none !important;
+}
+</style>
+
 </head>
 
-<body><div id="v36VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V75</div>
+<body><div id="v36VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V76</div>
 <header class="v16-header">
   
 </header>
@@ -907,7 +941,7 @@ nav.bottom-nav > * {
 </section>
 
 <section class="card">
-  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V75 • local/offline-first test build</div>
+  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V76 • local/offline-first test build</div>
   <div class="notice" style="margin-bottom:12px">Choose what is automatically selected when you start a new flight. You can still change any selection for an individual flight.</div>
   <div class="default-checks">
     <label><input id="defaultIFR" type="checkbox"> IFR</label>
@@ -3638,7 +3672,7 @@ setTimeout(updateTotalsPeriodV23,300);
   // Initial state: PF unless this is an explicitly loaded PM flight.
   sync(pm.checked ? 'pm' : 'pf');
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V75 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V76 • local/offline-first test build');
   document.title='EASA Flight Logbook V36';
 })();
 </script>
@@ -3976,8 +4010,8 @@ setTimeout(()=>{
     };
   }
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V75 • local/offline-first test build');
-  document.title='EASA Flight Logbook V75';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V76 • local/offline-first test build');
+  document.title='EASA Flight Logbook V76';
 })();
 </script>
 
@@ -4030,7 +4064,7 @@ setTimeout(()=>{
   };
 
   document.title='EASA Flight Logbook V44';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V75 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V76 • local/offline-first test build');
 })();
 </script>
 
@@ -4096,8 +4130,8 @@ setTimeout(()=>{
     if(changed && typeof window.saveData==='function')window.saveData();
   }
 
-  document.title='EASA Flight Logbook V75';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V75 • local/offline-first test build');
+  document.title='EASA Flight Logbook V76';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V76 • local/offline-first test build');
 })();
 </script>
 
@@ -4242,7 +4276,7 @@ setTimeout(()=>{
 
 
 <script>
-/* ================= V75: PICUS signature workflow + flight list order + version ================= */
+/* ================= V76: PICUS signature workflow + flight list order + version ================= */
 (function(){
   const el=id=>document.getElementById(id);
   const isPicus=()=>!!el("picusLog")?.checked;
@@ -4388,17 +4422,17 @@ setTimeout(()=>{
     </tr>`).join("")}</tbody></table></div>`;
   };
 
-  // Ensure the final visible build/version text is V75.
+  // Ensure the final visible build/version text is V76.
   document.querySelectorAll('.sub').forEach(e=>{
-    e.textContent='V75 • local/offline-first test build';
+    e.textContent='V76 • local/offline-first test build';
   });
-  document.title='EASA Flight Logbook V75';
+  document.title='EASA Flight Logbook V76';
 })();
 </script>
 
 
 <script>
-/* ================= V75: validation + cleaner PICUS signing + auto-pick ================= */
+/* ================= V76: validation + cleaner PICUS signing + auto-pick ================= */
 (function(){
   const $=id=>document.getElementById(id);
 
@@ -4542,14 +4576,14 @@ setTimeout(()=>{
   }
 
   // Keep the visible build marker current.
-  document.querySelectorAll(".sub").forEach(e=>e.textContent="V75 • local/offline-first test build");
-  document.title="EASA Flight Logbook V75";
+  document.querySelectorAll(".sub").forEach(e=>e.textContent="V76 • local/offline-first test build");
+  document.title="EASA Flight Logbook V76";
 })();
 </script>
 
 
 <script>
-/* ================= V75: Pilotlog CSV import ================= */
+/* ================= V76: Pilotlog CSV import ================= */
 (function(){
   const $=id=>document.getElementById(id);
   let importRowsV68=[];
@@ -4838,8 +4872,8 @@ setTimeout(()=>{
   });
 
   // Final visible build marker.
-  document.querySelectorAll(".sub").forEach(e=>e.textContent="V75 • local/offline-first test build");
-  document.title="EASA Flight Logbook V75";
+  document.querySelectorAll(".sub").forEach(e=>e.textContent="V76 • local/offline-first test build");
+  document.title="EASA Flight Logbook V76";
 })();
 </script>
 
@@ -4850,6 +4884,28 @@ setTimeout(()=>{
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('./sw.js', {scope:'./'})
       .catch(function(err){ console.warn('Service worker registration failed:', err); });
+  });
+})();
+</script>
+
+
+<script id="v76-entry-scroll">
+(function(){
+  function v76SetEntryScroll(id){
+    document.body.classList.toggle('v76-entry-page', id === 'flightsPage');
+  }
+  var originalShowTab = window.showTab;
+  if (typeof originalShowTab === 'function' && !window.__v76ShowTabWrapped) {
+    window.showTab = function(id, btn){
+      var result = originalShowTab.apply(this, arguments);
+      v76SetEntryScroll(id);
+      return result;
+    };
+    window.__v76ShowTabWrapped = true;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var active = document.querySelector('.app-page.active');
+    v76SetEntryScroll(active ? active.id : 'flightsPage');
   });
 })();
 </script>
