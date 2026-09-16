@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#080F27">
+<meta name="theme-color" content="#EEF1F7">
 <title>EASA Flight Logbook V63</title>
 <style>
 /* ==================================================================
@@ -13,48 +13,54 @@
    Structure/IDs/classes preserved for JS compatibility — visuals only.
    ================================================================== */
 :root{
-  --bg:#080F27;
-  --card:#101D40;
-  --card-border:rgba(255,255,255,.07);
-  --ink:#F3F5FC;
-  --muted:#8892B3;
-  --muted-2:#586089;
-  --line:rgba(255,255,255,.09);
-  --accent:#3D6FF5;
-  --accent-dark:#2851C7;
-  --accent-soft:rgba(61,111,245,.16);
-  --accent2:#F5C94D;
-  --accent2-dark:#E0B22E;
-  --accent2-ink:#181205;
-  --danger:#FF6B6B;
-  --danger-soft:rgba(255,107,107,.14);
-  --ok:#4ADE80;
-  --ok-soft:rgba(74,222,128,.14);
-  --input-bg:#0B1631;
-  --input-border:rgba(255,255,255,.10);
-  --chip-bg:#182548;
-  --shadow-card:0 1px 2px rgba(0,0,0,.30),0 10px 30px rgba(0,0,0,.35);
-  --shadow-pop:0 20px 50px rgba(0,0,0,.55);
-  --radius-lg:18px;
-  --radius-md:12px;
-  --radius-sm:10px;
+  --bg:#EEF1F7;
+  --card:rgba(255,255,255,.82);
+  --card-solid:#FFFFFF;
+  --card-border:rgba(60,60,67,.09);
+  --glass-highlight:rgba(255,255,255,.7);
+  --ink:#1C1C1E;
+  --muted:#6E6E76;
+  --muted-2:#AEAEB4;
+  --line:rgba(60,60,67,.12);
+  --accent:#0A84FF;
+  --accent-dark:#0064D6;
+  --accent-soft:rgba(10,132,255,.13);
+  --accent2:#0A84FF;
+  --accent2-dark:#0064D6;
+  --accent2-ink:#FFFFFF;
+  --danger:#FF3B30;
+  --danger-soft:rgba(255,59,48,.12);
+  --ok:#30B368;
+  --ok-soft:rgba(48,179,104,.13);
+  --input-bg:#F2F3F7;
+  --input-border:rgba(60,60,67,.13);
+  --chip-bg:#EEF0F4;
+  --shadow-card:0 1px 1px rgba(30,41,59,.03),0 10px 26px rgba(30,41,59,.07);
+  --shadow-pop:0 24px 60px rgba(30,41,59,.22);
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:12px;
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;background:var(--bg)}
-body{margin:0;font-family:var(--font);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;padding-bottom:calc(70px + env(safe-area-inset-bottom))}
+body{margin:0;font-family:var(--font);background:
+    radial-gradient(1100px 620px at 18% -8%,rgba(10,132,255,.10),rgba(10,132,255,0) 60%),
+    radial-gradient(900px 560px at 100% 0%,rgba(120,120,255,.07),rgba(120,120,255,0) 55%),
+    var(--bg);
+  background-attachment:fixed;color:var(--ink);-webkit-font-smoothing:antialiased;padding-bottom:calc(92px + env(safe-area-inset-bottom))}
 h1,h2,h3{margin:0}
 button{font-family:inherit}
-::selection{background:rgba(10,124,255,.22)}
+::selection{background:rgba(10,132,255,.22)}
 
 /* ---------------- Header ---------------- */
-.v16-header{position:sticky;top:0;z-index:20;padding:calc(6px + env(safe-area-inset-top)) 16px 7px;display:flex;flex-direction:column;justify-content:center;gap:0px;background:rgba(8,15,39,.82);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--card-border)}
+.v16-header{position:sticky;top:0;z-index:20;padding:calc(6px + env(safe-area-inset-top)) 16px 7px;display:flex;flex-direction:column;justify-content:center;gap:0px;background:rgba(255,255,255,.68);backdrop-filter:saturate(190%) blur(22px);-webkit-backdrop-filter:saturate(190%) blur(22px);border-bottom:1px solid var(--card-border);box-shadow:0 1px 0 rgba(255,255,255,.6) inset}
 .v16-header h1{font-size:19px;line-height:1.15;font-weight:750;letter-spacing:-.3px;color:var(--ink)}
 .v16-header .sub{font-size:11.5px;font-weight:650;color:var(--muted);letter-spacing:.01em}
 
 /* ---------------- Layout ---------------- */
 main{max-width:760px;margin:8px auto;padding:0 12px 10px}
-.card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:11px;margin-bottom:10px;box-shadow:var(--shadow-card)}
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:11px;margin-bottom:10px;box-shadow:var(--shadow-card);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px)}
 #flightsPage>.card:first-child{padding:14px}
 .app-page{display:none}
 .app-page.active{display:block;animation:fadeIn .18s ease}
@@ -68,13 +74,13 @@ main{max-width:760px;margin:8px auto;padding:0 12px 10px}
 /* ---------------- Entry-type segmented control ---------------- */
 .entry-switch{display:flex;gap:3px;background:var(--input-bg);padding:3px;border-radius:11px;margin-bottom:8px;border:1px solid var(--input-border)}
 .entry-switch button{flex:1;border:0;background:transparent;color:var(--muted);font-weight:650;font-size:13.5px;padding:6px 10px;border-radius:8px;transition:background .15s,color .15s,box-shadow .15s}
-.entry-switch button.active{background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(61,111,245,.35)}
+.entry-switch button.active{background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(10,132,255,.35)}
 
 /* ---------------- Generic form grid / fields ---------------- */
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .field{min-width:0}
 .field label{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:6px;letter-spacing:.01em;text-transform:uppercase}
-.field-icon{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;flex:0 0 15px;color:#7C89B0}
+.field-icon{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;flex:0 0 15px;color:#8B8D98}
 .field-icon svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
 input,select,textarea{
@@ -84,13 +90,13 @@ input,select,textarea{
   -webkit-appearance:none;appearance:none;
 }
 select{
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5.5 8l4.5 4.5L14.5 8' fill='none' stroke='%237C89B0' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5.5 8l4.5 4.5L14.5 8' fill='none' stroke='%236E6E76' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
   background-repeat:no-repeat;background-position:right 10px center;background-size:14px;padding-right:30px;
 }
 textarea{min-height:36px;height:36px;resize:vertical;line-height:1.3;font-size:14px}
 input::placeholder,textarea::placeholder{color:var(--muted-2)}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3.5px rgba(61,111,245,.22);background:var(--input-bg)}
-input[type=date],input[type=time]{color-scheme:dark}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3.5px rgba(10,132,255,.18);background:#fff}
+input[type=date],input[type=time]{color-scheme:light}
 input[type=number]{text-align:center}
 input[type=checkbox]{width:17px;height:17px;min-height:0;accent-color:var(--accent)}
 input:disabled{opacity:.45;cursor:not-allowed;background:var(--input-bg)}
@@ -98,10 +104,10 @@ input:disabled{opacity:.45;cursor:not-allowed;background:var(--input-bg)}
 /* ---------------- Buttons ---------------- */
 button{border:0;border-radius:var(--radius-sm);padding:10px 16px;font-weight:650;font-size:14px;cursor:pointer;transition:filter .12s,transform .05s,background .12s}
 button:active{transform:scale(.97)}
-.primary{background:var(--accent2);color:var(--accent2-ink);box-shadow:0 4px 14px rgba(245,201,77,.22)}
+.primary{background:var(--accent2);color:var(--accent2-ink);box-shadow:0 4px 14px rgba(10,132,255,.28)}
 .primary:active{background:var(--accent2-dark)}
 .secondary{background:var(--chip-bg);color:var(--ink)}
-.secondary:active{background:#202c58}
+.secondary:active{background:#DEE1E8}
 .danger{background:var(--danger-soft);color:var(--danger)}
 .danger:active{filter:brightness(.96)}
 .small{padding:7px 12px;font-size:12.5px;border-radius:8px}
@@ -117,7 +123,7 @@ button:active{transform:scale(.97)}
 .micro-info{margin-top:6px;font-size:11px;font-weight:650;color:var(--accent-dark);background:var(--accent-soft);display:inline-block;padding:3px 8px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 
 .airport-wrap{position:relative}
-.suggestions{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;background:var(--card);border:1px solid var(--card-border);border-radius:12px;box-shadow:var(--shadow-pop);max-height:230px;overflow:auto;padding:5px}
+.suggestions{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border:1px solid var(--card-border);border-radius:14px;box-shadow:var(--shadow-pop);max-height:230px;overflow:auto;padding:5px}
 .suggestions:empty{display:none;padding:0;border:0;box-shadow:none}
 .suggestions div{padding:9px 10px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--ink)}
 .suggestions div:hover{background:var(--accent-soft)}
@@ -134,7 +140,7 @@ button:active{transform:scale(.97)}
 }
 .v17-role-grid label span{pointer-events:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 4px}
 .v17-role-grid input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;width:100%;height:100%}
-.v17-role-grid label:has(input:checked){background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 3px 8px rgba(61,111,245,.35)}
+.v17-role-grid label:has(input:checked){background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 3px 8px rgba(10,132,255,.35)}
 .v17-role-grid label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
 
 /* ---------------- Flight times allocation (collapsible) ---------------- */
@@ -215,27 +221,27 @@ tbody tr:hover{background:var(--input-bg)}
 .badge{display:inline-block;padding:3px 7px;border-radius:6px;background:var(--chip-bg);font-size:10px;font-weight:750}
 
 /* ---------------- Modals ---------------- */
-.modal-overlay{position:fixed;inset:0;background:rgba(2,5,16,.62);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
-.modal-card{background:var(--card);border:1px solid var(--card-border);border-radius:20px;padding:20px;max-width:720px;width:100%;max-height:90vh;overflow:auto;box-shadow:var(--shadow-pop)}
+.modal-overlay{position:fixed;inset:0;background:rgba(28,28,34,.42);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.modal-card{background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);border:1px solid var(--card-border);border-radius:22px;padding:20px;max-width:720px;width:100%;max-height:90vh;overflow:auto;box-shadow:var(--shadow-pop)}
 .signature-card{max-width:760px}
 .signature-canvas-wrap{width:100%;height:280px;background:#fff;border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;touch-action:none}
 .signature-canvas-wrap canvas{display:block;width:100%;height:100%;background:#fff;touch-action:none;cursor:crosshair}
 @media(max-width:600px){.modal-card.signature-card{max-width:none;padding:14px}.signature-canvas-wrap{height:260px}}
 .signature-status{font-size:12px;color:var(--muted)}
 
-/* ---------------- Bottom navigation ---------------- */
-.v16-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:2000;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:5px 4px calc(5px + env(safe-area-inset-bottom));background:rgba(8,15,39,.88);border-top:1px solid var(--card-border);box-shadow:0 -6px 22px rgba(0,0,0,.25);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px)}
-.v16-bottom-nav .tab{padding:5px 2px 4px;border-radius:11px;background:transparent;color:#98999E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;font-weight:650;min-width:0}
+/* ---------------- Bottom navigation (floating glass pill) ---------------- */
+.v16-bottom-nav{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2000;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;width:min(320px,calc(100% - 32px));padding:7px 6px;background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.55);border-radius:28px;box-shadow:0 14px 34px rgba(30,41,59,.16),0 3px 10px rgba(30,41,59,.08),inset 0 1px 0 rgba(255,255,255,.65);backdrop-filter:saturate(190%) blur(26px);-webkit-backdrop-filter:saturate(190%) blur(26px)}
+.v16-bottom-nav .tab{padding:5px 2px 4px;border-radius:18px;background:transparent;color:#8E8E93;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;font-weight:650;min-width:0;transition:color .15s}
 .v16-bottom-nav .tab span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .v16-bottom-nav .tab.active{color:var(--accent)}
 .v16-bottom-nav .nav-icon{color:inherit;display:flex;align-items:center;justify-content:center;height:23px}
-.v16-bottom-nav .nav-icon svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.v16-bottom-nav .tab.active .nav-icon svg{fill:rgba(61,111,245,.16)}
+.v16-bottom-nav .nav-icon svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.v16-bottom-nav .tab.active .nav-icon svg{fill:rgba(10,132,255,.14)}
 
-.v16-more-menu{position:fixed;right:10px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:2100;display:none;min-width:215px;background:var(--card);border:1px solid var(--card-border);border-radius:16px;box-shadow:var(--shadow-pop);padding:6px}
+.v16-more-menu{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom));z-index:2100;display:none;min-width:220px;background:rgba(255,255,255,.88);backdrop-filter:saturate(190%) blur(24px);-webkit-backdrop-filter:saturate(190%) blur(24px);border:1px solid rgba(255,255,255,.55);border-radius:20px;box-shadow:0 14px 34px rgba(30,41,59,.18),inset 0 1px 0 rgba(255,255,255,.65);padding:6px}
 .v16-more-menu.open{display:block;animation:popIn .14s ease}
-@keyframes popIn{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
-.v16-more-menu .more-item{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;background:var(--card);color:var(--ink);font-size:14px;font-weight:600;text-align:left;border-radius:10px}
+@keyframes popIn{from{opacity:0;transform:translate(-50%,6px) scale(.98)}to{opacity:1;transform:translate(-50%,0)}}
+.v16-more-menu .more-item{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;background:transparent;color:var(--ink);font-size:14px;font-weight:600;text-align:left;border-radius:12px}
 .v16-more-menu .more-item:active{background:var(--input-bg)}
 .v16-more-menu .more-item .field-icon{width:18px;height:18px;flex:0 0 18px;color:var(--muted)}
 .v16-more-menu .more-item .field-icon svg{width:18px;height:18px}
@@ -263,9 +269,6 @@ tbody tr:hover{background:var(--input-bg)}
   .v17-landing{gap:7px}
   .v17-landing input[type=number]{width:40px}
   .time-grid-v15 input{font-size:11.5px}
-}
-@media(min-width:701px){
-  .v16-bottom-nav{max-width:760px;left:50%;right:auto;transform:translateX(-50%);width:min(760px,100%);border-radius:18px 18px 0 0}
 }
 
 /* ==================================================================
@@ -510,14 +513,16 @@ tbody tr:hover{background:var(--input-bg)}
 .custom-period-v23{display:flex;align-items:center;gap:6px}
 .custom-period-v23 input{height:34px;border-radius:9px;padding:0 8px;min-width:125px}
 .totals-summary-v23{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
-.total-chip-v23{padding:6px 9px;border-radius:8px;border:1px solid rgba(148,163,184,.25);font-size:11px;line-height:1.15}
-.total-chip-v23 b{display:block;font-size:13px}
+.total-chip-v23{padding:6px 9px;border-radius:8px;border:1px solid var(--card-border);background:var(--chip-bg);color:var(--muted);font-size:11px;line-height:1.15}
+.total-chip-v23 b{display:block;font-size:13px;color:var(--ink)}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style id="v34BackupCSS">
-.v34-backup-card{margin-top:12px}.v34-drive-status{font-size:13px;font-weight:700;margin:6px 0 10px}
-.v34-drive-actions{display:flex;gap:8px;flex-wrap:wrap}.v34-drive-actions button{min-height:36px}
-.v34-backup-meta{font-size:11px;opacity:.72;margin-top:8px}
+.v34-backup-card{margin-top:12px}.v34-drive-status{font-size:13px;font-weight:700;margin:6px 0 10px;color:var(--ink)}
+.v34-drive-actions{display:flex;gap:8px;flex-wrap:wrap}
+.v34-drive-actions button{min-height:36px;background:var(--chip-bg);color:var(--ink);border-radius:var(--radius-sm);padding:9px 14px;font-size:13px;font-weight:650}
+.v34-drive-actions button:active{background:#DEE1E8}
+.v34-backup-meta{font-size:11px;opacity:.72;margin-top:8px;color:var(--muted)}
 </style>
 </head>
 
@@ -526,13 +531,13 @@ tbody tr:hover{background:var(--input-bg)}
   <h1>EASA Flight Logbook</h1>
 </header>
 <nav class="v16-bottom-nav" aria-label="Logbook sections">
-  <button id="newFlightTab" class="tab active" onclick="showTab('flightsPage',this)"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h6.5l-2 7h2.2l4.1-7h5.7c1.1 0 2.5-.9 2.5-1.9s-1.4-1.6-2.5-1.6h-5.7l-4.1-7H7.5l2 7H3z"/></svg></span><span>New Flight</span></button>
+  <button id="newFlightTab" class="tab active" onclick="showTab('flightsPage',this)"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></span><span>New Flight</span></button>
   <button id="flightListTab" class="tab" onclick="showTab('flightListPage',this)"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span><span>Flights</span></button>
-  <button id="aircraftTab" class="tab" onclick="showTab('aircraftPage',this)"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h6.5l-2 7h2.2l4.1-7h5.7c1.1 0 2.5-.9 2.5-1.9s-1.4-1.6-2.5-1.6h-5.7l-4.1-7H7.5l2 7H3z"/></svg></span><span>Aircraft</span></button>
-  <button id="crewTab" class="tab" onclick="showTab('crewPage',this)"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M2.7 20c.7-3.6 2.9-5.4 6.3-5.4s5.6 1.8 6.3 5.4"/><circle cx="17.5" cy="8.5" r="2.4"/><path d="M15.5 14.6c2.6.2 4 1.8 4.6 4.6"/></svg></span><span>Crew</span></button>
-  <button id="moreTab" class="tab" onclick="toggleMoreMenu(event)"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span><span>More</span></button>
+  <button id="moreTab" class="tab" onclick="toggleMoreMenu(event)"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true" style="fill:currentColor;stroke:none"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg></span><span>More</span></button>
 </nav>
 <div id="moreMenu" class="v16-more-menu" aria-hidden="true">
+  <button id="aircraftTab" class="more-item" onclick="showTab('aircraftPage',this);closeMoreMenu()"><span class="field-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-1 .1-1.3.5l-.4.5c-.4.5-.2 1.2.4 1.4L9 11l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.5 1 .7 1.4.4l.5-.4c.4-.3.6-.8.5-1.3Z"/></svg></span> <span>Aircraft</span></button>
+  <button id="crewTab" class="more-item" onclick="showTab('crewPage',this);closeMoreMenu()"><span class="field-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M2.7 20c.7-3.6 2.9-5.4 6.3-5.4s5.6 1.8 6.3 5.4"/><circle cx="17.5" cy="8.5" r="2.4"/><path d="M15.5 14.6c2.6.2 4 1.8 4.6 4.6"/></svg></span> <span>Crew</span></button>
   <button class="more-item" onclick="showTab('simPage',this);closeMoreMenu()"><span class="field-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span> <span>Simulators</span></button>
   <button class="more-item" onclick="showTab('airportsPage',this);closeMoreMenu()"><span class="field-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.6"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></span> <span>Airports</span></button>
   <button id="settingsTab" class="more-item" onclick="showTab('settingsPage',this);closeMoreMenu()"><span class="field-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a7.6 7.6 0 000-3l1.9-1.5-2-3.4-2.3.6a7.6 7.6 0 00-2.6-1.5L14 2h-4l-.4 2.7a7.6 7.6 0 00-2.6 1.5l-2.3-.6-2 3.4L4.6 10.5a7.6 7.6 0 000 3L2.7 15l2 3.4 2.3-.6c.75.66 1.63 1.17 2.6 1.5L10 22h4l.4-2.7a7.6 7.6 0 002.6-1.5l2.3.6 2-3.4z"/></svg></span> <span>Settings &amp; Signature</span></button>
@@ -2207,7 +2212,7 @@ function syncPrintReminderToggle(){
   if(btn) {
     btn.setAttribute("aria-pressed",enabled?"true":"false");
     btn.style.borderColor=enabled?"var(--accent)":"var(--input-border)";
-    btn.style.background=enabled?"rgba(61,111,245,.12)":"var(--chip-bg)";
+    btn.style.background=enabled?"rgba(10,132,255,.12)":"var(--chip-bg)";
   }
   if(icon){
     icon.textContent=enabled?"✓":"";
@@ -2922,9 +2927,9 @@ document.addEventListener('click',e=>{const m=document.getElementById('moreMenu'
 const v16BaseShowTab=window.showTab;
 window.showTab=function(id,btn){
   v16BaseShowTab(id,btn);
-  const moreIds=['simPage','airportsPage','settingsPage'];
+  const moreIds=['simPage','airportsPage','settingsPage','aircraftPage','crewPage'];
   document.querySelectorAll('.v16-bottom-nav .tab').forEach(x=>x.classList.remove('active'));
-  const target=moreIds.includes(id)?document.getElementById('moreTab'):(id==='flightListPage'?document.getElementById('flightListTab'):id==='aircraftPage'?document.getElementById('aircraftTab'):id==='crewPage'?document.getElementById('crewTab'):document.getElementById('newFlightTab'));
+  const target=moreIds.includes(id)?document.getElementById('moreTab'):(id==='flightListPage'?document.getElementById('flightListTab'):document.getElementById('newFlightTab'));
   if(target)target.classList.add('active');
   closeMoreMenu();
 };

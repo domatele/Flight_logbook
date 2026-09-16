@@ -178,3 +178,83 @@ pages), row cell counts are consistent across every row (22, down from
 totals carry forward correctly across pages (checked: 1:00 + 1:30 + 1:10
 FSTD minutes across three pages sums to the 3:40 shown in the
 accumulated total).
+
+## Round 6: Visual redesign — light "liquid glass" theme
+
+Purely a visual pass: no HTML structure, layout, spacing, element sizes,
+or JS/business logic were touched, and the printed/PDF logbook page
+(`@media print`) was intentionally left exactly as it was — this only
+restyles the on-screen app.
+
+- Replaced the dark navy theme with a light, Apple-style theme: soft
+  light-gray/blue-tinted background, translucent frosted-glass surfaces
+  (`backdrop-filter: blur + saturate`) on the header, bottom nav, "More"
+  menu, dropdown suggestion lists, and modals, and near-white glass
+  cards for content sections.
+- Switched the single accent colour to Apple system blue (`#0A84FF`)
+  everywhere — segmented control, role chips (PIC/SIC/DUAL/etc.),
+  toggles, focus rings, active tab — and moved the "primary" action
+  buttons (Add flight, Save, etc.) from the old gold/amber fill to the
+  same blue, matching a native iOS look.
+- Softer, shallower shadows; slightly larger corner radii on cards,
+  inputs and buttons for a more "continuous curve" Apple feel.
+- Updated `<meta name="theme-color">` and `manifest.json`'s
+  `background_color`/`theme_color` to match the new light palette (the
+  browser/PWA chrome tint).
+- Styled the three unclassed Google Drive backup buttons (Connect /
+  Backup now / Restore backup), which had no button styling at all
+  before and were rendering as bare native browser buttons.
+
+### Known issues found during this pass (not fixed — flagged for a decision)
+
+1. **PWA wiring is disconnected.** `index.html` never links
+   `manifest.json`, never sets an `apple-touch-icon`, and never
+   registers `sw.js`. "Add to Home Screen" won't use the custom icon,
+   and the offline caching implied by the Settings-page copy
+   ("remains available offline") isn't actually active.
+2. `sw.js`'s cache list (`app.js`, `style.css`) is stale — it still
+   reflects the old multi-file build, not the current single
+   `index.html`.
+3. `style.css` and `app.js` are unused leftovers from an earlier
+   prototype (different element IDs entirely) — dead weight in the zip.
+4. The "Flights/page" dropdown on the Flights tab has a duplicate
+   `24` option.
+5. Nine different places in the code set `document.title`/`.sub` text
+   to old version strings (V32, V36, V44, V66…) that overwrite each
+   other; it happens to resolve to the correct "V67" today only because
+   of script order, plus two static leftovers (`v36VersionBadge` corner
+   badge and a Settings-page note) still hard-code "V66".
+6. `selectCrewProfile()` is dead code — it targets a `picProfile`
+   element that no longer exists anywhere in the HTML (superseded by
+   the `crewSearch` autocomplete).
+7. The "Captain signature" modal (PICUS flights) tries to show the
+   selected captain's name via a `picusCaptainDisplay` element, but
+   that element was dropped from the modal's markup at some point, so
+   the name never actually displays there before signing.
+
+## Round 7: floating glass tab bar, 3-tab nav, icon refresh
+
+- Cut the bottom navigation down to 3 tabs — **New Flight**, **Flights**,
+  **More** — and moved Aircraft and Crew into the More menu alongside
+  Simulators, Airports, and Settings & Signature (now 5 items there).
+  `aircraftTab`/`crewTab` are the same IDs, just re-homed as more-menu
+  rows instead of dedicated bottom tabs; the active-tab logic
+  (`window.showTab` override) was updated so the Aircraft/Crew pages
+  now correctly light up the More tab, the same way Simulators/
+  Airports/Settings already did.
+- Restyled the nav itself as a compact floating glass pill — detached
+  from the screen edge with margin on all sides, fully rounded corners,
+  stronger blur/saturation, and a soft outer shadow — instead of the
+  old full-width bar docked flush to the bottom. The "More" popup menu
+  now opens centered above that pill instead of pinned to the screen's
+  right edge, to stay visually anchored to it.
+- New icons: **New Flight** now uses a paper-airplane/send glyph
+  instead of reusing the same aircraft-silhouette icon as the Aircraft
+  page; **Aircraft** (now in the More menu) got its own distinct plane
+  icon so the two no longer look identical; **More** now renders as
+  three solid dots instead of three faint outlined rings (the old
+  icon's stroke-only style left them looking like hollow circles).
+  Crew/Simulators/Airports/Settings icons were left as-is. Happy to do
+  a pass on the rest of the field icons throughout the forms too, if
+  wanted — this round focused on navigation only, since that's what
+  was raised.
