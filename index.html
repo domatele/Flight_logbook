@@ -521,8 +521,7 @@ tbody tr:hover{background:var(--input-bg)}
 </style>
 </head>
 
-<body><div id="v36VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V47</div>
-<header class="v16-header">
+<body><header class="v16-header">
   <h1>EASA Flight Logbook</h1>
 </header>
 <nav class="v16-bottom-nav" aria-label="Logbook sections">
@@ -758,7 +757,7 @@ tbody tr:hover{background:var(--input-bg)}
 </section>
 
 <section class="card">
-  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V64 • local/offline-first test build</div>
+  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V65 • local/offline-first test build</div>
   <div class="notice" style="margin-bottom:12px">Choose what is automatically selected when you start a new flight. You can still change any selection for an individual flight.</div>
   <div class="default-checks">
     <label><input id="defaultIFR" type="checkbox"> IFR</label>
@@ -3463,7 +3462,7 @@ setTimeout(updateTotalsPeriodV23,300);
   // Initial state: PF unless this is an explicitly loaded PM flight.
   sync(pm.checked ? 'pm' : 'pf');
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V64 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V65 • local/offline-first test build');
   document.title='EASA Flight Logbook V36';
 })();
 </script>
@@ -3801,8 +3800,8 @@ setTimeout(()=>{
     };
   }
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V64 • local/offline-first test build');
-  document.title='EASA Flight Logbook V63';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V65 • local/offline-first test build');
+  document.title='EASA Flight Logbook V65';
 })();
 </script>
 
@@ -3855,7 +3854,7 @@ setTimeout(()=>{
   };
 
   document.title='EASA Flight Logbook V44';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V64 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V65 • local/offline-first test build');
 })();
 </script>
 
@@ -3921,9 +3920,149 @@ setTimeout(()=>{
     if(changed && typeof window.saveData==='function')window.saveData();
   }
 
-  document.title='EASA Flight Logbook V63';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V64 • local/offline-first test build');
+  document.title='EASA Flight Logbook V65';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V65 • local/offline-first test build');
 })();
 </script>
+
+<script>
+/* ================= V65: flight function exclusivity + PICUS signature fix ================= */
+(function(){
+  const ids = ["picLog","sicLog","dualLog","instructorLog","picusLog"];
+
+  function el(id){ return document.getElementById(id); }
+  function checked(id){ return !!el(id)?.checked; }
+  function set(id,v){ if(el(id)) el(id).checked=!!v; }
+
+  // Function-time rule:
+  // PIC, SIC, DUAL and Instructor are mutually exclusive.
+  // PICUS is an exception only because it automatically includes PIC.
+  // IFR and PF/PM are independent and are deliberately not touched here.
+  function normalizeFunctions(changedId){
+    if(changedId === "picusLog" && checked("picusLog")){
+      set("picLog", true);
+      set("sicLog", false);
+      set("dualLog", false);
+      set("instructorLog", false);
+    } else if(changedId === "picLog" && checked("picLog")){
+      set("sicLog", false);
+      set("dualLog", false);
+      set("instructorLog", false);
+      // PICUS may remain selected: this is the single allowed combination.
+    } else if(changedId === "sicLog" && checked("sicLog")){
+      set("picLog", false);
+      set("dualLog", false);
+      set("instructorLog", false);
+      set("picusLog", false);
+    } else if(changedId === "dualLog" && checked("dualLog")){
+      set("picLog", false);
+      set("sicLog", false);
+      set("instructorLog", false);
+      set("picusLog", false);
+    } else if(changedId === "instructorLog" && checked("instructorLog")){
+      set("picLog", false);
+      set("sicLog", false);
+      set("dualLog", false);
+      set("picusLog", false);
+    } else if(changedId && !checked(changedId)){
+      // If PICUS is turned off, also remove its automatically paired PIC.
+      if(changedId === "picusLog") set("picLog", false);
+    }
+
+    if(checked("picusLog")) set("picLog", true);
+
+    try{ if(typeof window.v11Allocate === "function") window.v11Allocate(true); }catch(e){}
+    try{ if(typeof window.v15SyncRole === "function") window.v15SyncRole(); }catch(e){}
+    try{ if(typeof window.v11SyncRole === "function") window.v11SyncRole(); }catch(e){}
+    try{ if(typeof window.updateLandingDefaultsV8 === "function") window.updateLandingDefaultsV8(); }catch(e){}
+  }
+
+  ids.forEach(id=>{
+    el(id)?.addEventListener("change", function(){ normalizeFunctions(id); });
+  });
+
+  // Normalize any legacy/default state after the older versioned scripts have run.
+  function normalizeCurrent(){
+    if(checked("picusLog")){
+      normalizeFunctions("picusLog");
+    } else if(checked("dualLog")){
+      normalizeFunctions("dualLog");
+    } else if(checked("instructorLog")){
+      normalizeFunctions("instructorLog");
+    } else if(checked("sicLog")){
+      normalizeFunctions("sicLog");
+    } else if(checked("picLog")){
+      normalizeFunctions("picLog");
+    }
+  }
+  setTimeout(normalizeCurrent, 0);
+
+  // PICUS signature belongs to the Other Crew Member. Never require a
+  // separately selected captain just to accept the signature.
+  window.acceptPicusSignature = function(){
+    const c = el("picusCanvas");
+    if(!c){ alert("Signature field is unavailable."); return; }
+
+    const data = c.getContext("2d").getImageData(0,0,c.width,c.height).data;
+    let ink=false;
+    for(let i=3;i<data.length;i+=4){
+      if(data[i]>0){ ink=true; break; }
+    }
+    if(!ink){
+      alert("Please add the captain's signature.");
+      return;
+    }
+
+    // Store the Other Crew Member name when available, but do not block
+    // saving if the name is unavailable. Printing already uses the
+    // authoritative Other Crew Member profile.
+    let name="";
+    try{
+      name = typeof window.currentOtherCrewNameV41 === "function"
+        ? window.currentOtherCrewNameV41() : "";
+    }catch(e){}
+    picusCaptainV8 = name || "";
+    picusSignatureV8 = c.toDataURL("image/png");
+
+    el("picusModal").style.display="none";
+    const fn=picusSaveContinuation;
+    picusSaveContinuation=null;
+    if(fn) fn();
+  };
+
+  // Make the landing Override checkbox visibly checked on browsers where the
+  // native dark checkbox rendering is too subtle.
+  const style=document.createElement("style");
+  style.textContent=`
+    #landingOverride{
+      -webkit-appearance:none!important;
+      appearance:none!important;
+      width:17px!important;height:17px!important;
+      min-height:17px!important;
+      border:1.5px solid var(--muted)!important;
+      border-radius:4px!important;
+      background:var(--input-bg)!important;
+      display:inline-grid!important;
+      place-content:center!important;
+      cursor:pointer!important;
+      box-sizing:border-box!important;
+    }
+    #landingOverride:checked{
+      background:var(--accent)!important;
+      border-color:var(--accent)!important;
+    }
+    #landingOverride:checked::after{
+      content:""!important;
+      width:8px!important;height:4px!important;
+      border-left:2px solid #fff!important;
+      border-bottom:2px solid #fff!important;
+      transform:rotate(-45deg) translate(1px,-1px)!important;
+      display:block!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
+</script>
+
 </body>
 </html>
