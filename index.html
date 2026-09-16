@@ -2385,14 +2385,10 @@ loadData();renderAircraftSelector();renderCrewSelectors();renderSimSelector();cl
 
 <div id="picusModal" class="modal-overlay" style="display:none">
   <div class="modal-card">
-    <div class="section-title">PICUS — Captain signature</div>
-    <p class="notice">PICUS is selected. The captain is taken automatically from the Other crew member field. Obtain the captain's signature before saving this flight.</p>
+    <div class="section-title">Captain signature</div>
+    <p class="notice">Sign here to confirm the PICUS flight. The captain is the person selected in Other Crew Member.</p>
     <div class="field">
-      <label>Captain</label>
-      <div id="picusCaptainDisplay" style="min-height:36px;padding:9px 10px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:8px;font-weight:650;color:var(--ink)">—</div>
-    </div>
-    <div class="field" style="margin-top:10px">
-      <label>Captain signature</label>
+      <label>Signature</label>
       <canvas id="picusCanvas" width="900" height="260" style="width:100%;height:200px;background:#fff;border:1px solid #cbd5e1;border-radius:10px;touch-action:none"></canvas>
     </div>
     <div class="actions" style="justify-content:space-between">
@@ -4218,6 +4214,157 @@ setTimeout(()=>{
     e.textContent='V66 • local/offline-first test build';
   });
   document.title='EASA Flight Logbook V66';
+})();
+</script>
+
+
+<script>
+/* ================= V67: validation + cleaner PICUS signing + auto-pick ================= */
+(function(){
+  const $=id=>document.getElementById(id);
+
+  // Mandatory fields for every flight.
+  window.validateRequiredFlightFieldsV67=function(){
+    const crewId=String(selectedCrewProfileId||"");
+    const aircraftId=String(selectedAircraftProfileId||"");
+    const dep=String($("dep")?.value||"").trim();
+    const arr=String($("arr")?.value||"").trim();
+    const dt=String($("depTime")?.value||"").trim();
+    const at=String($("arrTime")?.value||"").trim();
+
+    const missing=[];
+    if(!crewId || !(Array.isArray(crewLibrary)&&crewLibrary.some(c=>String(c.id)===crewId)))
+      missing.push("Other crew member");
+    if(!aircraftId || !(Array.isArray(aircraftLibrary)&&aircraftLibrary.some(a=>String(a.id)===aircraftId)))
+      missing.push("Aircraft");
+    if(!dep) missing.push("Departure aerodrome");
+    if(!arr) missing.push("Arrival aerodrome");
+    if(!dt) missing.push("Departure time");
+    if(!at) missing.push("Arrival time");
+
+    if(missing.length){
+      alert("Please complete the mandatory fields:\n\n• "+missing.join("\n• "));
+      return false;
+    }
+    return true;
+  };
+
+  // Add the same validation inside the object builder so edit/save paths
+  // cannot bypass it.
+  const oldFlightObject=window.v11FlightObject;
+  if(typeof oldFlightObject==="function"){
+    window.v11FlightObject=function(existing){
+      if(!window.validateRequiredFlightFieldsV67()) throw new Error("Mandatory flight fields are missing.");
+      return oldFlightObject(existing);
+    };
+  }
+
+  // Validate before opening the PICUS signature dialog, so an incomplete
+  // flight never opens a pointless signature window.
+  function guard(continuation){
+    if(!window.validateRequiredFlightFieldsV67()) return;
+    continuation();
+  }
+
+  const oldAdd=window.addFlight;
+  if(typeof oldAdd==="function") window.addFlight=function(){
+    guard(()=>oldAdd.apply(this,arguments));
+  };
+
+  const oldReturn=window.saveAndCreateReturn;
+  if(typeof oldReturn==="function") window.saveAndCreateReturn=function(){
+    guard(()=>oldReturn.apply(this,arguments));
+  };
+
+  const oldCreateReturn=window.createReturnLeg;
+  if(typeof oldCreateReturn==="function") window.createReturnLeg=function(){
+    guard(()=>oldCreateReturn.apply(this,arguments));
+  };
+
+  const oldThird=window.createThirdLeg;
+  if(typeof oldThird==="function") window.createThirdLeg=function(){
+    guard(()=>oldThird.apply(this,arguments));
+  };
+
+  const oldEdit=window.saveEditedFlight;
+  if(typeof oldEdit==="function") window.saveEditedFlight=function(){
+    guard(()=>oldEdit.apply(this,arguments));
+  };
+
+  // PICUS printed remarks contain only the structured PICUS marker and the
+  // captain's signature. Never print the captain's name in Remarks.
+  if(typeof window.printRemarksV12==="function"){
+    window.printRemarksV12=function(f){
+      const clean=String(f?.remarks||"").split(/\r?\n/)
+        .map(x=>x.trim())
+        .filter(x=>x && !/^PICUS(?:\s*[—-].*)?$/i.test(x))
+        .join("\n").trim();
+      const base=clean?window.esc(clean).replace(/\n/g,"<br>"):"";
+      if(!f?.picusLog) return base;
+      const sig=(f.picusSignature&&String(f.picusSignature).startsWith("data:image/"))
+        ? `<img src="${f.picusSignature}" alt="Captain signature">` : "";
+      return `<div class="picus-print-remark">${base?`<div>${base}</div>`:""}<span class="picus-captain">PICUS</span>${sig}</div>`;
+    };
+  }
+
+  // Auto-select the highest-ranked matching saved entry.
+  // Enter works on laptop; blur works on mobile. Exact matches naturally win
+  // because the existing search functions rank them first.
+  function autoPickAirport(id){
+    const input=$(id);
+    if(!input) return;
+    const q=input.value.trim().toUpperCase();
+    if(!q) return;
+    const hits=typeof searchAirportsV5==="function"?searchAirportsV5(q,8):[];
+    if(hits.length){
+      const exact=hits.find(a=>String(a.icao||"").toUpperCase()===q);
+      const a=exact||hits[0];
+      if(a){
+        input.value=String(a.icao||"").toUpperCase();
+        const box=$(id+"Sug"); if(box) box.innerHTML="";
+        if(typeof calcCurrent==="function") calcCurrent();
+      }
+    }
+  }
+
+  function autoPickCrew(){
+    const input=$("crewSearch");
+    if(!input) return;
+    const q=input.value.trim().toUpperCase();
+    if(!q) return;
+    const hits=Array.isArray(crewLibrary)?crewLibrary.filter(c=>
+      String(c.name||"").toUpperCase().includes(q) ||
+      String(c.code||"").toUpperCase().includes(q)
+    ).slice(0,8):[];
+    if(hits.length){
+      const exact=hits.find(c=>
+        String(c.code||"").toUpperCase()===q ||
+        String(c.name||"").toUpperCase()===q
+      );
+      pickCrew((exact||hits[0]).id);
+    }
+  }
+
+  ["dep","arr"].forEach(id=>{
+    const input=$(id);
+    if(!input) return;
+    input.addEventListener("keydown",e=>{
+      if(e.key==="Enter"){e.preventDefault();autoPickAirport(id);}
+    });
+    input.addEventListener("blur",()=>setTimeout(()=>autoPickAirport(id),80));
+  });
+
+  const crew=$("crewSearch");
+  if(crew){
+    crew.addEventListener("keydown",e=>{
+      if(e.key==="Enter"){e.preventDefault();autoPickCrew();}
+    });
+    crew.addEventListener("blur",()=>setTimeout(autoPickCrew,80));
+  }
+
+  // Keep the visible build marker current.
+  document.querySelectorAll(".sub").forEach(e=>e.textContent="V67 • local/offline-first test build");
+  document.title="EASA Flight Logbook V67";
 })();
 </script>
 
