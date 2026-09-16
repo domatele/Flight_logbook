@@ -6,6 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#EEF1F7">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <title>EASA Flight Logbook V63</title>
 <style>
 /* ==================================================================
@@ -763,7 +766,7 @@ tbody tr:hover{background:var(--input-bg)}
 </section>
 
 <section class="card">
-  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V66 • local/offline-first test build</div>
+  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V69 • local/offline-first test build</div>
   <div class="notice" style="margin-bottom:12px">Choose what is automatically selected when you start a new flight. You can still change any selection for an individual flight.</div>
   <div class="default-checks">
     <label><input id="defaultIFR" type="checkbox"> IFR</label>
@@ -775,6 +778,36 @@ tbody tr:hover{background:var(--input-bg)}
   </div>
   <div class="notice" style="margin-top:10px">Example: if you are normally an SIC receiving line training, enable <b>IFR + SIC + DUAL</b>. When you later become PIC, change the defaults to <b>IFR + PIC</b>.</div>
 </section>
+
+<section class="card" id="dataImportCard">
+  <div class="section-title">Data import</div>
+  <div class="notice" style="margin-bottom:12px">
+    Import flight records from another logbook. Select the source first; more import formats can be added here later.
+  </div>
+  <div class="grid">
+    <div class="field">
+      <label>Import source</label>
+      <select id="dataImportSource">
+        <option value="pilotlog">Pilotlog CSV</option>
+        <option value="" disabled>Other sources — coming later</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Import method</label>
+      <select id="dataImportMode">
+        <option value="merge">Add alongside existing flights</option>
+        <option value="replace">Replace flight database entirely</option>
+      </select>
+    </div>
+  </div>
+  <input id="dataImportFile" type="file" accept=".csv,text/csv" style="display:none" onchange="handleDataImportFileV68(event)">
+  <div class="actions" style="margin-top:4px">
+    <button type="button" class="secondary" onclick="document.getElementById('dataImportFile').click()">Choose CSV file</button>
+    <button type="button" class="primary" id="dataImportRunBtn" onclick="runDataImportV68()" disabled>Import flights</button>
+  </div>
+  <div id="dataImportStatus" class="notice" style="display:none;margin-top:12px"></div>
+</section>
+
 <section class="card">
   <div class="section-title">Pilot & data</div>
   <div class="grid"><div class="field"><label>Pilot name</label><input id="settingsPilotName"></div><div class="field"><label>Address (optional)</label><input id="settingsAddress"></div></div>
@@ -3464,7 +3497,7 @@ setTimeout(updateTotalsPeriodV23,300);
   // Initial state: PF unless this is an explicitly loaded PM flight.
   sync(pm.checked ? 'pm' : 'pf');
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V66 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V69 • local/offline-first test build');
   document.title='EASA Flight Logbook V36';
 })();
 </script>
@@ -3802,7 +3835,7 @@ setTimeout(()=>{
     };
   }
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V66 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V69 • local/offline-first test build');
   document.title='EASA Flight Logbook V66';
 })();
 </script>
@@ -3856,7 +3889,7 @@ setTimeout(()=>{
   };
 
   document.title='EASA Flight Logbook V44';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V66 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V69 • local/offline-first test build');
 })();
 </script>
 
@@ -3923,7 +3956,7 @@ setTimeout(()=>{
   }
 
   document.title='EASA Flight Logbook V66';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V66 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V69 • local/offline-first test build');
 })();
 </script>
 
@@ -4216,7 +4249,7 @@ setTimeout(()=>{
 
   // Ensure the final visible build/version text is V66.
   document.querySelectorAll('.sub').forEach(e=>{
-    e.textContent='V66 • local/offline-first test build';
+    e.textContent='V69 • local/offline-first test build';
   });
   document.title='EASA Flight Logbook V66';
 })();
@@ -4370,6 +4403,302 @@ setTimeout(()=>{
   // Keep the visible build marker current.
   document.querySelectorAll(".sub").forEach(e=>e.textContent="V67 • local/offline-first test build");
   document.title="EASA Flight Logbook V67";
+})();
+</script>
+
+
+<script>
+/* ================= V68: Pilotlog CSV import ================= */
+(function(){
+  const $=id=>document.getElementById(id);
+  let importRowsV68=[];
+  let importFileNameV68="";
+
+  function cleanV68(v){
+    return String(v==null?"":v).trim();
+  }
+  function upperV68(v){
+    return cleanV68(v).toUpperCase();
+  }
+  function minutesV68(v){
+    const s=cleanV68(v);
+    if(!s) return 0;
+    const m=s.match(/^(\d+):(\d{1,2})$/);
+    if(m) return Number(m[1])*60+Number(m[2]);
+    const n=Number(s);
+    return Number.isFinite(n)?Math.round(n):0;
+  }
+  function boolV68(v){
+    const s=upperV68(v);
+    return ["1","TRUE","YES","Y","X","PF","PM"].includes(s);
+  }
+  function csvParseV68(text){
+    const rows=[];
+    let row=[], field="", quoted=false;
+    for(let i=0;i<text.length;i++){
+      const ch=text[i];
+      if(quoted){
+        if(ch==='"'){
+          if(text[i+1]==='"'){field+='"';i++;}
+          else quoted=false;
+        }else field+=ch;
+      }else{
+        if(ch==='"') quoted=true;
+        else if(ch===','){row.push(field);field="";}
+        else if(ch==='\n'){
+          row.push(field); rows.push(row); row=[]; field="";
+        }else if(ch!=='\r') field+=ch;
+      }
+    }
+    row.push(field);
+    if(row.length>1 || cleanV68(row[0])) rows.push(row);
+    if(!rows.length) return [];
+    const headers=rows[0].map(h=>cleanV68(h).replace(/^\uFEFF/,""));
+    return rows.slice(1).filter(r=>r.some(x=>cleanV68(x))).map(r=>{
+      const o={};
+      headers.forEach((h,i)=>o[h]=r[i]??"");
+      return o;
+    });
+  }
+  function selfCrewV68(name){
+    const s=upperV68(name);
+    return !s || s==="SELF" || s==="ME" || s==="MYSELF";
+  }
+  function sourceCrewV68(r){
+    for(let i=1;i<=4;i++){
+      const id=cleanV68(r["pilot"+i+"_id"]);
+      const name=cleanV68(r["pilot"+i+"_name"]);
+      if(name && !selfCrewV68(name)) return {id,name};
+    }
+    return null;
+  }
+  function sourceAircraftV68(r){
+    const reg=upperV68(r.ac_reg);
+    const model=upperV68(r.ac_model);
+    const variant=cleanV68(r.ac_variant);
+    const type=model || upperV68(r.ac_rating);
+    if(!reg || !type) return null;
+    return {reg,type};
+  }
+  function findOrCreateCrewV68(r){
+    const src=sourceCrewV68(r);
+    if(!src) return null;
+    let c=null;
+    const id=cleanV68(src.id).toUpperCase();
+    if(id) c=crewLibrary.find(x=>cleanV68(x.licence).toUpperCase()===id || cleanV68(x.sourceId).toUpperCase()===id);
+    if(!c) c=crewLibrary.find(x=>upperV68(x.name)===upperV68(src.name));
+    if(!c){
+      c={id:uid(),name:upperV68(src.name),code:id,role:"PIC",licence:"",operator:upperV68(r.operator||"")};
+      c.sourceId=id;
+      crewLibrary.push(c);
+    }
+    return c;
+  }
+  function findOrCreateAircraftV68(r){
+    const src=sourceAircraftV68(r);
+    if(!src) return null;
+    let a=aircraftLibrary.find(x=>upperV68(x.reg)===src.reg);
+    if(!a){
+      a={
+        id:uid(),
+        reg:src.reg,
+        type:src.type,
+        operation:"MP",
+        power:upperV68(r.ac_power).includes("JET")?"JET":"PISTON",
+        engine:"ME",
+        simulator:false
+      };
+      aircraftLibrary.push(a);
+    }
+    return a;
+  }
+  function roleV68(pic,sic,dual,instr,picus){
+    if(picus) return "PICUS";
+    if(pic) return "PIC";
+    if(sic) return "SIC";
+    if(dual) return "DUAL";
+    if(instr) return "Instructor";
+    return "SIC";
+  }
+  function flightKeyV68(f){
+    return [
+      upperV68(f.flightNumber||f.flightnumber||""),
+      cleanV68(f.date),upperV68(f.dep),upperV68(f.arr),
+      cleanV68(f.dt),cleanV68(f.at),upperV68(f.reg)
+    ].join("|");
+  }
+  function rowToFlightV68(r){
+    const date=cleanV68(r.pilotlog_date);
+    const dep=upperV68(r.af_dep), arr=upperV68(r.af_arr);
+    const dt=cleanV68(r.time_dep), at=cleanV68(r.time_arr);
+    const crew=findOrCreateCrewV68(r);
+    const aircraft=findOrCreateAircraftV68(r);
+    if(!date||!dep||!arr||!dt||!at||!crew||!aircraft){
+      return {error:"missing mandatory source data"};
+    }
+
+    const pic=minutesV68(r.time_pic)>0;
+    const sic=minutesV68(r.time_sic)>0;
+    const dual=minutesV68(r.time_dual)>0;
+    const instr=minutesV68(r.time_instructor)>0;
+    const picus=minutesV68(r.time_picus)>0;
+    const duration=minutesV68(r.time_total) || Math.max(0,minutesV68(at)-minutesV68(dt));
+    const ifrTime=minutesV68(r.time_ifr);
+    const night=minutesV68(r.time_night);
+    const picTime=minutesV68(r.time_pic)+minutesV68(r.time_picus);
+
+    return {
+      id:uid(),
+      date,
+      pic:crew.name,
+      crewProfileId:crew.id,
+      aircraft:aircraft.type,
+      reg:aircraft.reg,
+      aircraftProfileId:aircraft.id,
+      dep,arr,dt,at,
+      engine:aircraft.engine||"ME",
+      role:roleV68(pic,sic,dual,instr,picus),
+      duration,
+      night,
+      ifr:ifrTime>0,
+      pf:boolV68(r.pf),
+      pm:boolV68(r.pf) ? false : false,
+      picLog:pic||picus,
+      sicLog:sic,
+      dualLog:dual,
+      instructorLog:instr,
+      picusLog:picus,
+      picTime,
+      sicTime:minutesV68(r.time_sic),
+      dualTime:minutesV68(r.time_dual),
+      instructorTime:minutesV68(r.time_instructor),
+      ifrTime,
+      picusTime:0,
+      picusCaptain:"",
+      picusSignature:"",
+      ldgDay:Number(r.ldg_day||0)||0,
+      ldgNight:Number(r.ldg_night||0)||0,
+      remarks:cleanV68(r.remarks),
+      flightNumber:cleanV68(r.flightnumber),
+      operator:cleanV68(r.operator),
+      pairing:cleanV68(r.pairing),
+      importSource:"Pilotlog"
+    };
+  }
+  function statusV68(msg,show=true){
+    const e=$("dataImportStatus");
+    if(!e)return;
+    e.style.display=show?"block":"none";
+    e.textContent=msg;
+  }
+  window.handleDataImportFileV68=function(event){
+    const file=event.target.files?.[0];
+    importRowsV68=[]; importFileNameV68="";
+    const btn=$("dataImportRunBtn");
+    if(btn)btn.disabled=true;
+    if(!file){statusV68("",false);return;}
+    importFileNameV68=file.name;
+    const reader=new FileReader();
+    reader.onload=function(){
+      try{
+        const rows=csvParseV68(String(reader.result||""));
+        if(!rows.length) throw new Error("The CSV contains no flight rows.");
+        importRowsV68=rows;
+        const source=$("dataImportSource")?.value;
+        if(source!=="pilotlog") throw new Error("Please select Pilotlog CSV as the import source.");
+        if(btn)btn.disabled=false;
+        statusV68(`${file.name} • ${rows.length} flight${rows.length===1?"":"s"} detected. Choose the import method and press Import flights.`);
+      }catch(e){
+        importRowsV68=[];
+        if(btn)btn.disabled=true;
+        statusV68("Could not read the CSV: "+(e?.message||e));
+      }
+    };
+    reader.onerror=function(){
+      importRowsV68=[]; if(btn)btn.disabled=true;
+      statusV68("Could not read the selected file.");
+    };
+    reader.readAsText(file);
+  };
+
+  window.runDataImportV68=function(){
+    if(!importRowsV68.length){alert("Please choose a CSV file first.");return;}
+    if($("dataImportSource")?.value!=="pilotlog"){alert("Please select Pilotlog CSV.");return;}
+
+    const mode=$("dataImportMode")?.value||"merge";
+    if(mode==="replace"){
+      const ok=confirm("Replace the flight database entirely?\n\nAll currently saved flights will be removed and replaced by the flights from this CSV.\nSaved aircraft and crew libraries will be preserved.");
+      if(!ok)return;
+    }
+
+    const originalFlights=flights.slice();
+    const imported=[];
+    let skipped=0;
+    const errors=[];
+    importRowsV68.forEach((r,i)=>{
+      try{
+        const f=rowToFlightV68(r);
+        if(f.error){skipped++;errors.push(`Row ${i+2}: missing mandatory source data`);return;}
+        imported.push(f);
+      }catch(e){
+        skipped++;errors.push(`Row ${i+2}: ${e?.message||"invalid data"}`);
+      }
+    });
+
+    if(!imported.length){
+      alert("No flights could be imported.\n\n"+errors.slice(0,8).join("\n"));
+      return;
+    }
+
+    if(mode==="replace"){
+      flights=imported;
+    }else{
+      const existing=new Set(flights.map(flightKeyV68));
+      let duplicates=0;
+      imported.forEach(f=>{
+        const k=flightKeyV68(f);
+        if(existing.has(k)){duplicates++;return;}
+        existing.add(k);flights.push(f);
+      });
+      if(!flights.length) flights=originalFlights;
+      const added=imported.length-duplicates;
+      localStorage.setItem(CREW_STORAGE_KEY,JSON.stringify(crewLibrary));
+      localStorage.setItem(AIRCRAFT_STORAGE_KEY,JSON.stringify(aircraftLibrary));
+      saveData();
+      statusV68(`${importFileNameV68} imported • ${added} added${duplicates?` • ${duplicates} duplicates skipped`:""}${skipped?` • ${skipped} rows skipped`:""}.`);
+      $("dataImportFile").value="";
+      importRowsV68=[]; importFileNameV68="";
+      if($("dataImportRunBtn"))$("dataImportRunBtn").disabled=true;
+      return;
+    }
+
+    localStorage.setItem(CREW_STORAGE_KEY,JSON.stringify(crewLibrary));
+    localStorage.setItem(AIRCRAFT_STORAGE_KEY,JSON.stringify(aircraftLibrary));
+    saveData();
+    renderAircraftSelector();
+    renderCrewSelectors();
+    renderAircraftLibrary();
+    renderCrewLibrary();
+    const msg=`${importFileNameV68} imported • ${imported.length} flights loaded${skipped?` • ${skipped} rows skipped`:""}.`;
+    statusV68(msg);
+    $("dataImportFile").value="";
+    importRowsV68=[]; importFileNameV68="";
+    if($("dataImportRunBtn"))$("dataImportRunBtn").disabled=true;
+  };
+
+  // If the user changes the source, require a new file so a future source
+  // parser can never accidentally consume a Pilotlog file.
+  $("dataImportSource")?.addEventListener("change",function(){
+    importRowsV68=[];
+    importFileNameV68="";
+    if($("dataImportFile"))$("dataImportFile").value="";
+    if($("dataImportRunBtn"))$("dataImportRunBtn").disabled=true;
+    statusV68("",false);
+  });
+
+  // Final visible build marker.
+  document.querySelectorAll(".sub").forEach(e=>e.textContent="V69 • local/offline-first test build");
+  document.title="EASA Flight Logbook V69";
 })();
 </script>
 

@@ -221,7 +221,7 @@ restyles the on-screen app.
    `24` option.
 5. Nine different places in the code set `document.title`/`.sub` text
    to old version strings (V32, V36, V44, V66…) that overwrite each
-   other; it happens to resolve to the correct "V67" today only because
+   other; it happens to resolve to the correct "V68" today only because
    of script order, plus two static leftovers (`v36VersionBadge` corner
    badge and a Settings-page note) still hard-code "V66".
 6. `selectCrewProfile()` is dead code — it targets a `picProfile`
