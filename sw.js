@@ -1,17 +1,19 @@
-const CACHE_NAME = "easa-logbook-v76";
+const CACHE_NAME = "easa-logbook-v91";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css",
-  "./app.js",
   "./manifest.json",
   "./favicon.ico",
   "./icon-32.png",
+  "./icon-64.png",
+  "./icon-120.png",
+  "./icon-144.png",
   "./icon-152.png",
   "./icon-167.png",
   "./icon-180.png",
   "./icon-192.png",
-  "./icon-512.png"
+  "./icon-512.png",
+  "./icon-512-print.png"
 ];
 
 self.addEventListener("install", (event) => {

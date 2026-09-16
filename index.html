@@ -547,7 +547,7 @@ header .header-title {
 
 
 <style id="v73-tabs">
-/* V76: thinner, separated bottom navigation buttons. */
+/* V83: thinner, separated bottom navigation buttons. */
 .bottom-tabs,
 .bottom-nav,
 .tab-bar,
@@ -575,7 +575,7 @@ nav.bottom-nav > * {
 
 
 <style id="v74-bottom-tabs">
-/* V76: compact, separated bottom tabs */
+/* V83: compact, separated bottom tabs */
 .v16-bottom-nav {
   gap: 8px !important;
   padding: 6px 10px !important;
@@ -594,7 +594,7 @@ nav.bottom-nav > * {
 
 
 <style id="v75-bottom-tabs">
-/* V76: each bottom tab is an independent floating liquid-glass button. */
+/* V83: each bottom tab is an independent floating liquid-glass button. */
 .v16-bottom-nav {
   display: flex !important;
   align-items: center !important;
@@ -658,7 +658,7 @@ nav.bottom-nav > * {
 
 
 <style id="v76-scroll-and-tabs">
-/* V76: only the New Flight entry screen is locked to the viewport.
+/* V83: only the New Flight entry screen is locked to the viewport.
    Flight list, Settings and library pages retain normal scrolling. */
 html, body {
   overflow-x: hidden !important;
@@ -702,9 +702,167 @@ body.v76-entry-page main {
 }
 </style>
 
-</head>
 
-<body><div id="v36VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V76</div>
+<style id="v77-flight-entry-order">
+/* V83: entry order is Remarks -> Flight times -> Date/Aircraft -> airports -> times.
+   LDG controls live inside the collapsible Flight times section. */
+#timeAllocation .v77-landing-inside {
+  width: 100%;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 7px;
+  align-items: center;
+}
+#timeAllocation .v77-landing-inside label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+#timeAllocation .v77-landing-inside input[type=number] {
+  width: 44px;
+  min-height: 32px;
+  padding: 4px;
+  font-weight: 700;
+  font-size: 13px;
+}
+#timeAllocation .v77-landing-inside .v77-override {
+  justify-content: center;
+}
+#timeAllocation .v77-landing-inside .v77-override input {
+  width: 17px;
+  height: 17px;
+}
+@media(max-width:480px) {
+  #timeAllocation .v77-landing-inside {
+    gap: 4px;
+  }
+}
+</style>
+
+
+<style id="v78-flight-times-notes">
+/* V83: calculation/PICUS notes live inside the collapsible Flight Times panel. */
+#timeAllocation .v78-flight-note {
+  width: 100%;
+  margin-top: 7px;
+  padding: 7px 9px;
+  box-sizing: border-box;
+  border-radius: 9px;
+  background: rgba(255,255,255,.42);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.35;
+}
+#timeAllocation .v78-picus-note {
+  display: none;
+}
+</style>
+
+
+<style id="v79-flight-note">
+/* V83: calculation note belongs inside the collapsible Flight Times section. */
+#timeAllocation > #calcNotice {
+  width: 100%;
+  margin-top: 8px !important;
+  margin-bottom: 0 !important;
+  box-sizing: border-box;
+}
+</style>
+
+
+<style id="v80-dark-mode">
+/* Appearance (light/dark) toggle control, shown in its own Settings card. */
+.v80-theme-setting{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.v80-theme-title{font-weight:700;font-size:14px}
+.v80-theme-subtitle{font-size:11px;color:var(--muted);margin-top:2px}
+.v80-switch{position:relative;width:46px;height:26px;flex:0 0 46px}
+.v80-switch input{opacity:0;width:0;height:0;position:absolute}
+.v80-switch span{position:absolute;inset:0;border-radius:999px;background:#c8cbd2;cursor:pointer;transition:.2s}
+.v80-switch span:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.2s}
+.v80-switch input:checked + span{background:var(--accent)}
+.v80-switch input:checked + span:before{transform:translateX(20px)}
+
+/* Dark theme. Wrapped entirely in @media screen so it can never affect
+   the printed logbook page (which must always stay black-on-white on
+   paper regardless of the app's on-screen theme). Everything below just
+   redefines the SAME custom properties the rest of the stylesheet
+   already reads, so nearly the whole app re-themes correctly on its
+   own; only the handful of surfaces below that use a hardcoded colour
+   instead of a variable need an explicit override. */
+@media screen{
+  body.v80-dark{
+    --bg:#000000;
+    --card:rgba(28,28,30,.86);
+    --card-solid:#1C1C1E;
+    --card-border:rgba(255,255,255,.09);
+    --glass-highlight:rgba(255,255,255,.05);
+    --ink:#FFFFFF;
+    --muted:#98989F;
+    --muted-2:#636366;
+    --line:rgba(255,255,255,.14);
+    --accent-dark:#409CFF;
+    --accent-soft:rgba(10,132,255,.22);
+    --accent2-dark:#409CFF;
+    --danger:#FF453A;
+    --danger-soft:rgba(255,69,58,.18);
+    --ok:#32D74B;
+    --ok-soft:rgba(50,215,75,.18);
+    --input-bg:#1C1C1E;
+    --input-border:rgba(255,255,255,.16);
+    --chip-bg:#232326;
+    --shadow-card:0 1px 1px rgba(0,0,0,.6),0 10px 26px rgba(0,0,0,.55);
+    --shadow-pop:0 24px 60px rgba(0,0,0,.7);
+    background:#000;
+    background-image:none;
+  }
+  body.v80-dark input:focus,body.v80-dark select:focus,body.v80-dark textarea:focus{background:#232326}
+  body.v80-dark select{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5.5 8l4.5 4.5L14.5 8' fill='none' stroke='%2398989F' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  }
+  /* Hardcoded translucent-white glass surfaces that don't read a variable. */
+  body.v80-dark .v16-header{background:rgba(20,20,22,.72)}
+  body.v80-dark .suggestions{background:rgba(28,28,30,.94)}
+  body.v80-dark .modal-card{background:rgba(28,28,30,.94)}
+  body.v80-dark .modal-overlay{background:rgba(0,0,0,.6)}
+  body.v80-dark .v16-more-menu{background:rgba(28,28,30,.92)}
+  body.v80-dark .v78-flight-note{background:rgba(255,255,255,.06)}
+  body.v80-dark .signature-canvas-wrap{background:#fff}
+  /* The floating glass bottom tabs (and the two icon labels below) use
+     hardcoded light colours from an earlier styling pass rather than the
+     shared variables, so they need their own explicit dark version. */
+  body.v80-dark .v16-bottom-nav .tab{
+    background:rgba(28,28,30,.7) !important;
+    border-color:rgba(255,255,255,.12) !important;
+    color:#8E8E93 !important;
+  }
+  body.v80-dark .v16-bottom-nav .tab.active{
+    background:rgba(255,255,255,.08) !important;
+    color:var(--accent) !important;
+  }
+  body.v80-dark [style*="color:#667085"],
+  body.v80-dark [style*="color:#8a94a6"],
+  body.v80-dark [style*="color:#98A2B3"]{color:var(--muted) !important}
+  body.v80-dark [style*="background:#f4f5f7"]{
+    background:var(--input-bg) !important;color:var(--ink) !important;border-color:var(--input-border) !important;
+  }
+}
+</style>
+
+</head>
+<body><script>try{if(localStorage.getItem('easa-logbook-dark-mode')==='1'){document.documentElement.classList.add('v80-dark');document.body.classList.add('v80-dark')}}catch(e){}</script><div id="v36VersionBadge" style="position:fixed;top:2px;right:6px;z-index:99999;font:600 9px/1.2 -apple-system,BlinkMacSystemFont,sans-serif;opacity:.45;pointer-events:none">V90</div>
 <header class="v16-header">
   
 </header>
@@ -847,24 +1005,24 @@ body.v76-entry-page main {
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
       <div class="section-title" style="margin:0">Flights</div>
       <div class="actions" style="margin:0">
-        <label style="font-size:12px;color:#667085">Flights/page
+        <label style="font-size:12px;color:var(--muted)">Flights/page
           <select id="perPage" onchange="renderPrintPreview()" style="width:90px;padding:6px">
             <option>6</option><option>8</option><option>10</option><option>12</option>
             <option>14</option><option>16</option><option>18</option><option>20</option>
-            <option selected>24</option><option>24</option>
+            <option>22</option><option selected>24</option>
           </select>
         </label>
-        <label style="font-size:12px;color:#667085">Font
+        <label style="font-size:12px;color:var(--muted)">Font size
           <select id="printFontSize" onchange="renderPrintPreview()" style="width:80px;padding:6px">
             <option value="6">6 pt</option><option value="6.5">6.5 pt</option>
             <option value="7" selected>7 pt</option><option value="7.5">7.5 pt</option>
             <option value="8">8 pt</option><option value="9">9 pt</option><option value="10">10 pt</option>
           </select>
         </label>
-        <label style="font-size:12px;color:#667085">From
+        <label style="font-size:12px;color:var(--muted)">From
           <input id="printDateFrom" type="date" onchange="renderPrintPreview()" style="width:135px;padding:6px">
         </label>
-        <label style="font-size:12px;color:#667085">To
+        <label style="font-size:12px;color:var(--muted)">To
           <input id="printDateTo" type="date" onchange="renderPrintPreview()" style="width:135px;padding:6px">
         </label>
         <button class="secondary small" onclick="clearPrintDateWindow()">All dates</button>
@@ -874,8 +1032,28 @@ body.v76-entry-page main {
         <input id="importFile" type="file" accept=".json,application/json" style="display:none" onchange="importJSON(event)">
         <button class="secondary small" onclick="exportCSV()">Export CSV</button>
       </div>
-      <div style="margin-top:8px;font-size:11.5px;color:#8a94a6">Tip: in your browser's print dialog, turn off "Headers and footers" (usually under "More settings") for the cleanest printout — otherwise the browser adds its own URL/date/page-number strip on top of this layout's margins.</div>
     </div>
+    <details class="v89-print-options">
+      <summary>Print customization</summary>
+      <div class="v89-grid">
+        <label>Layout<select id="v89Layout"><option value="one" selected>One page — all columns</option><option value="two">Two pages — standard EASA</option></select></label>
+        <label>Typeface<select id="v89Font"><option value="Arial" selected>Arial</option><option value="Helvetica">Helvetica</option><option value="Times New Roman">Times New Roman</option><option value="Courier New">Courier New</option></select></label>
+        <label>Orientation<select id="v89Orientation"><option value="landscape" selected>Horizontal</option><option value="portrait">Vertical</option></select></label>
+        <label>Date format<select id="v89Date"><option value="dd/mm/yy" selected>DD/MM/YY</option><option value="yy/mm/dd">YY/MM/DD</option><option value="ddMONyy">DDMONYY</option></select></label>
+      </div>
+      <div class="v89-checks">
+        <label><input id="v89Alt" type="checkbox"> Alternate gray rows</label>
+        <label><input id="v89Front" type="checkbox"> Print front page</label>
+        <label><input id="v89Logo" type="checkbox" checked> App logo</label>
+        <label><input id="v89Pilot" type="checkbox" checked> Pilot name</label>
+        <label><input id="v89Range" type="checkbox" checked> Flight date range</label>
+        <label><input id="v89Year" type="checkbox"> Logbook year</label>
+        <label><input id="v89Remark" type="checkbox"> Free remark</label>
+      </div>
+      <div class="v89-year-row"><label>Year display<select id="v89YearMode"><option value="year">Year</option><option value="range">Year range</option></select></label></div>
+      <textarea id="v89RemarkText" rows="2" placeholder="Optional front-page remark..."></textarea>
+    </details>
+    <div style="margin-top:8px;font-size:11.5px;color:var(--muted)">Tip: in your browser's print dialog, turn off "Headers and footers" (usually under "More settings") for the cleanest printout — otherwise the browser adds its own URL/date/page-number strip on top of this layout's margins.</div>
     <div id="flightTable"></div>
   </section>
 
@@ -902,9 +1080,7 @@ body.v76-entry-page main {
       <label><span class="field-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg></span>Search ICAO / IATA / name</label>
       <input id="airportLibrarySearch" placeholder="e.g. OPIS, ISB, Islamabad" oninput="renderAirportLibrary()">
     </div>
-    <div class="notice" style="margin-bottom:12px">
-      Search the local airport database. Custom airports are stored on this iPhone and can be used for flight entry and night calculations.
-    </div>
+    
     <div id="airportDbStatus" class="notice" style="margin:10px 0"></div>
     <div id="airportLibraryList" class="library-grid"></div>
   </section>
@@ -929,6 +1105,20 @@ body.v76-entry-page main {
 </div>
 
 <div id="settingsPage" class="app-page">
+<section class="card">
+  <div class="section-title">Appearance</div>
+  <div class="v80-theme-setting">
+    <div>
+      <div class="v80-theme-title">Dark mode</div>
+      <div class="v80-theme-subtitle">Switch between light and dark appearance</div>
+    </div>
+    <label class="v80-switch" aria-label="Dark mode">
+      <input id="v80DarkMode" type="checkbox" onchange="v80SetDarkMode(this.checked)">
+      <span></span>
+    </label>
+  </div>
+</section>
+
 <section class="card v34-backup-card" id="v34BackupCard">
 <div class="section-title">Google Drive Backup</div>
 <div id="v34DriveStatus" class="v34-drive-status">Not connected</div>
@@ -941,7 +1131,7 @@ body.v76-entry-page main {
 </section>
 
 <section class="card">
-  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V76 • local/offline-first test build</div>
+  <div class="section-title">Flight-entry defaults</div>
   <div class="notice" style="margin-bottom:12px">Choose what is automatically selected when you start a new flight. You can still change any selection for an individual flight.</div>
   <div class="default-checks">
     <label><input id="defaultIFR" type="checkbox"> IFR</label>
@@ -955,7 +1145,7 @@ body.v76-entry-page main {
 </section>
 
 <section class="card" id="dataImportCard">
-  <div class="section-title">Data import</div>
+<div class="section-title">Data import</div>
   <div class="notice" style="margin-bottom:12px">
     Import flight records from another logbook. Select the source first; more import formats can be added here later.
   </div>
@@ -995,11 +1185,12 @@ body.v76-entry-page main {
   <div class="modal-card" style="max-width:480px">
     <div class="section-title">Printing isn't available here</div>
     <div class="notice" style="margin-bottom:10px">This logbook is currently open as the installed Home Screen app. iOS doesn't let apps installed this way open the print/PDF sheet at all — it's a limitation of iOS itself, not something this app can turn on. Printing only works when the same page is open as a normal tab in Safari.</div>
-    <div class="notice" style="margin-bottom:6px"><b>To print or save as PDF:</b> open Safari, go to this address, then use the Share button → Print (or Save to Files as PDF) from there.</div>
-    <div style="font-size:11.5px;font-family:monospace;background:#f4f5f7;color:#1a1d29;border:1px solid #e3e5ea;border-radius:8px;padding:8px 10px;margin-bottom:10px;word-break:break-all" id="iosPrintUrl"></div>
+    <div class="notice" style="margin-bottom:6px"><b>To print or save as PDF:</b> tap "Open in Safari" below, then use the Share button → Print (or Save to Files as PDF) from there.</div>
+    <div style="font-size:11.5px;font-family:monospace;background:var(--input-bg);color:var(--ink);border:1px solid var(--input-border);border-radius:8px;padding:8px 10px;margin-bottom:10px;word-break:break-all" id="iosPrintUrl"></div>
     <div class="actions" style="justify-content:flex-end">
       <button class="secondary" onclick="closeIOSPrintNotice()">Close</button>
-      <button class="primary" id="iosPrintCopyBtn" onclick="copyPrintURL()">Copy link</button>
+      <button class="secondary" id="iosPrintCopyBtn" onclick="copyPrintURL()">Copy link</button>
+      <button class="primary" onclick="openPrintInSafari()">Open in Safari</button>
     </div>
   </div>
 </div>
@@ -2211,18 +2402,18 @@ function printRows(chunk,startIndex,rowsPerPage,before){
        remarks are single-line/ellipsis anyway) and that space was moved to
        Aircraft Type/Registration, which were wrapping mid-word before. -->
   <colgroup>
-    <col style="width:5.5%">
-    <col style="width:3.8%"><col style="width:3.4%">
-    <col style="width:3.8%"><col style="width:3.4%">
-    <col style="width:3.5%"><col style="width:6.5%">
+    <col style="width:4.7%">
+    <col style="width:3.3%"><col style="width:3%">
+    <col style="width:3.3%"><col style="width:3%">
+    <col style="width:3%"><col style="width:5%">
+    <col style="width:3.4%"><col style="width:3.4%">
     <col style="width:3.8%"><col style="width:3.8%">
-    <col style="width:4.4%"><col style="width:4.4%">
-    <col style="width:10.2%">
-    <col style="width:3.2%"><col style="width:3.2%">
-    <col style="width:4.5%"><col style="width:4.5%">
-    <col style="width:4.5%"><col style="width:4.5%"><col style="width:4.5%"><col style="width:4.5%">
-    <col style="width:3.5%">
-    <col style="width:6.7%">
+    <col style="width:9%">
+    <col style="width:2.8%"><col style="width:2.8%">
+    <col style="width:4%"><col style="width:4%">
+    <col style="width:4%"><col style="width:4%"><col style="width:4%"><col style="width:4%">
+    <col style="width:3%">
+    <col style="width:18%">
   </colgroup>
   <thead>
     <tr class="group-row">
@@ -2303,6 +2494,146 @@ function printRows(chunk,startIndex,rowsPerPage,before){
     </tr>
   </tbody></table>`;
 }
+// EASA standard two-page layout: page "A" carries Date / Departure / Arrival /
+// Aircraft / Single-Pilot time / Multi-Pilot time / Total time / Name PIC /
+// Landings (the first 14 columns of the combined table above); page "B"
+// carries Operational Condition time / Pilot Function time / Simulator /
+// Remarks (the remaining 8), matching the two-page paper logbook layout.
+function printRowsPageA(chunk,startIndex,rowsPerPage,before){
+  before=before||printTimeBuckets(flights.slice(0,startIndex));
+  const page=printTimeBuckets(chunk);
+  const acc={};
+  Object.keys(page).forEach(k=>acc[k]=(before[k]||0)+(page[k]||0));
+
+  return `<table class="print-table">
+  <colgroup>
+    <col style="width:8.7%">
+    <col style="width:6.0%"><col style="width:5.4%">
+    <col style="width:6.0%"><col style="width:5.4%">
+    <col style="width:5.6%"><col style="width:10.3%">
+    <col style="width:6.0%"><col style="width:6.0%">
+    <col style="width:7.0%"><col style="width:7.0%">
+    <col style="width:16.2%">
+    <col style="width:5.1%"><col style="width:5.1%">
+  </colgroup>
+  <thead>
+    <tr class="group-row">
+      <th rowspan="2">Date<br><span class="date-fmt">DD/MM/YY</span></th>
+      <th colspan="2">Departure</th>
+      <th colspan="2">Arrival</th>
+      <th colspan="2">Aircraft</th>
+      <th colspan="2">Single Pilot Time</th>
+      <th rowspan="2">Multi Pilot<br>Time</th>
+      <th rowspan="2">Total Flight<br>Time</th>
+      <th rowspan="2">Name PIC /<br>Instructor</th>
+      <th colspan="2">Landings</th>
+    </tr>
+    <tr class="sub-row">
+      <th>Place</th><th>Time</th>
+      <th>Place</th><th>Time</th>
+      <th>Type</th><th>Reg.</th>
+      <th>SE</th><th>ME</th>
+      <th class="no-wrap">Day</th><th class="no-wrap">Night</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${chunk.map(f=>`<tr class="flight-row${f.isSimSession?' sim-session-row':''}">
+      <td>${fmtDate(f.date)}</td>
+      <td>${f.dep}</td><td>${f.dt}</td>
+      <td>${f.arr}</td><td>${f.at}</td>
+      <td class="print-left">${esc(f.aircraft)}</td><td>${esc(f.reg)}</td>
+      <td>${(()=>{if(f.isSimSession)return"0:00";const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return(a?.operation==="SP"&&(a?.engine||f.engine)==="SE")?minsToHM(f.duration):"0:00";})()}</td>
+      <td>${(()=>{if(f.isSimSession)return"0:00";const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return(a?.operation==="SP"&&(a?.engine||f.engine)==="ME")?minsToHM(f.duration):"0:00";})()}</td>
+      <td>${(()=>{if(f.isSimSession)return"0:00";const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return(a?.operation==="MP"&&!a?.simulator)?minsToHM(f.duration):"0:00";})()}</td>
+      <td>${(()=>{if(f.isSimSession)return"0:00";const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return a?.simulator?"0:00":minsToHM(f.duration);})()}</td>
+      <td class="print-left">${esc(formatPrintCrewName(f.pic))}</td>
+      <td>${f.ldgDay||0}</td><td>${f.ldgNight||0}</td>
+    </tr>`).join("")}
+    ${Array.from(
+      {length:Math.max(0,(rowsPerPage||chunk.length)-chunk.length)},
+      ()=>`<tr class="flight-row blank-flight-row">${Array.from({length:14},()=>"<td></td>").join("")}</tr>`
+    ).join("")}
+
+    <tr class="print-total">
+      <td colspan="7" class="print-left">PAGE TOTAL</td>
+      <td>${minsToHM(page.spSE)}</td><td>${minsToHM(page.spME)}</td>
+      <td>${minsToHM(page.multi)}</td><td>${minsToHM(page.duration)}</td><td></td>
+      <td>${page.ldgDay}</td><td>${page.ldgNight}</td>
+    </tr>
+    <tr class="brought-total compact-total">
+      <td colspan="7" class="print-left"><b>BROUGHT FORWARD</b></td>
+      <td>${minsToHM(before.spSE)}</td><td>${minsToHM(before.spME)}</td>
+      <td>${minsToHM(before.multi)}</td><td>${minsToHM(before.duration)}</td><td></td>
+      <td>${before.ldgDay||0}</td><td>${before.ldgNight||0}</td>
+    </tr>
+    <tr class="print-total compact-total acc-total">
+      <td colspan="7" class="print-left">ACCUMULATED TOTAL</td>
+      <td>${minsToHM(acc.spSE)}</td><td>${minsToHM(acc.spME)}</td>
+      <td>${minsToHM(acc.multi)}</td><td>${minsToHM(acc.duration)}</td><td></td>
+      <td>${acc.ldgDay||0}</td><td>${acc.ldgNight||0}</td>
+    </tr>
+  </tbody></table>`;
+}
+function printRowsPageB(chunk,startIndex,rowsPerPage,before){
+  before=before||printTimeBuckets(flights.slice(0,startIndex));
+  const page=printTimeBuckets(chunk);
+  const acc={};
+  Object.keys(page).forEach(k=>acc[k]=(before[k]||0)+(page[k]||0));
+
+  return `<table class="print-table">
+  <colgroup>
+    <col style="width:12.1%"><col style="width:12.1%">
+    <col style="width:12.1%"><col style="width:12.1%"><col style="width:12.1%"><col style="width:12.1%">
+    <col style="width:9.4%">
+    <col style="width:18.0%">
+  </colgroup>
+  <thead>
+    <tr class="group-row">
+      <th colspan="2">Operational<br>Condition Time</th>
+      <th colspan="4">Pilot Function Time</th>
+      <th rowspan="2">Simulator<br>(FSTD)</th>
+      <th rowspan="2">Remarks</th>
+    </tr>
+    <tr class="sub-row">
+      <th>Night</th><th>IFR</th>
+      <th>PIC</th><th>Co-Pilot</th><th>Dual</th><th>Instructor</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${chunk.map(f=>`<tr class="flight-row${f.isSimSession?' sim-session-row':''}">
+      <td>${minsToHM(f.night||0)}</td><td>${minsToHM(f.ifrTime??(f.ifr?f.duration:0))}</td>
+      <td>${["PIC","PICUS"].includes(f.role)?minsToHM(f.duration):"0:00"}</td>
+      <td>${f.role==="Co-pilot"?minsToHM(f.duration):"0:00"}</td>
+      <td>${f.role==="Dual"?minsToHM(f.duration):"0:00"}</td>
+      <td>${["Instructor","Examiner"].includes(f.role)?minsToHM(f.duration):"0:00"}</td>
+      <td>${(()=>{if(f.isSimSession)return minsToHM(f.simDuration||0);const a=aircraftLibrary.find(x=>x.id===f.aircraftProfileId);return a?.simulator?minsToHM(f.duration):"0:00";})()}</td>
+      <td class="print-remarks">${printRemarksV12(f)}</td>
+    </tr>`).join("")}
+    ${Array.from(
+      {length:Math.max(0,(rowsPerPage||chunk.length)-chunk.length)},
+      ()=>`<tr class="flight-row blank-flight-row">${Array.from({length:8},()=>"<td></td>").join("")}</tr>`
+    ).join("")}
+
+    <tr class="print-total">
+      <td>${minsToHM(page.night)}</td><td>${minsToHM(page.ifr)}</td>
+      <td>${minsToHM(page.pic)}</td><td>${minsToHM(page.co)}</td>
+      <td>${minsToHM(page.dual)}</td><td>${minsToHM(page.instructor)}</td>
+      <td>${minsToHM(page.simulator)}</td><td class="signature-cell" rowspan="3">${signatureForPrint()}</td>
+    </tr>
+    <tr class="brought-total compact-total">
+      <td>${minsToHM(before.night)}</td><td>${minsToHM(before.ifr)}</td>
+      <td>${minsToHM(before.pic)}</td><td>${minsToHM(before.co)}</td>
+      <td>${minsToHM(before.dual)}</td><td>${minsToHM(before.instructor)}</td>
+      <td>${minsToHM(before.simulator)}</td>
+    </tr>
+    <tr class="print-total compact-total acc-total">
+      <td>${minsToHM(acc.night)}</td><td>${minsToHM(acc.ifr)}</td>
+      <td>${minsToHM(acc.pic)}</td><td>${minsToHM(acc.co)}</td>
+      <td>${minsToHM(acc.dual)}</td><td>${minsToHM(acc.instructor)}</td>
+      <td>${minsToHM(acc.simulator)}</td>
+    </tr>
+  </tbody></table>`;
+}
 function renderPrintPreview(){
   const {from,to}=getPrintDateWindow();
   if(from&&to&&from>to){
@@ -2358,14 +2689,26 @@ function renderPrintPreview(){
     const carry={};
     Object.keys(beforeWindow).forEach(k=>carry[k]=(beforeWindow[k]||0)+(selectedBefore[k]||0));
 
-    return `<div class="print-page" style="${pageStyle}">
-      <div class="print-header">
+    const header=`<div class="print-header">
         <div>
           <div class="print-title">FLIGHT CREW LOGBOOK — EASA / PART-FCL</div>
           <div style="font-size:8px">${esc(settings.pilotName||"Pilot")} ${settings.address?"• "+esc(settings.address):""}</div>
         </div>
+      </div>`;
 
+    const twoPage=document.getElementById("v89Layout")?.value==="two";
+    if(twoPage){
+      return `<div class="print-page" style="${pageStyle}">
+        ${header}
+        ${printRowsPageA(chunk,start,rowsOnPage,carry)}
       </div>
+      <div class="print-page" style="${pageStyle}">
+        ${header}
+        ${printRowsPageB(chunk,start,rowsOnPage,carry)}
+      </div>`;
+    }
+    return `<div class="print-page" style="${pageStyle}">
+      ${header}
       ${printRows(chunk,start,rowsOnPage,carry)}
     </div>`;
   }).join("");
@@ -2474,6 +2817,13 @@ function copyPrintURL(){
   } else {
     prompt("Copy this link and open it in Safari:",url);
   }
+}
+function openPrintInSafari(){
+  // A same-origin target="_blank"/window.open() navigation from an iOS
+  // Home Screen standalone web app is handed off to a real Safari tab
+  // (standalone apps don't support multiple windows themselves), which
+  // is what actually gets the user to a context where printing works.
+  window.open(location.href, "_blank");
 }
 function exportJSON(){
   const payload={format:"EASA Flight Logbook V8",exportedAt:new Date().toISOString(),settings,aircraftLibrary,crewLibrary,simulatorLibrary,simSessions,flights};
@@ -3672,7 +4022,7 @@ setTimeout(updateTotalsPeriodV23,300);
   // Initial state: PF unless this is an explicitly loaded PM flight.
   sync(pm.checked ? 'pm' : 'pf');
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V76 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V90 • local/offline-first test build');
   document.title='EASA Flight Logbook V36';
 })();
 </script>
@@ -4010,8 +4360,8 @@ setTimeout(()=>{
     };
   }
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V76 • local/offline-first test build');
-  document.title='EASA Flight Logbook V76';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V90 • local/offline-first test build');
+  document.title='EASA Flight Logbook V90';
 })();
 </script>
 
@@ -4064,7 +4414,7 @@ setTimeout(()=>{
   };
 
   document.title='EASA Flight Logbook V44';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V76 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V90 • local/offline-first test build');
 })();
 </script>
 
@@ -4130,8 +4480,8 @@ setTimeout(()=>{
     if(changed && typeof window.saveData==='function')window.saveData();
   }
 
-  document.title='EASA Flight Logbook V76';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V76 • local/offline-first test build');
+  document.title='EASA Flight Logbook V90';
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V90 • local/offline-first test build');
 })();
 </script>
 
@@ -4276,7 +4626,7 @@ setTimeout(()=>{
 
 
 <script>
-/* ================= V76: PICUS signature workflow + flight list order + version ================= */
+/* ================= V83: PICUS signature workflow + flight list order + version ================= */
 (function(){
   const el=id=>document.getElementById(id);
   const isPicus=()=>!!el("picusLog")?.checked;
@@ -4422,17 +4772,17 @@ setTimeout(()=>{
     </tr>`).join("")}</tbody></table></div>`;
   };
 
-  // Ensure the final visible build/version text is V76.
+  // Ensure the final visible build/version text is V83.
   document.querySelectorAll('.sub').forEach(e=>{
-    e.textContent='V76 • local/offline-first test build';
+    e.textContent='V90 • local/offline-first test build';
   });
-  document.title='EASA Flight Logbook V76';
+  document.title='EASA Flight Logbook V90';
 })();
 </script>
 
 
 <script>
-/* ================= V76: validation + cleaner PICUS signing + auto-pick ================= */
+/* ================= V83: validation + cleaner PICUS signing + auto-pick ================= */
 (function(){
   const $=id=>document.getElementById(id);
 
@@ -4576,14 +4926,14 @@ setTimeout(()=>{
   }
 
   // Keep the visible build marker current.
-  document.querySelectorAll(".sub").forEach(e=>e.textContent="V76 • local/offline-first test build");
-  document.title="EASA Flight Logbook V76";
+  document.querySelectorAll(".sub").forEach(e=>e.textContent="V90 • local/offline-first test build");
+  document.title="EASA Flight Logbook V90";
 })();
 </script>
 
 
 <script>
-/* ================= V76: Pilotlog CSV import ================= */
+/* ================= V83: Pilotlog CSV import ================= */
 (function(){
   const $=id=>document.getElementById(id);
   let importRowsV68=[];
@@ -4872,8 +5222,8 @@ setTimeout(()=>{
   });
 
   // Final visible build marker.
-  document.querySelectorAll(".sub").forEach(e=>e.textContent="V76 • local/offline-first test build");
-  document.title="EASA Flight Logbook V76";
+  document.querySelectorAll(".sub").forEach(e=>e.textContent="V90 • local/offline-first test build");
+  document.title="EASA Flight Logbook V90";
 })();
 </script>
 
@@ -4907,6 +5257,270 @@ setTimeout(()=>{
     var active = document.querySelector('.app-page.active');
     v76SetEntryScroll(active ? active.id : 'flightsPage');
   });
+})();
+</script>
+
+
+<script id="v77-flight-entry-order-js">
+(function(){
+  function arrangeV77(){
+    var fields = document.getElementById('flightFields');
+    var top = fields && fields.querySelector('.v15-top-grid');
+    var allocation = document.getElementById('timeAllocation');
+    var remarks = fields && fields.querySelector('.v15-remarks');
+    var crewRow = fields && fields.querySelector('.crew-landing-row');
+    var landing = crewRow && crewRow.querySelector('.v17-landing');
+
+    if(!fields || !top || !allocation || !remarks) return false;
+
+    /* Move Remarks to the very top, then Flight times, then the date/aircraft row. */
+    fields.insertBefore(remarks, fields.firstElementChild);
+    fields.insertBefore(allocation, top);
+
+    /* Move the entire LDG controls into the collapsible Flight times section. */
+    if(landing){
+      landing.classList.add('v77-landing-inside');
+      allocation.appendChild(landing);
+      landing.classList.remove('v17-landing');
+      landing.style.removeProperty('display');
+    }
+    return true;
+  }
+
+  function runV77(){
+    if(arrangeV77()) return;
+    setTimeout(arrangeV77, 50);
+    setTimeout(arrangeV77, 250);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', runV77);
+  } else {
+    runV77();
+  }
+})();
+</script>
+
+
+<script id="v78-flight-times-notes-js">
+(function(){
+  function v78Text(el){
+    return (el && (el.textContent || el.innerText) || '').trim();
+  }
+
+  function findNightNote(){
+    var all = Array.from(document.querySelectorAll('body *'));
+    return all.find(function(el){
+      if(el.children.length) return false;
+      var t = v78Text(el);
+      return /night times? (are )?calculated|night.*calculation|calculated.*night/i.test(t);
+    });
+  }
+
+  function findPicusControl(){
+    var el = document.getElementById('picusLog');
+    return el || document.querySelector('input[name="picusLog"]');
+  }
+
+  function addNotes(){
+    var allocation = document.getElementById('timeAllocation');
+    if(!allocation) return false;
+
+    var night = findNightNote();
+    if(night && night.parentElement !== allocation){
+      var note = document.createElement('div');
+      note.className = 'v78-flight-note';
+      note.id = 'v78-night-note';
+      note.innerHTML = night.innerHTML;
+      allocation.appendChild(note);
+      night.remove();
+    }
+
+    if(!document.getElementById('v78-picus-note')){
+      var note = document.createElement('div');
+      note.className = 'v78-flight-note v78-picus-note';
+      note.id = 'v78-picus-note';
+      note.textContent = 'PICUS selected: “PICUS” is automatically added to the logbook Remarks together with the captain’s signature.';
+      allocation.appendChild(note);
+    }
+    return true;
+  }
+
+  function updatePicusNote(){
+    var note = document.getElementById('v78-picus-note');
+    var cb = findPicusControl();
+    if(note) note.style.display = cb && cb.checked ? 'block' : 'none';
+  }
+
+  function run(){
+    addNotes();
+    updatePicusNote();
+  }
+
+  if(document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else run();
+
+  document.addEventListener('change', function(e){
+    if(e.target && (e.target.id === 'picusLog' || e.target.name === 'picusLog')){
+      updatePicusNote();
+    }
+  });
+  setTimeout(run, 100);
+  setTimeout(run, 500);
+})();
+</script>
+
+
+<script id="v79-flight-note-js">
+(function(){
+  function arrangeV79(){
+    var allocation = document.getElementById('timeAllocation');
+    var calc = document.getElementById('calcNotice');
+    if(!allocation || !calc) return false;
+
+    /* Remove the V83 duplicate/generated note if present. */
+    document.querySelectorAll('#timeAllocation .v78-flight-note').forEach(function(el){
+      el.remove();
+    });
+
+    /* The real calculation notice is the one updated by calcCurrent().
+       Move it into the collapsible Flight Times section. */
+    if(calc.parentElement !== allocation){
+      allocation.appendChild(calc);
+    }
+
+    return true;
+  }
+
+  function removeAirportNote(){
+    document.querySelectorAll('body .notice').forEach(function(el){
+      var t=(el.textContent||'').trim();
+      if(/^Search the local airport database\./i.test(t)){
+        el.remove();
+      }
+    });
+  }
+
+  function run(){
+    arrangeV79();
+    removeAirportNote();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', run);
+  } else run();
+
+  setTimeout(run,100);
+  setTimeout(run,500);
+})();
+</script>
+
+
+<script id="v80-dark-mode-js">
+(function(){
+  var KEY='easa-logbook-dark-mode';
+  window.v80SetDarkMode=function(on){
+    var enabled=!!on;
+    document.documentElement.classList.toggle('v80-dark', enabled);
+    document.body.classList.toggle('v80-dark', enabled);
+    try{localStorage.setItem(KEY, enabled?'1':'0')}catch(e){}
+    var cb=document.getElementById('v80DarkMode');
+    if(cb) cb.checked=enabled;
+    var tc=document.querySelector('meta[name="theme-color"]');
+    if(tc) tc.setAttribute('content', enabled?'#000000':'#EEF1F7');
+  };
+  function init(){
+    var on=false;
+    try{on=localStorage.getItem(KEY)==='1'}catch(e){}
+    v80SetDarkMode(on);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
+})();
+</script>
+
+
+<style id="v89-print-css">
+/* V90 print customization */
+.v89-print-options{margin-top:9px;padding:9px 11px;border:1px solid var(--line);border-radius:12px;background:var(--chip-bg)}
+.v89-print-options summary{cursor:pointer;font-size:12px;font-weight:750}
+.v89-grid{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px;margin-top:8px}
+.v89-grid label,.v89-year-row label{font-size:12px;display:flex;flex-direction:column;gap:4px}
+.v89-grid select,.v89-year-row select,.v89-print-options textarea{box-sizing:border-box;padding:6px;width:100%}
+.v89-checks{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:9px}
+.v89-checks label{font-size:12px!important;display:flex!important;align-items:center!important;gap:5px!important;cursor:pointer!important;opacity:1!important;color:var(--ink)!important;pointer-events:auto!important}
+.v89-checks input[type="checkbox"]{position:static!important;display:inline-block!important;width:16px!important;height:16px!important;min-width:16px!important;margin:0!important;padding:0!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;cursor:pointer!important;appearance:auto!important;-webkit-appearance:checkbox!important;filter:none!important;accent-color:#0a84ff!important}
+.v89-checks input[type="checkbox"]:disabled{opacity:1!important;filter:none!important;cursor:pointer!important}
+.v89-year-row{margin-top:8px;max-width:180px}.v89-print-options textarea{margin-top:8px}
+@media print{
+  #printArea .print-page{width:283mm!important;height:190mm!important;max-height:190mm!important;padding:1.2mm!important;box-sizing:border-box!important;overflow:hidden!important;margin:0!important;page-break-before:auto!important;page-break-after:always!important;break-before:auto!important;break-after:page!important;break-inside:avoid!important}
+  #printArea .print-page:last-child{page-break-after:auto!important;break-after:auto!important}
+  #printArea .print-table{width:279mm!important;max-width:279mm!important;table-layout:fixed!important;font-family:var(--v90-font,Arial),Arial,Helvetica,sans-serif!important}
+  #printArea .print-table tr.flight-row,#printArea .print-table tr.flight-row td{height:5.8mm!important;min-height:5.8mm!important;max-height:5.8mm!important;box-sizing:border-box!important}
+  #printArea .print-table td.print-remarks{white-space:normal!important;overflow:hidden!important;text-overflow:clip!important;word-break:normal!important;overflow-wrap:anywhere!important;line-height:1.0!important;text-align:left!important;vertical-align:middle!important;padding:.35mm 1mm!important;font-size:var(--print-font,7pt)!important}
+  #printArea .print-table td.print-remarks>div{max-width:100%!important;overflow-wrap:anywhere!important;white-space:normal!important}
+  #printArea .picus-print-remark{width:100%!important;box-sizing:border-box!important;white-space:normal!important;overflow:hidden!important;line-height:1!important;font-size:6pt!important;overflow-wrap:anywhere!important}
+  #printArea .picus-print-remark .picus-captain{display:block!important;font-size:6pt!important;margin:0!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  #printArea .picus-print-remark img{max-width:100%!important;max-height:2.4mm!important;width:auto!important;height:auto!important;margin:0!important}
+  #printArea.v89-alt .print-table tbody tr.flight-row:nth-child(even) td{background:#eee!important}
+  #printArea.v89-alt .print-table tbody tr.flight-row:nth-child(odd) td{background:#fff!important}
+  .v89-front-page{display:flex!important;width:283mm!important;height:190mm!important;max-height:190mm!important;box-sizing:border-box!important;align-items:center!important;justify-content:center!important;flex-direction:column!important;text-align:center!important;padding:15mm!important;margin:0!important;background:#fff!important;color:#000!important;page-break-before:auto!important;break-before:auto!important;page-break-after:always!important;break-after:page!important;page-break-inside:avoid!important;break-inside:avoid!important}
+  .v89-front-page img{width:40mm!important;height:40mm!important;object-fit:contain!important;margin-bottom:9mm!important;background:#fff!important;padding:2mm!important;box-sizing:content-box!important;border:0!important}
+  .v89-front-page .title{font-size:20pt!important;font-weight:800!important;margin-bottom:7mm!important}.v89-front-page .meta{font-size:12pt!important;line-height:1.6!important}.v89-front-page .remark{max-width:180mm!important;margin-top:10mm!important;white-space:pre-wrap!important}
+  html.v89-portrait #printArea{width:196mm!important;max-width:196mm!important}html.v89-portrait #printArea .print-page{width:196mm!important;height:190mm!important;max-height:190mm!important}html.v89-portrait #printArea .print-table{width:193mm!important;max-width:193mm!important;font-size:5.1pt!important}html.v89-portrait #printArea .print-table th{font-size:4.7pt!important}html.v89-portrait #printArea .print-table tr.flight-row,html.v89-portrait #printArea .print-table tr.flight-row td{height:5mm!important;min-height:5mm!important;max-height:5mm!important}html.v89-portrait .v89-front-page{width:196mm!important;max-width:196mm!important;height:190mm!important;max-height:190mm!important}
+}
+</style>
+<script id="v89-print-js">
+(function(){
+'use strict';
+var ids=['v89Layout','v89Font','v89Orientation','v89Date','v89Alt','v89Front','v89Logo','v89Pilot','v89Range','v89Year','v89Remark','v89YearMode','v89RemarkText'];
+var months=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'], $=function(id){return document.getElementById(id)};
+function val(id,d){var e=$(id);return e?e.value:d} function checked(id,d){var e=$(id);return e?!!e.checked:d}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function parseDate(x){var s=String(x||'').trim().toUpperCase(),m=s.match(/^(\d{2})([A-Z]{3})(\d{2})$/);if(m){var mi=months.indexOf(m[2]);if(mi>=0)return '20'+m[3]+'-'+String(mi+1).padStart(2,'0')+'-'+m[1]}m=s.match(/^(\d{2})\/(\d{2})\/(\d{2})$/);if(m)return '20'+m[3]+'-'+m[2]+'-'+m[1];m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?s:''}
+function fmt(x){var s=parseDate(x),m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!m)return String(x||'');var f=val('v89Date','dd/mm/yy'),y=m[1],mo=m[2],d=m[3];if(f==='yy/mm/dd')return y.slice(2)+'/'+mo+'/'+d;if(f==='ddMONyy')return d+months[+mo-1]+y.slice(2);return d+'/'+mo+'/'+y.slice(2)}
+function getFlights(){try{return typeof getPrintFlights==='function'?getPrintFlights():[]}catch(e){return []}}
+function save(){try{var o={};ids.forEach(function(id){var e=$(id);if(e)o[id]=e.type==='checkbox'?e.checked:e.value});localStorage.setItem('v89PrintOptions',JSON.stringify(o))}catch(e){}}
+function restore(){try{var o=JSON.parse(localStorage.getItem('v89PrintOptions')||'null');if(!o)return;ids.forEach(function(id){var e=$(id);if(!e||o[id]===undefined)return;if(e.type==='checkbox')e.checked=!!o[id];else e.value=o[id]})}catch(e){}}
+function enable(){ids.forEach(function(id){var e=$(id);if(!e)return;e.disabled=false;e.removeAttribute('disabled');e.removeAttribute('aria-disabled');e.style.setProperty('opacity','1','important');e.style.setProperty('pointer-events','auto','important')})}
+function removeFront(a){Array.prototype.slice.call(a.querySelectorAll('.v89-front-page')).forEach(function(x){x.remove()})}
+function addFront(a){removeFront(a);if(!checked('v89Front',false))return;var fs=getFlights(),dates=fs.map(function(f){return String(f.date||'').slice(0,10)}).filter(Boolean).sort(),years=[];dates.forEach(function(d){var y=d.slice(0,4);if(years.indexOf(y)<0)years.push(y)});var h='';if(checked('v89Logo',true))h+='<img src="./icon-512-print.png" alt="Logbook">';h+='<div class="title">FLIGHT CREW LOGBOOK</div><div class="meta">';var pilot=(typeof settings!=='undefined'&&settings&&settings.pilotName)||'';if(checked('v89Pilot',true)&&pilot)h+='<div>'+esc(pilot)+'</div>';if(checked('v89Range',true)&&dates.length)h+='<div>'+fmt(dates[0])+' – '+fmt(dates[dates.length-1])+'</div>';if(checked('v89Year',false)&&years.length)h+='<div>'+esc(val('v89YearMode','year')==='range'?years[0]+'–'+years[years.length-1]:years.join(', '))+'</div>';h+='</div>';var r=String(val('v89RemarkText','')).trim();if(checked('v89Remark',false)&&r)h+='<div class="remark">'+esc(r).replace(/\n/g,'<br>')+'</div>';var d=document.createElement('div');d.className='v89-front-page';d.innerHTML=h;a.insertBefore(d,a.firstChild)}
+function apply(a){enable();a.classList.toggle('v89-alt',checked('v89Alt',false));a.style.setProperty('--v90-font',val('v89Font','Arial'));document.documentElement.classList.toggle('v89-portrait',val('v89Orientation','landscape')==='portrait');var rule=$('v89-page-rule');if(!rule){rule=document.createElement('style');rule.id='v89-page-rule';document.head.appendChild(rule)}rule.textContent=val('v89Orientation','landscape')==='portrait'?'@media print{@page{size:A4 portrait;margin:5mm 5mm 3mm 5mm}}':'@media print{@page{size:A4 landscape;margin:5mm 7mm 3mm 7mm}}';a.querySelectorAll('.print-table .flight-row:not(.blank-flight-row) td:first-child').forEach(function(td){var raw=td.getAttribute('data-v89-date')||parseDate(td.textContent);if(raw){td.setAttribute('data-v89-date',raw);td.textContent=fmt(raw)}});a.querySelectorAll('.print-table .date-fmt').forEach(function(x){x.textContent=val('v89Date','dd/mm/yy').toUpperCase()});a.querySelectorAll('.print-table th').forEach(function(th){var t=th.textContent.trim();if(/^Simulator\s*\(FSTD\)$/i.test(t)||/^Simulator$/i.test(t))th.textContent='SIM';if(/^Instructor$/i.test(t))th.textContent='INSCTR'});addFront(a)}
+function refresh(){save();enable();var a=$('printArea');if(a)apply(a)}
+function init(){
+  restore();enable();
+  // renderPrintPreview() fully rebuilds #printArea from the flight data
+  // every time it runs (perPage/date-range/font changes, adding or
+  // editing a flight, etc.) which would otherwise silently wipe out
+  // every one of the customisations below (front page, date format,
+  // SIM/INSCTR renaming) since they're applied as a DOM post-process
+  // step. Wrapping it so apply() always runs right after keeps the
+  // chosen print settings in effect no matter what triggered the render.
+  if(typeof window.renderPrintPreview==='function'&&!window.renderPrintPreview.__v89wrapped){
+    var baseRender=window.renderPrintPreview;
+    var wrapped=function(){baseRender();var a=$('printArea');if(a)apply(a)};
+    wrapped.__v89wrapped=true;
+    window.renderPrintPreview=wrapped;
+  }
+  ids.forEach(function(id){
+    var e=$(id);if(!e)return;
+    e.disabled=false;e.removeAttribute('disabled');
+    if(e.type==='checkbox'){e.addEventListener('change',refresh)}
+    else if(e.tagName==='TEXTAREA'){e.addEventListener('input',refresh)}
+    else if(id==='v89Layout'){
+      // The one-page/two-page choice changes how many print-table(s) get
+      // built per chunk of flights, which happens inside renderPrintPreview
+      // itself, not in apply()'s post-processing — so it needs a full
+      // re-render, not just a re-apply.
+      e.addEventListener('change',function(){save();if(typeof window.renderPrintPreview==='function')window.renderPrintPreview()});
+    }
+    else{e.addEventListener('change',refresh)}
+  });
+  var a=$('printArea');if(a)apply(a);
+  try{var ob=new MutationObserver(function(){enable()});ids.forEach(function(id){var e=$(id);if(e)ob.observe(e,{attributes:true,attributeFilter:['disabled','style']})})}catch(e){}
+}
+window.v89PrintOptionsChanged=refresh;if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
 

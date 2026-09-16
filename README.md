@@ -258,3 +258,92 @@ restyles the on-screen app.
   a pass on the rest of the field icons throughout the forms too, if
   wanted — this round focused on navigation only, since that's what
   was raised.
+
+## Round 8: fixing dark mode and print customization (added elsewhere, not working correctly)
+
+Between the last round and this one, dark mode, print customization
+(layout/font/orientation/date-format/front-page/2-page-split), the PWA
+manifest/service-worker/icon wiring, and several other unrelated tweaks
+(nav restyle, flight-entry field order) were added outside this thread.
+This round only touches dark mode and print customization, which is what
+was reported as broken.
+
+**Dark mode** — the existing implementation redefined CSS variables
+(`--surface`, `--text`, etc.) that nothing in the stylesheet actually
+reads, so large parts of the UI (the print-customization panel among
+others) never changed color at all, while ~150 lines of `!important`
+overrides tried to patch individual elements one at a time. More
+seriously, none of it was scoped to screen-only, so if dark mode was on
+while printing, the printed page could come out with a black background
+and white (invisible) text. Rewrote it to redefine the app's actual
+variables under a `@media screen` block — so it cannot affect
+printing — with a short list of explicit overrides only for the
+handful of surfaces that use a hardcoded color instead of a variable
+(the floating nav tabs, header, modals, one translucent note box). Also:
+gave "Appearance" its own Settings card (it was unlabeled, stacked above
+"Data import" with no heading of its own), added an early inline script
+so dark mode applies before first paint instead of flashing light mode
+on load, and the browser/PWA chrome color (`theme-color`) now switches
+with it.
+
+**Print customization** — the root cause of "most of it doesn't work":
+`renderPrintPreview()` fully rebuilds `#printArea` from scratch on every
+call (flights/page change, date-range change, font-size change, adding
+or editing any flight — i.e. constantly), and the customization settings
+(front page, date format, SIM/INSCTR renaming, 2-page split) were only
+applied as a one-off DOM post-processing pass with nothing telling it to
+re-run afterward. So the moment you touched almost anything, those
+settings silently reverted to default even though the controls still
+showed your choices. Fixed by wrapping `renderPrintPreview` so the
+customization pass always re-applies after every render.
+
+Also fixed:
+- The front page's "Pilot name" line could never work — it read
+  `window.settings.pilotName`, but `settings` is declared with `let`,
+  which (unlike `var`) never becomes a `window` property. Reads the
+  variable directly now.
+- The "Two pages — standard EASA" layout was cutting the table at the
+  wrong column (after column 16 instead of 14) and, more fundamentally,
+  was trying to hide columns by position on rows that use `colspan`
+  (the header row and the three totals rows), which doesn't work —
+  `nth-child` counts actual cells, not visual columns, so those rows
+  never actually got hidden on either half. Replaced the whole
+  clone-and-hide approach with two properly-built tables matching the
+  reference photo's real column groups: page **A** carries Date /
+  Departure / Arrival / Aircraft / Single-Pilot time / Multi-Pilot time
+  / Total time / Name PIC / Landings; page **B** carries Operational
+  Condition time / Pilot Function time / Simulator / Remarks (with the
+  signature block, matching the reference).
+- The front page's fixed A4-landscape dimensions never switched for
+  Vertical/portrait orientation, so it could overflow the printed page
+  in that mode; it now resizes with the rest of the layout.
+- A leftover global column-width rule kept `!important`-forcing every
+  `.print-table`'s column widths to a fixed 22-column layout — with the
+  2-page split now building genuinely different tables (14 and 8
+  columns), that rule would have corrupted both of them. Folded its
+  (better) proportions into the one-page table's own column widths and
+  removed the global override.
+- The print-customization panel was crammed inside the same horizontal
+  toolbar strip as the small "Flights/page, Font, dates, buttons" row,
+  which squeezed it into a cramped, narrow space when expanded; it's
+  now a full-width block below that row.
+- Removed the leftover duplicate `24` option in "Flights/page" (added a
+  genuine `22` option instead of the accidental repeat).
+- The new "Font" control (typeface: Arial/Helvetica/Times/Courier) had
+  the same label as the pre-existing "Font" control (point size), which
+  would read as one broken control rather than two working ones;
+  relabeled to "Typeface".
+- Added an "Open in Safari" button next to "Copy link" on the
+  iOS-Home-Screen print notice — a same-origin `window.open()` from a
+  standalone iOS web app hands off to a real Safari tab, which is the
+  one-tap version of what "Copy link" already asked the user to do
+  manually. The underlying diagnosis (iOS blocks `window.print()`
+  entirely for Home-Screen-installed web apps; there's no in-app
+  workaround, only opening the same page in Safari) was already
+  correct.
+- The service worker's cached file list still referenced the unused
+  `style.css`/`app.js` and was missing several icons actually in use,
+  including the front page's logo image — so that image could fail to
+  load if the print preview was opened while offline. Updated the list
+  and bumped the cache version so the fixes above actually reach the
+  installed app instead of serving a stale cached copy.
