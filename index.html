@@ -7,9 +7,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#EEF1F7">
 <link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./favicon.ico" type="image/x-icon">
+<link rel="icon" type="image/png" sizes="32x32" href="./icon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
-<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-<title>EASA Flight Logbook V63</title>
+<link rel="apple-touch-icon" sizes="167x167" href="./icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="./icon-152.png">
+<title>EASA Flight Logbook</title>
 <style>
 /* ==================================================================
    EASA Flight Logbook — iOS-style visual design system (V21 UI pass)
@@ -766,7 +769,7 @@ tbody tr:hover{background:var(--input-bg)}
 </section>
 
 <section class="card">
-  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V69 • local/offline-first test build</div>
+  <div class="section-title">Flight-entry defaults</div><div class="notice" style="margin-bottom:8px">V70 • local/offline-first test build</div>
   <div class="notice" style="margin-bottom:12px">Choose what is automatically selected when you start a new flight. You can still change any selection for an individual flight.</div>
   <div class="default-checks">
     <label><input id="defaultIFR" type="checkbox"> IFR</label>
@@ -3497,7 +3500,7 @@ setTimeout(updateTotalsPeriodV23,300);
   // Initial state: PF unless this is an explicitly loaded PM flight.
   sync(pm.checked ? 'pm' : 'pf');
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V69 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V70 • local/offline-first test build');
   document.title='EASA Flight Logbook V36';
 })();
 </script>
@@ -3835,7 +3838,7 @@ setTimeout(()=>{
     };
   }
 
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V69 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V70 • local/offline-first test build');
   document.title='EASA Flight Logbook V66';
 })();
 </script>
@@ -3889,7 +3892,7 @@ setTimeout(()=>{
   };
 
   document.title='EASA Flight Logbook V44';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V69 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V70 • local/offline-first test build');
 })();
 </script>
 
@@ -3956,7 +3959,7 @@ setTimeout(()=>{
   }
 
   document.title='EASA Flight Logbook V66';
-  document.querySelectorAll('.sub').forEach(e=>e.textContent='V69 • local/offline-first test build');
+  document.querySelectorAll('.sub').forEach(e=>e.textContent='V70 • local/offline-first test build');
 })();
 </script>
 
@@ -4249,7 +4252,7 @@ setTimeout(()=>{
 
   // Ensure the final visible build/version text is V66.
   document.querySelectorAll('.sub').forEach(e=>{
-    e.textContent='V69 • local/offline-first test build';
+    e.textContent='V70 • local/offline-first test build';
   });
   document.title='EASA Flight Logbook V66';
 })();
@@ -4697,8 +4700,19 @@ setTimeout(()=>{
   });
 
   // Final visible build marker.
-  document.querySelectorAll(".sub").forEach(e=>e.textContent="V69 • local/offline-first test build");
-  document.title="EASA Flight Logbook V69";
+  document.querySelectorAll(".sub").forEach(e=>e.textContent="V70 • local/offline-first test build");
+  document.title="EASA Flight Logbook V70";
+})();
+</script>
+
+
+<script>
+(function(){
+  if(!('serviceWorker' in navigator)) return;
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js', {scope:'./'})
+      .catch(function(err){ console.warn('Service worker registration failed:', err); });
+  });
 })();
 </script>
 
