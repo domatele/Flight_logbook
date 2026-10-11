@@ -259,91 +259,256 @@ restyles the on-screen app.
   wanted — this round focused on navigation only, since that's what
   was raised.
 
-## Round 8: fixing dark mode and print customization (added elsewhere, not working correctly)
+## Round 8 (V150): QR backup in the printed logbook
 
-Between the last round and this one, dark mode, print customization
-(layout/font/orientation/date-format/front-page/2-page-split), the PWA
-manifest/service-worker/icon wiring, and several other unrelated tweaks
-(nav restyle, flight-entry field order) were added outside this thread.
-This round only touches dark mode and print customization, which is what
-was reported as broken.
+Goal: if the app, the phone, the JSON backups and Google Drive are all gone,
+the **printed logbook alone** is enough to rebuild the digital logbook,
+without retyping anything.
 
-**Dark mode** — the existing implementation redefined CSS variables
-(`--surface`, `--text`, etc.) that nothing in the stylesheet actually
-reads, so large parts of the UI (the print-customization panel among
-others) never changed color at all, while ~150 lines of `!important`
-overrides tried to patch individual elements one at a time. More
-seriously, none of it was scoped to screen-only, so if dark mode was on
-while printing, the printed page could come out with a black background
-and white (invisible) text. Rewrote it to redefine the app's actual
-variables under a `@media screen` block — so it cannot affect
-printing — with a short list of explicit overrides only for the
-handful of surfaces that use a hardcoded color instead of a variable
-(the floating nav tabs, header, modals, one translucent note box). Also:
-gave "Appearance" its own Settings card (it was unlabeled, stacked above
-"Data import" with no heading of its own), added an early inline script
-so dark mode applies before first paint instead of flashing light mode
-on load, and the browser/PWA chrome color (`theme-color`) now switches
-with it.
+**What gets printed** (Print customization → *QR backup*):
 
-**Print customization** — the root cause of "most of it doesn't work":
-`renderPrintPreview()` fully rebuilds `#printArea` from scratch on every
-call (flights/page change, date-range change, font-size change, adding
-or editing any flight — i.e. constantly), and the customization settings
-(front page, date format, SIM/INSCTR renaming, 2-page split) were only
-applied as a one-off DOM post-processing pass with nothing telling it to
-re-run afterward. So the moment you touched almost anything, those
-settings silently reverted to default even though the controls still
-showed your choices. Fixed by wrapping `renderPrintPreview` so the
-customization pass always re-applies after every render.
+- **One QR code per logbook page.** Each one is self-contained: that page's
+  entries, its printed PAGE TOTAL and its BROUGHT FORWARD totals. Losing a
+  sheet loses only that sheet's code, and the brought-forward chain shows
+  exactly which page is missing. A page is split into two codes only if it
+  would otherwise need a code denser than QR version 27 (it doesn't with
+  24 entries per page; a heavy 30-entry page occasionally does).
+- **One INDEX code** (plain text, readable by any phone camera/QR app):
+  pilot, print date, entry/page counts and **totals per year**, plus START
+  (brought forward before page 1) and END (final accumulated) totals.
+- **A "How to recover" sheet** next to the index, which documents the format
+  on paper, so recovery works even without this README.
+- Placement: **At end of book** (index sheet + 8 codes per landscape sheet,
+  9 per portrait sheet), **After each page** (one sheet after every logbook
+  page, so in double-sided printing each page carries its own backup on the
+  back; in the two-page layout it follows the right-hand page), or **Off**.
+- QR sheets are always black on white (also with *Dark print*) and use error
+  correction Q (25%) where that fits within version 25, otherwise M (15%).
 
-Also fixed:
-- The front page's "Pilot name" line could never work — it read
-  `window.settings.pilotName`, but `settings` is declared with `let`,
-  which (unlike `var`) never becomes a `window` property. Reads the
-  variable directly now.
-- The "Two pages — standard EASA" layout was cutting the table at the
-  wrong column (after column 16 instead of 14) and, more fundamentally,
-  was trying to hide columns by position on rows that use `colspan`
-  (the header row and the three totals rows), which doesn't work —
-  `nth-child` counts actual cells, not visual columns, so those rows
-  never actually got hidden on either half. Replaced the whole
-  clone-and-hide approach with two properly-built tables matching the
-  reference photo's real column groups: page **A** carries Date /
-  Departure / Arrival / Aircraft / Single-Pilot time / Multi-Pilot time
-  / Total time / Name PIC / Landings; page **B** carries Operational
-  Condition time / Pilot Function time / Simulator / Remarks (with the
-  signature block, matching the reference).
-- The front page's fixed A4-landscape dimensions never switched for
-  Vertical/portrait orientation, so it could overflow the printed page
-  in that mode; it now resizes with the rest of the layout.
-- A leftover global column-width rule kept `!important`-forcing every
-  `.print-table`'s column widths to a fixed 22-column layout — with the
-  2-page split now building genuinely different tables (14 and 8
-  columns), that rule would have corrupted both of them. Folded its
-  (better) proportions into the one-page table's own column widths and
-  removed the global override.
-- The print-customization panel was crammed inside the same horizontal
-  toolbar strip as the small "Flights/page, Font, dates, buttons" row,
-  which squeezed it into a cramped, narrow space when expanded; it's
-  now a full-width block below that row.
-- Removed the leftover duplicate `24` option in "Flights/page" (added a
-  genuine `22` option instead of the accidental repeat).
-- The new "Font" control (typeface: Arial/Helvetica/Times/Courier) had
-  the same label as the pre-existing "Font" control (point size), which
-  would read as one broken control rather than two working ones;
-  relabeled to "Typeface".
-- Added an "Open in Safari" button next to "Copy link" on the
-  iOS-Home-Screen print notice — a same-origin `window.open()` from a
-  standalone iOS web app hands off to a real Safari tab, which is the
-  one-tap version of what "Copy link" already asked the user to do
-  manually. The underlying diagnosis (iOS blocks `window.print()`
-  entirely for Home-Screen-installed web apps; there's no in-app
-  workaround, only opening the same page in Safari) was already
-  correct.
-- The service worker's cached file list still referenced the unused
-  `style.css`/`app.js` and was missing several icons actually in use,
-  including the front page's logo image — so that image could fail to
-  load if the print preview was opened while offline. Updated the list
-  and bumped the cache version so the fixes above actually reach the
-  installed app instead of serving a stale cached copy.
+Monthly codes were considered and left out: months don't line up with
+printed pages, so they would add codes without adding anything that can be
+recovered or checked.
+
+**Restoring**
+
+- *In the app:* Flights tab → **Restore from QR**. Paste the scanned text of
+  any number of codes (one per line or back to back). The dialog shows pages
+  found/missing and checks: every page against its printed totals, the
+  brought-forward chain, page 1 vs the index, every year vs the index, and
+  final totals vs the index. Entries already in the app are skipped, and the
+  aircraft, crew and simulator profiles are recreated. In browsers with the
+  BarcodeDetector API (e.g. Chrome on Mac/Android) there's also *Read QR from
+  photos…*. Safari/iOS doesn't offer that API: scan with the camera or any QR
+  app and paste the text.
+- *Without the app:* `logbook_qr_recover.py` (Logbook folder) reads photos,
+  scanned PDFs or pasted text and writes `logbook_recovered.csv`,
+  `logbook_recovered_backup.json` (load with *Restore JSON*) and a check
+  report. Needs `pip3 install opencv-python` (+ `pymupdf` for PDFs).
+- *By hand:* CyberChef recipe "From Base45" → "Zlib Inflate" on the data
+  part of a page code gives the CSV.
+
+**Format `EASALOG1`** (stable, documented, open standards only)
+
+    page code  = EASALOG1 ID<yymmdd-hhmm> PAGE <n>/<N> PART <p>/<P> N<len> <data>
+    <data>     = <len> chars, Base45 (RFC 9285) of zlib (RFC 1950) compressed UTF-8 CSV
+    index code = "EASALOG1 INDEX ID<id>" + plain-text lines (byte mode)
+
+The whole page code uses only QR alphanumeric characters, so it is encoded in
+the denser alphanumeric mode. Decompressed CSV:
+
+    #EASALOG1,1
+    #book,<id>,<pilot>
+    #page,<n>,<N>,<part>,<parts>
+    #totals,SE,ME,MP,TOTAL,LDG_D,LDG_N,NIGHT,IFR,PIC,COP,DUAL,INSTR,SIM
+    #brought_forward,<13 values>
+    #this_page,<13 values>
+    kind,date,dep,out,arr,in,type,reg,eng,op,total,night,ifr,pic,cop,dual,instr,picus,sim,ldgD,ldgN,role,flags,name,crew,captain,remarks
+    F,2026-08-21,LSZH,18:39,EDDH,20:03,A320,LY-CAP,ME,MP,1:24,0:57,1:24,,1:24,,,,,,1,Co-pilot,IMS,DIMOS ASSOS,,,
+
+kind F = flight, S = simulator session (type/reg = simulator profile, sim =
+session time, name = instructor). Times H:MM, blank = 0. `pic/cop/dual/instr`
+are the times exactly as the printed page counts them (stored allocation, or
+the role-based fallback for older records). flags: I IFR, F PF, M PM, P PIC,
+S SIC, D dual, T instructor, U PICUS, X aircraft profile is a simulator.
+Totals use the same rules as the printed page (`printTimeBuckets`).
+
+Not in the codes: internal IDs, the signature images (PICUS/pilot), and
+library-only fields (crew licence/operator, aircraft power). They're recreated
+empty on restore.
+
+**Verification done for this round** (headless Chromium + zbar/OpenCV):
+
+- QR encoder: all 40 versions × 4 error-correction levels filled to capacity
+  decode correctly (zbar 160/160); format/version BCH bits checked against
+  the spec values.
+- Compressor: 400+ fuzz cases round-trip through Node's zlib and the built-in
+  inflater; Base45 matches the RFC 9285 test vectors.
+- Real data (681 flights + 43 FSTD, 31 pages): every page's code totals equal
+  the totals printed on that page (one-page layout, 24 and 30 per page, with
+  and without a date window). PDF → 200 dpi raster → all 32 codes decode;
+  restore into an empty app reproduces every flight with **zero field
+  differences**, plus all simulator sessions and the aircraft/crew/sim
+  libraries; all year/final checks pass.
+- Missing page, corrupted code, codes pasted back to back, and re-importing
+  over existing data (duplicates skipped) all behave correctly.
+- Print variants: end/after-each × one/two-page × portrait × dark print ×
+  front page produce the expected number of PDF pages (no blank or
+  overflowing pages).
+
+Replaces the V148/V149 "QR flight data" checkbox, which never worked: its
+pasted QR library referenced Node's `module` object, so the whole script
+crashed when the page loaded.
+
+### Found during this round, not fixed (needs a decision)
+
+- **Two-page layout misprints from the second spread on** (also in V149):
+  the left page shows dates that belong to other flights, and its totals row
+  sits under the wrong columns; on the right page the columns are shifted
+  (dates appear under NIGHT). Page 1 is correct. The QR codes are built from
+  the data, not the printed sheet, so they're correct either way.
+
+## Round 9 (V150.1): Safari print fixes
+
+Chrome output is unchanged: one-page, two-page, dark and portrait+front-page
+PDFs were compared pixel by pixel against V149 with QR off, and every page is
+identical.
+
+- **Blank page between QR sheets in Safari:** each QR sheet had both a page
+  break before and after it. Chrome merges two breaks in a row; Safari prints
+  both, which adds a blank page. Each QR sheet now only breaks after itself
+  (the logbook page before it already breaks after itself).
+- **Tables spilling onto a second page in Safari:** several older print
+  patches (V122/V127/V134/V139/V140) set the same explicit height on every
+  table cell as on its row. Chrome counts a cell's padding and border inside
+  that height; Safari adds them on top (0.265 mm padding + 0.265 mm border,
+  top and bottom). Every row grew by ~0.4 mm, about 11 mm over 24 rows, so the
+  ACCUMULATED TOTAL row moved to a new page. A final pass
+  (`normalizeCellHeights` in the V150 script, run last before printing) keeps
+  the height on the row and gives cells the row height minus 1.06 mm. Chrome
+  already used the row height, so it renders the same.
+- **Orientation:** Safari ignores the `@page` orientation the app requests
+  (Chrome applies it), so in Safari you must pick Landscape in the print panel.
+  This is a browser limitation with no workaround from the page; the
+  "Before you print" reminder and the tip under the print buttons now say so.
+
+## Round 10 (V150.2): Safari scaling — the real cause
+
+Measured on two real Safari 26 PDFs (A4 landscape, Save as PDF): **every
+fixed size prints ×1.066**. The 64 mm QR codes print 68 mm, 6.54 mm rows
+print 6.97 mm, 4 mm rows print 4.2 mm, and widths look right only because
+they're percentages. Safari ignores the `@page` size, lays the printout out
+about 265 mm wide (matches US Letter width minus margins), and stretches it to
+the A4 width. So every fixed-height page (198.5 mm logbook page, front page,
+QR sheet) became ~211 mm on paper against ~202 mm printable: the last table
+row moved to a new page, and a blank page followed every QR sheet.
+
+Fix: in Safari only (user-agent check that excludes Chrome/Edge/Firefox/
+Opera/Android), the print area gets `zoom: 0.938` (= 1/1.066), so it prints
+at the intended size. Chrome output is still pixel-identical to V149.
+`SAFARI_PRINT_ZOOM` in the V150 script is the single value to tune if a
+different Safari/paper setup measures differently. The Round 9 cell-height
+change stays: harmless, and correct for engines that add cell padding to
+explicit heights.
+
+## Round 11 (V151): 2nd and 3rd logbooks
+
+- **Settings → Logbooks:** "Logbooks in use" 1 (standard) / 2 / 3, plus
+  optional names for the 2nd and 3rd (e.g. "Gliders"; default "2nd logbook" /
+  "3rd logbook"). It also shows how many flights/FSTD sessions each logbook
+  holds. Lowering the count asks for confirmation if entries would be hidden;
+  nothing is deleted.
+- **New Flight page:** next to *Add flight* (which still adds to the 1st
+  logbook) there are *Add to 2nd logbook* / *Add to 3rd logbook*. The FSTD
+  form gets the same buttons. While editing, a chip shows which logbook the
+  flight is in, plus *Move to …* buttons. *Save Changes* keeps the flight in
+  its logbook.
+- **Flights list:** still one list; entries in the 2nd/3rd logbook carry a
+  small "2nd"/"3rd" badge.
+- **Printing:** Print customization → *Logbook* (with entry counts) chooses
+  which logbook to print. Only that logbook's flights and FSTD sessions are
+  printed, brought-forward totals only count that logbook, and the page header
+  says which logbook it is. The QR backup covers only the printed logbook. Its
+  print ID gets "-L2"/"-L3", page codes carry `#logbook,<n>,<name>`, and the
+  index has a LOGBOOK line. *Restore from QR* and `logbook_qr_recover.py`
+  put entries back into the right logbook (and switch the extra logbooks on
+  if needed). The recovery CSV has a `logbook` column.
+- **Data:** an entry in the 2nd/3rd logbook has `logbook: 2|3`; no field means
+  the 1st. JSON backups, Google Drive backup and Restore JSON carry it as is.
+  The settings (`settings.logbooks`) travel with the backup.
+- **Implementation:** the app has several layered add/edit/return-leg
+  implementations that all end in `saveData()`, so the logbook is applied
+  there (V151 script at the end of the file). For printing, `flights` /
+  `simSessions` are temporarily narrowed to the chosen logbook around
+  `printLogbook` / `proceedToPrint` / `renderPrintPreview`.
+- **Verified** (Chromium, real data): adding to 2nd/1st, moving via Edit,
+  editing keeps the logbook, FSTD to 3rd, values persisted, badges. Printing
+  each logbook gives exactly its own entries (525/184/15 in the test split)
+  with all QR checks passing. QR restore and the Python script restore into
+  the right logbooks. With one logbook the Chrome print is still
+  pixel-identical to V149.
+- **Not included:** *Create Return* / *3rd Leg* save the current leg into the
+  1st logbook. Use *Edit → Move to …*, or add the leg with the logbook button.
+  The CSV export has no logbook column yet.
+
+### Found, not fixed
+
+- **Edit mode (pre-existing in V149):** the *Cancel Edit* button sits
+  underneath the Refresh/Clear pair, so only its last letter shows.
+
+## Round 12 (V152): dark mode completion
+
+- **Root cause:** most text and surfaces use the theme variables from `:root`
+  (`--ink` near-black, `--card`, `--input-bg`, `--chip-bg`, …), and dark mode
+  never redefined them. Section titles, bold text in notes, crew/airport
+  suggestions and the Drive status line stayed near-black on dark grey. Dark
+  mode now defines all of them.
+- **Selected role chips** (PIC/SIC/DUAL/PF/PM/IFR/…) and Settings default
+  chips didn't look pressed: the dark theme's `!important` grey overrode the
+  blue selected style. Selected chips are now solid blue again.
+- **Flights page:** the period total tiles, the Print customization panel and
+  the flight table header were still light. All are now dark.
+- **Reset Auto** (Flight times): no longer light.
+- **Verified:** an automated contrast audit over every page and state (New
+  Flight with suggestions open and chips selected, FSTD, edit mode, Flights,
+  Aircraft, Crew, Simulators, Airports, Settings, More menu, Restore from QR,
+  print reminder, crew/aircraft dialogs) finds no unreadable text and no light
+  panels in dark mode. Light mode screenshots are pixel-identical to V151.
+  The rules are screen-only, so printing is unaffected.
+
+## Round 13 (V153): Endorsements & remarks
+
+- **More → Endorsements** (new tab): add an *Endorsement* or a *Remark* with an
+  optional date, name, licence number, free text and a signature. Ticking
+  **Signed** opens a signature pad (finger, Apple Pencil, mouse or trackpad).
+  The signature is cropped to the ink, so it prints large in small boxes. Tap
+  the signature preview to sign again; untick to remove it. Entries can be
+  edited and deleted. With 2nd/3rd logbooks on, each entry belongs to one
+  logbook. The list is chronological; undated entries sort by the day they were
+  entered.
+- **Storage:** `settings.endorsements` (array of `{id, kind, date, name,
+  licence, text, signature (PNG data URL), logbook?, created, updated?}`), so
+  Backup JSON, Restore JSON and Google Drive backup include them automatically.
+  They're not in the QR codes yet (signatures don't fit in a QR code).
+- **Printing:** Print customization → **Endorsement pages** plus
+  *Endorsements per page*: 3 × 2, 4 × 2, 3 × 3 or 4 × 3 (columns × rows). The
+  pages go at the end of the logbook, before the QR backup sheets (in "after
+  each page" QR mode, after the last page's code and before the index sheet).
+  Each box prints only the fields that were filled (type, date, text, name,
+  licence no., signature). Long texts shrink automatically to fit their box
+  (measured off-screen before printing). The remaining boxes on the last page
+  print empty with Date / Name / Licence No. / Signature guides, for
+  handwritten endorsements. When printing the 2nd/3rd logbook, only its own
+  entries print, and the title names the logbook.
+- **Verified** (Chromium): add/edit/delete, signature drawing, persistence,
+  JSON backup content. All four grids, QR end / after-each / off, the one- and
+  two-page layouts and the 2nd logbook give the right order and the right number
+  of PDF pages, with no blank pages. The dark-mode contrast audit is still clean.
+- Dark mode: *Delete* buttons keep their red text.
+
+### V153.1: choosing the logbook for an endorsement
+
+With 2nd/3rd logbooks switched on, **Save** asks "Save endorsement/remark to
+which logbook?" and shows one button per logbook. When editing, the current
+logbook is highlighted. *Cancel* saves nothing and keeps the form. With one
+logbook, Save saves straight away. The logbook dropdown in the form was removed,
+and the list shows each entry's logbook when several are in use.
