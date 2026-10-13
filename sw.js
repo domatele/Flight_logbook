@@ -1,4 +1,4 @@
-const CACHE_NAME = "easa-logbook-v135";
+const CACHE_NAME = "easa-logbook-v136";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -47,14 +47,20 @@ self.addEventListener("fetch", (event) => {
   // from loading offline.
   if (url.origin !== self.location.origin) return;
 
-  // Navigation: always prefer the cached application shell. If the shell
-  // is missing, try the network and finally fall back to cached index.html.
+  // Navigation (the app page itself): network first, so a new version shows up on the
+  // very next load; fall back to the cached copy when offline. (Before V153.2 this was
+  // cache-first, which kept showing the previous version until a second reload.)
   if (request.mode === "navigate") {
     event.respondWith(
-      caches.match("./index.html").then((cachedIndex) => {
-        if (cachedIndex) return cachedIndex;
-        return fetch(request).catch(() => caches.match("./index.html"));
-      })
+      fetch(request, { cache: "no-store" })
+        .then((response) => {
+          if (response && response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match("./index.html").then((cached) => cached || caches.match(request)))
     );
     return;
   }

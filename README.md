@@ -512,3 +512,94 @@ which logbook?" and shows one button per logbook. When editing, the current
 logbook is highlighted. *Cancel* saves nothing and keeps the form. With one
 logbook, Save saves straight away. The logbook dropdown in the form was removed,
 and the list shows each entry's logbook when several are in use.
+
+### sw.js (cache v136): updates show up on the next load
+
+The service worker served the page **cache-first**: it showed the previously
+cached app and only fetched the new one in the background, so every update
+needed a second reload (and looked "not fixed" after the first). Navigation is
+now **network-first**: online, the latest index.html loads and refreshes the
+cache; offline, the cached copy is used. Tested in Chromium: after publishing a
+new version, one reload shows it, and the app still opens offline. The switch
+itself still needs one last double reload, because the old worker is in charge
+until the new one installs.
+
+### V153.2: rename every logbook
+
+Settings → Logbooks now has a name field for the **1st** logbook too (all
+optional, up to 40 characters; empty = "1st/2nd/3rd logbook"). Names are stored
+in `settings.logbooks.name1/name2/name3` and used everywhere: Add/Move buttons,
+the edit chip, list badges (which now show the name), the print selector,
+printed page headers, the endorsement "which logbook?" dialog and list badges,
+and the QR index/meta (`LOGBOOK: 1 (Airline A320)`). Renaming only changes
+labels; entries stay in their logbook (stored by number).
+
+## Round 14 (V154): currency, personalisation, statistics, print extras
+
+**Currency** (More → Currency, plus a banner on the New Flight page)
+- Recency, last 90 days, per type (single-pilot piston aeroplanes grouped as
+  SEP/MEP class). Shows landings in 90 days, "current until" (third most recent
+  landing + 90 days) and night currency (last night landing + 90 days).
+  Following EASA FCL.060(b), each logged landing counts as a take-off and
+  landing; FSTD sessions are not counted. Types flown in the last 12 months are
+  listed.
+- Flight-time limits: block time in the last 28 days / 12 months / calendar
+  year against editable limits (defaults ORO.FTL.210: 100 / 1000 / 900 h).
+  Meters turn amber at 75% and red at 90%. All logbooks are counted.
+- Expiry dates: licence, medical, ratings, checks and so on, with presets.
+  Warnings at 60 / 30 / 7 days and when expired.
+- Banner: lapsed or ending recency (types flown in the last 90 days), limits at
+  90% or more, expiries within 60 days. Tap it to open Currency; × hides it for
+  the day (it comes back if something new appears).
+- Data: `settings.limits`, `settings.expiries` (included in backups).
+
+**Personalisation**
+- Accent colour (Settings → Appearance): Blue, Indigo, Teal, Green, Orange,
+  Red, Pink, Graphite. Each has a light and a dark-mode shade; white text
+  contrast is at least 3.5:1. Implemented by rewriting every accent-blue value
+  in the screen stylesheets (print rules untouched). Stored in
+  `settings.ui.accent`.
+- Flights list: a new renderer with Sort (newest/oldest), Rows
+  (comfortable/compact), selectable columns (incl. PIC/instructor, other crew,
+  landings, remarks, tags) and a Tag filter with totals for that tag.
+  Preferences are per device (localStorage).
+- Tags: a Tags field on the New Flight form (suggestions from tags already
+  used, stored uppercase), applied on Add flight / logbook buttons / Save
+  Changes / Create Return / 3rd Leg, and filled in when editing. `flight.tags`.
+
+**Statistics** (More → Statistics)
+- Period: all time, last 12 months, or a year. Headline numbers, hours per
+  year, hours per month, time by function and by condition/operation, a route
+  map (airports and routes on a lat/lon grid; needs the airport database), top
+  routes, top airports, aircraft types, registrations and milestones (hours,
+  flights, firsts, with progress to the next one). Plain SVG charts, one accent
+  colour, hover tooltips; every value is also shown as text.
+
+**Print extras** (Print customization)
+- Footer text and page numbers ("Page 7", "7 / 31", "Page 7 of 31", "7") with
+  a first page number, for continuing a paper logbook. The flight rows give up
+  4 mm in total so the footer never overflows (one-page: pinned to the page
+  bottom; two-page: directly under the table). With both off, output is
+  unchanged.
+- Totals per year page: one row per year (flights, SE, ME, multi-pilot, total,
+  night, IFR, PIC, co-pilot, dual, instructor, FSTD, landings), plus a total,
+  brought forward and grand total when printing a date window. It goes after
+  the logbook pages, before endorsements and the QR backup.
+- Hours summary (Flights → *Hours summary*): a one-page portrait extract for
+  job applications. It covers totals by function and condition, recent
+  experience (90 days / 12 months / this year), validity items from Currency,
+  per-type totals and your signature. You can preview it, print/save it as PDF,
+  or copy it as text; with several logbooks, choose all or one. While it
+  prints, the logbook's own @page rules are removed and restored afterwards.
+
+**Build fix:** the original file has scripts after `</body></html>`, so the
+V151+ modules were loading before the QR module, which then replaced a hook
+they had wrapped. They are now appended at the very end of the file.
+Logbooks/endorsements/QR behaviour is unchanged (re-tested).
+
+**Verified:** with the extras off, Chrome print is pixel-identical to V149
+(one-page, two-page, dark, portrait + front page). The QR round trip still
+gives zero field differences; logbook, endorsement and per-logbook print tests
+pass. Footer/numbering adds no pages. The summary prints as one portrait page
+and the logbook prints landscape afterwards. The dark-mode audit over every
+page and state finds no unreadable text.

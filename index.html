@@ -8179,513 +8179,6 @@ setTimeout(()=>{
   setTimeout(setV,50);setTimeout(setV,300);
 })();
 </script>
-<style id="v151-logbooks-css">
-.v151-lb-buttons{display:contents}
-.v151-lb-chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:650;background:rgba(10,132,255,.12);color:#0A84FF;white-space:nowrap}
-.v151-lb-badge{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;font-size:10.5px;font-weight:700;line-height:1.5;background:rgba(10,132,255,.13);color:#0A84FF;vertical-align:middle;white-space:nowrap}
-body.v80-dark .v151-lb-badge,body.v80-dark .v151-lb-chip{background:rgba(10,132,255,.26);color:#7cc0ff}
-@media print{.v151-lb-badge{display:none!important}#printArea .v151-lb-front{font:700 13pt Arial,Helvetica,sans-serif!important;letter-spacing:.06em!important;margin:2mm 0 4mm!important;color:inherit!important}}
-</style>
-<style id="v152-dark-fixes">
-/* V152: dark-mode completion. Most text/surfaces use the theme variables from :root (--ink #1C1C1E etc.), which
-   dark mode never redefined, so titles, bold text and suggestions stayed near-black on dark grey. Screen only:
-   printing and light mode are untouched. */
-@media screen{
-body.v80-dark{
-  --bg:#000;--card:#17181c;--card-solid:#17181c;--card-border:#2a2c33;--glass-highlight:rgba(255,255,255,.06);
-  --ink:#f5f6f8;--muted:#a3a8b4;--muted-2:#6f7480;--line:#2a2c33;--accent:#1683ff;--accent-dark:#0a6fe0;--accent-soft:rgba(22,131,255,.24);
-  --input-bg:#1d1f24;--input-border:#30323a;--chip-bg:#22242a;--danger-soft:rgba(255,69,58,.22);--ok-soft:rgba(48,209,88,.2);
-  --shadow-card:none;--shadow-pop:0 24px 60px rgba(0,0,0,.65);
-}
-/* selected role / default chips: the dark theme's "!important" dark grey overrode the blue selected state */
-body.v80-dark .v17-role-grid label:has(input:checked),
-body.v80-dark .default-checks label:has(input:checked){background:#1683ff!important;border-color:#1683ff!important;color:#fff!important;box-shadow:0 3px 12px rgba(22,131,255,.45)!important}
-/* titles, bold text, suggestion lists, status lines */
-body.v80-dark .section-title,body.v80-dark .card b,body.v80-dark .card strong,body.v80-dark .modal-card b,body.v80-dark .notice b,
-body.v80-dark .suggestions div,body.v80-dark .library-item b,body.v80-dark #v34DriveStatus{color:#f5f6f8!important}
-body.v80-dark .suggestions{border-color:#30323a!important;box-shadow:0 12px 30px rgba(0,0,0,.6)!important}
-body.v80-dark .suggestions div:hover,body.v80-dark .suggestions div.active,body.v80-dark .suggestions div[aria-selected="true"]{background:rgba(22,131,255,.26)!important}
-/* Flights page: period total tiles, print customization panel, table header */
-body.v80-dark #totalsSummaryV23 > *{background:#22242a!important;border-color:#30323a!important;color:#f5f6f8!important}
-body.v80-dark #totalsSummaryV23 > * *{color:inherit}
-body.v80-dark #totalsSummaryV23 > * :not(b):not(strong):last-child{color:#a3a8b4!important}
-body.v80-dark .v103-print-controls{background:#111216!important;border-color:#30323a!important}
-body.v80-dark .v103-print-controls label{color:#b8bcc6!important}
-body.v80-dark table thead th{background:#111216!important;color:#8e93a0!important;border-color:#2a2c33!important}
-body.v80-dark #flightTable td{border-color:#24262c!important}
-/* destructive buttons keep their red text */
-body.v80-dark button.danger{color:#ff6b61!important;border-color:rgba(255,107,97,.35)!important}
-/* "Reset Auto" in Flight times */
-body.v80-dark #timeAllocation .time-actions button{background:#22242a!important;color:#fff!important;border-color:#30323a!important}
-}
-</style>
-
-<style id="v153-endorsements-css">
-/* ---- Endorsements tab ---- */
-.v153-kind{margin:2px 0 12px}
-.v153-lb-card{max-width:420px!important;width:100%}
-.v153-lb-choices{display:flex;flex-direction:column;gap:8px}
-.v153-lb-choices button{width:100%;padding:12px 14px;font-size:15px}
-.v153-grid{margin-bottom:2px}
-#endorsementsPage textarea#v153Text{min-height:96px;resize:vertical;width:100%;box-sizing:border-box}
-.v153-sign-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 4px}
-.v153-sign-chip{position:relative;display:inline-flex;align-items:center;gap:8px;padding:9px 16px 9px 12px;border-radius:999px;border:1px solid var(--input-border);background:var(--chip-bg);font-weight:650;font-size:14px;color:var(--ink);cursor:pointer;user-select:none}
-.v153-sign-chip input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;width:100%;height:100%}
-.v153-sign-chip span:before{content:"";display:inline-block;width:16px;height:16px;margin-right:8px;vertical-align:-3px;border-radius:5px;border:1.5px solid currentColor;opacity:.7}
-.v153-sign-chip:has(input:checked){background:var(--accent);border-color:var(--accent);color:#fff}
-.v153-sign-chip:has(input:checked) span:before{content:"✓";opacity:1;border-color:#fff;font-size:12px;line-height:14px;text-align:center}
-.v153-sig-preview{height:46px;max-width:180px;object-fit:contain;background:#fff;border-radius:10px;border:1px solid var(--input-border);padding:3px 8px;cursor:pointer}
-.v153-hint{font-size:12px;color:var(--muted)}
-.v153-empty{color:var(--muted);font-size:14px;padding:6px 2px}
-.v153-item{display:block}
-.v153-item-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
-.v153-kind-chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.03em;background:var(--accent-soft);color:var(--accent)}
-.v153-kind-chip.remark{background:rgba(142,142,147,.18);color:var(--muted)}
-.v153-item-text{white-space:pre-wrap;font-size:14px;line-height:1.4;margin:4px 0 6px;color:var(--ink)}
-.v153-item-sig{display:block;height:44px;max-width:200px;object-fit:contain;background:#fff;border-radius:8px;padding:2px 8px;margin:4px 0 6px}
-body.v80-dark .v153-sign-chip{background:#22242a!important;border-color:#30323a!important;color:#fff!important}
-body.v80-dark .v153-sign-chip:has(input:checked){background:#1683ff!important;border-color:#1683ff!important}
-body.v80-dark .v153-item-text{color:#f5f6f8}
-/* ---- printed endorsement sheets (also used off-screen for fitting) ---- */
-.v153-stage{position:fixed!important;left:-40000px!important;top:0!important;visibility:hidden!important;pointer-events:none!important}
-.v153-end-sheet{box-sizing:border-box!important;width:100%!important;margin:0!important;padding:3mm 2mm!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;font-family:Arial,Helvetica,sans-serif!important;background:#fff!important;color:#000!important}
-#printArea .v153-end-sheet{break-before:auto!important;page-break-before:auto!important;break-after:page!important;page-break-after:always!important;break-inside:avoid!important;page-break-inside:avoid!important}
-#printArea .v153-end-sheet:last-child{break-after:auto!important;page-break-after:auto!important}
-#printArea .v153-end-sheet *,.v153-stage .v153-end-sheet *{background:#fff!important;color:#000!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-shadow:none!important}
-.v153-end-title{display:flex!important;justify-content:space-between!important;align-items:baseline!important;gap:6mm!important;font:700 9.5pt Arial,Helvetica,sans-serif!important;letter-spacing:.02em!important;border-bottom:.3mm solid #000!important;padding:0 0 1.6mm!important;margin:0 0 3mm!important}
-.v153-end-title span:last-child{font-weight:400!important;font-size:8pt!important}
-.v153-end-grid{flex:1 1 auto!important;min-height:0!important;display:grid!important;gap:3mm!important}
-.v153-cell{box-sizing:border-box!important;min-height:0!important;min-width:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;border:.3mm solid #555!important;border-radius:1.5mm!important;padding:2.4mm 3mm!important}
-.v153-cell-head{display:flex!important;justify-content:space-between!important;gap:2mm!important;font:7.2pt Arial,Helvetica,sans-serif!important;letter-spacing:.05em!important;border-bottom:.2mm solid #bbb!important;padding-bottom:1mm!important;margin-bottom:1.6mm!important}
-.v153-cell-text{flex:1 1 auto!important;min-height:0!important;overflow:hidden!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;line-height:1.3!important;font-family:Arial,Helvetica,sans-serif!important}
-.v153-cell-foot{display:flex!important;justify-content:space-between!important;align-items:flex-end!important;gap:3mm!important;margin-top:1.4mm!important;padding-top:1.2mm!important;border-top:.2mm solid #bbb!important;font:7.4pt/1.25 Arial,Helvetica,sans-serif!important}
-.v153-cell-who{display:flex!important;flex-direction:column!important;gap:1mm!important;min-width:0!important}
-.v153-cell-foot small{display:block!important;font-size:5.4pt!important;color:#555!important;text-transform:uppercase!important;letter-spacing:.05em!important}
-.v153-cell-sig{flex:0 1 auto!important;text-align:right!important;min-width:0!important}
-.v153-cell-sig img{display:block!important;margin-left:auto!important;max-height:13mm!important;max-width:42mm!important;width:auto!important;height:auto!important;object-fit:contain!important}
-.v153-cell.blank{border-style:solid!important;border-color:#999!important}
-.v153-blank-fields{display:grid!important;grid-template-columns:1fr 1.3fr 1.3fr 1.3fr!important;gap:2mm!important;border-top:.2mm solid #bbb!important;padding-top:1mm!important;font:5.4pt Arial,Helvetica,sans-serif!important;color:#888!important;text-transform:uppercase!important;letter-spacing:.05em!important}
-.v153-blank-fields span{color:#888!important}
-</style>
-
-<script id="v151-logbooks">
-/* V151 — Additional logbooks (2nd / 3rd).
-   Settings → "Logbooks" turns them on (1, 2 or 3 logbooks, optional names).
-   A flight/FSTD entry belongs to logbook 1 unless it carries `logbook: 2|3`.
-   New Flight page: "Add to 2nd logbook" / "Add to 3rd logbook" next to "Add flight" (and next to "Add FSTD
-   session"); while editing, "Move to …" buttons. All entries stay in one list (with a small badge).
-   Printing: Print customization → "Logbook" chooses which logbook is printed; brought-forward totals and the
-   QR backup then only count that logbook.
-   Implementation note: the app has many layered add/edit implementations; they all end in saveData(), so the
-   logbook is applied there instead of patching each one. */
-(function(){
-'use strict';
-function $(id){return document.getElementById(id)}
-function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-var PRINT_KEY='easa-logbook-print-logbook-v151';
-
-function cfg(){var c=(typeof settings!=='undefined'&&settings&&settings.logbooks)||{};
-  return {count:Math.min(3,Math.max(1,Number(c.count)||1)),name2:String(c.name2||'').trim(),name3:String(c.name3||'').trim()}}
-function ord(n){return n===1?'1st':n===2?'2nd':'3rd'}
-function lbName(n){var c=cfg();var custom=n===2?c.name2:n===3?c.name3:'';return custom||(ord(n)+' logbook')}
-function lbOf(x){var n=Number(x&&x.logbook);return n===2||n===3?n:1}
-function setLb(x,n){if(n>1)x.logbook=n;else delete x.logbook}
-
-/* ---------- applying the chosen logbook on save ---------- */
-var pending=null,known={};
-function remember(){known={};(flights||[]).forEach(function(f){var n=lbOf(f);if(n>1)known[f.id]=n})}
-function apply(){
-  (flights||[]).forEach(function(f){
-    if(pending&&pending.kind==='move'&&f.id===pending.id){setLb(f,pending.n);return}
-    if(f.logbook==null&&known[f.id])f.logbook=known[f.id];             // a rebuilt flight object keeps its logbook
-    if(pending&&pending.kind==='new'&&pending.before&&!pending.before[f.id]&&f.logbook==null)setLb(f,pending.n);
-  });
-  remember();
-}
-var origSave=window.saveData;
-window.saveData=function(){try{apply()}catch(e){console.error('logbook assignment failed',e)}return origSave.apply(this,arguments)};
-
-function idSet(arr){var s={};(arr||[]).forEach(function(x){s[x.id]=1});return s}
-function picusOpen(){var m=$('picusModal');return !!(m&&m.style.display&&m.style.display!=='none')}
-function settle(){ // keep the target while the PICUS signature dialog is open, then clear it
-  if(!picusOpen()){pending=null;refreshButtons();return}
-  var t=setInterval(function(){if(!picusOpen()){clearInterval(t);setTimeout(function(){pending=null;refreshButtons()},50)}},300);
-}
-function addTo(n){
-  pending={kind:'new',n:n,before:idSet(flights)};
-  try{window.addFlight()}finally{settle()}
-}
-function moveTo(n){
-  var id=lastEditId;if(!id){alert('Open a flight with Edit first.');return}
-  pending={kind:'move',id:id,n:n};
-  try{window.saveEditedFlight()}finally{settle()}
-}
-function addSimTo(n){
-  var before=idSet(simSessions);
-  window.addSimSession();
-  var changed=false;(simSessions||[]).forEach(function(s){if(!before[s.id]&&s.logbook==null){setLb(s,n);changed=true}});
-  if(changed){try{localStorage.setItem(SIMSESSION_STORAGE_KEY,JSON.stringify(simSessions))}catch(e){}refreshBadges()}
-}
-
-/* ---------- New Flight page buttons ---------- */
-var lastEditId=null;
-var origEdit=window.editFlight;
-if(typeof origEdit==='function')window.editFlight=function(id){lastEditId=id;var r=origEdit.apply(this,arguments);setTimeout(refreshButtons,0);return r};
-function editing(){var b=$('saveChangesBtn');return !!(b&&b.style.display!=='none'&&lastEditId)}
-function refreshButtons(){
-  var c=cfg(),save=$('saveFlightBtn');if(!save)return;
-  var box=$('v151LbButtons');
-  if(!box){box=document.createElement('span');box.id='v151LbButtons';box.className='v151-lb-buttons';save.parentNode.insertBefore(box,save.nextSibling)}
-  var html='';
-  if(c.count>1){
-    if(editing()){
-      var f=(flights||[]).find(function(x){return x.id===lastEditId}),cur=f?lbOf(f):1;
-      html+='<span class="v151-lb-chip" title="This flight is in the '+esc(lbName(cur))+'">'+esc(lbName(cur))+'</span>';
-      for(var n=1;n<=c.count;n++)if(n!==cur)html+='<button type="button" class="secondary small v151-lb-btn" data-move="'+n+'">Move to '+esc(lbName(n))+'</button>';
-    }else for(var k=2;k<=c.count;k++)html+='<button type="button" class="secondary small v151-lb-btn" data-add="'+k+'">Add to '+esc(lbName(k))+'</button>';
-  }
-  box.innerHTML=html;
-  // FSTD form
-  var simBtn=document.querySelector('button[onclick="addSimSession()"]');
-  if(simBtn){var sb=$('v151LbSimButtons');
-    if(!sb){sb=document.createElement('span');sb.id='v151LbSimButtons';sb.className='v151-lb-buttons';simBtn.parentNode.insertBefore(sb,simBtn.nextSibling)}
-    var sh='';if(c.count>1)for(var j=2;j<=c.count;j++)sh+='<button type="button" class="secondary v151-lb-btn" data-addsim="'+j+'">Add to '+esc(lbName(j))+'</button>';
-    sb.innerHTML=sh}
-}
-document.addEventListener('click',function(e){
-  var b=e.target.closest&&e.target.closest('.v151-lb-btn');if(!b)return;
-  if(b.dataset.add)addTo(Number(b.dataset.add));else if(b.dataset.move)moveTo(Number(b.dataset.move));else if(b.dataset.addsim)addSimTo(Number(b.dataset.addsim));
-});
-
-/* ---------- badges in the flight list ---------- */
-function refreshBadges(){
-  var c=cfg();
-  document.querySelectorAll('.v151-lb-badge').forEach(function(x){x.remove()});
-  if(c.count<2)return;
-  var byId={};(flights||[]).forEach(function(f){byId[f.id]=lbOf(f)});(simSessions||[]).forEach(function(s){byId[s.id]=lbOf(s)});
-  document.querySelectorAll('[onclick*="editFlight(\'"],[onclick*="deleteSimSession(\'"]').forEach(function(btn){
-    var m=btn.getAttribute('onclick').match(/\('([^']+)'\)/);if(!m)return;var n=byId[m[1]];if(!n||n<2)return;
-    var row=btn.closest('tr, .library-item, .flight-card, li');if(!row||row.querySelector('.v151-lb-badge'))return;
-    var cell=row.querySelector('td')||row;var s=document.createElement('span');s.className='v151-lb-badge';s.textContent=n===2?'2nd':'3rd';s.title=lbName(n);
-    cell.appendChild(s)});
-}
-['render','renderSimLibrary'].forEach(function(name){var o=window[name];if(typeof o==='function')window[name]=function(){var r=o.apply(this,arguments);try{refreshBadges()}catch(e){}return r}});
-
-/* ---------- printing one logbook ---------- */
-function printLb(){var s=$('v151PrintLogbook');var n=s?Number(s.value):1;return cfg().count>1?Math.min(n,cfg().count):1}
-var swapped=false;
-function withLogbook(fn){return function(){
-  if(swapped||cfg().count<2)return fn.apply(this,arguments);
-  var n=printLb(),F=flights,S=simSessions;
-  flights=F.filter(function(f){return lbOf(f)===n});simSessions=S.filter(function(s){return lbOf(s)===n});swapped=true;
-  try{return fn.apply(this,arguments)}finally{flights=F;simSessions=S;swapped=false}
-}}
-['printLogbook','proceedToPrint','renderPrintPreview'].forEach(function(name){var o=window[name];if(typeof o==='function')window[name]=withLogbook(o)});
-function labelPrint(){
-  var area=$('printArea');if(!area||cfg().count<2)return;var n=printLb(),name=lbName(n).toUpperCase();
-  area.querySelectorAll('.print-header').forEach(function(h){var d=h.querySelector('div > div:nth-child(2)');if(!d||d.querySelector('.v151-lb-label'))return;
-    var s=document.createElement('span');s.className='v151-lb-label';s.textContent=' · '+name;d.appendChild(s)});
-  var fp=area.querySelector('.v103-front-page');
-  if(fp&&!fp.querySelector('.v151-lb-label')){var t=fp.querySelector('h1, .v103-front-title, [class*="title"]');var p=document.createElement('div');p.className='v151-lb-label v151-lb-front';p.textContent=name;
-    if(t&&t.parentNode)t.parentNode.insertBefore(p,t.nextSibling);else fp.appendChild(p)}
-}
-var origQR=window.__v148AppendQRPages;
-window.__v148AppendQRPages=function(){try{labelPrint()}catch(e){}return typeof origQR==='function'?origQR.apply(this,arguments):undefined};
-var origApply=window.v103ApplyPrintCustomization;
-window.v103ApplyPrintCustomization=function(){var r=typeof origApply==='function'?origApply.apply(this,arguments):undefined;try{labelPrint()}catch(e){}return r};
-window.EASALOG_LOGBOOK={printing:function(){var n=printLb();return {n:n,name:n>1?lbName(n):''}},of:lbOf,name:lbName,config:cfg};
-
-function buildPrintSelect(){
-  var wrap=document.querySelector('.v103-print-controls');if(!wrap)return;
-  var lab=$('v151PrintLogbookLabel');
-  if(!lab){lab=document.createElement('label');lab.id='v151PrintLogbookLabel';lab.innerHTML='Logbook<select id="v151PrintLogbook"></select>';wrap.insertBefore(lab,wrap.firstChild);
-    $('v151PrintLogbook').addEventListener('change',function(){try{localStorage.setItem(PRINT_KEY,this.value)}catch(e){}try{window.renderPrintPreview()}catch(e){}})}
-  var c=cfg(),sel=$('v151PrintLogbook'),keep=sel.value;try{keep=keep||localStorage.getItem(PRINT_KEY)||'1'}catch(e){keep=keep||'1'}
-  var html='';for(var n=1;n<=c.count;n++){var cnt=(flights||[]).filter(function(f){return lbOf(f)===n}).length+(simSessions||[]).filter(function(s){return lbOf(s)===n}).length;
-    html+='<option value="'+n+'">'+esc(lbName(n))+' ('+cnt+')</option>'}
-  sel.innerHTML=html;sel.value=Math.min(Number(keep)||1,c.count);lab.style.display=c.count>1?'':'none';
-  // keep the print summary readable: open the customization panel hint when several logbooks exist
-}
-
-/* ---------- Settings card ---------- */
-function buildSettings(){
-  if($('v151LogbooksCard'))return;
-  var page=$('settingsPage');if(!page)return;
-  var anchor=Array.prototype.find.call(page.querySelectorAll('section.card'),function(s){return /Pilot\s*&(amp;)?\s*data/i.test((s.querySelector('.section-title')||{}).textContent||'')});
-  var card=document.createElement('section');card.className='card';card.id='v151LogbooksCard';
-  card.innerHTML='<div class="section-title">Logbooks</div>'+
-    '<div class="notice" style="margin-bottom:10px">Keep up to three separate logbooks (for example a second licence or a different type of flying). Flights go to the 1st logbook with <b>Add flight</b>; extra buttons on the New Flight page add them to the 2nd or 3rd. Everything stays in one Flights list, and you choose which logbook to print under Print customization.</div>'+
-    '<div class="grid"><div class="field"><label>Logbooks in use</label><select id="v151LbCount"><option value="1">1 (standard)</option><option value="2">2 logbooks</option><option value="3">3 logbooks</option></select></div>'+
-    '<div class="field" id="v151LbName2Field"><label>Name of 2nd logbook (optional)</label><input id="v151LbName2" placeholder="2nd logbook" autocapitalize="words"></div>'+
-    '<div class="field" id="v151LbName3Field"><label>Name of 3rd logbook (optional)</label><input id="v151LbName3" placeholder="3rd logbook" autocapitalize="words"></div></div>'+
-    '<div id="v151LbStats" class="notice" style="margin-top:8px"></div>';
-  if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(card,anchor.nextSibling);else page.appendChild(card);
-  function store(){
-    var c=Number($('v151LbCount').value)||1,cur=cfg();
-    var inUse=[2,3].filter(function(n){return n>c&&((flights||[]).some(function(f){return lbOf(f)===n})||(simSessions||[]).some(function(s){return lbOf(s)===n}))});
-    if(inUse.length&&!confirm('The '+inUse.map(lbName).join(' and ')+' still contain entries. They stay saved (and come back if you switch this on again), but they will be hidden from printing and the extra buttons until then. Continue?')){$('v151LbCount').value=cur.count;return}
-    settings.logbooks={count:c,name2:$('v151LbName2').value.trim(),name3:$('v151LbName3').value.trim()};
-    saveData();syncAll();
-  }
-  $('v151LbCount').addEventListener('change',store);
-  $('v151LbName2').addEventListener('change',store);$('v151LbName3').addEventListener('change',store);
-}
-function syncSettings(){
-  if(!$('v151LbCount'))return;var c=cfg();
-  $('v151LbCount').value=String(c.count);$('v151LbName2').value=c.name2;$('v151LbName3').value=c.name3;
-  $('v151LbName2Field').style.display=c.count>=2?'':'none';$('v151LbName3Field').style.display=c.count>=3?'':'none';
-  var parts=[];for(var n=1;n<=3;n++){var cnt=(flights||[]).filter(function(f){return lbOf(f)===n}).length,sc=(simSessions||[]).filter(function(s){return lbOf(s)===n}).length;
-    if(n<=c.count||cnt||sc)parts.push(esc(lbName(n))+': <b>'+cnt+'</b> flight'+(cnt===1?'':'s')+(sc?', '+sc+' FSTD':''))}
-  $('v151LbStats').innerHTML=parts.join(' · ');$('v151LbStats').style.display=c.count>1?'':'none';
-}
-function syncAll(){try{syncSettings()}catch(e){}try{refreshButtons()}catch(e){}try{buildPrintSelect()}catch(e){}try{refreshBadges()}catch(e){}}
-var origRender=window.render;
-if(typeof origRender==='function')window.render=function(){var r=origRender.apply(this,arguments);try{syncSettings();buildPrintSelect();refreshButtons()}catch(e){}return r};
-
-function init(){
-  remember();buildSettings();syncAll();
-  var sc=$('saveChangesBtn');
-  if(sc&&window.MutationObserver)new MutationObserver(function(){refreshButtons()}).observe(sc,{attributes:true,attributeFilter:['style']});
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();
-
-</script>
-<script id="v153-endorsements">
-/* V153 — Endorsements & remarks.
-   More → "Endorsements": add an endorsement or remark with optional date, name, licence number, free text and a
-   signature (tick "Signed" → signature pad). Stored in settings.endorsements so JSON backup / Restore JSON /
-   Google Drive backup carry them automatically.
-   Printing: Print customization → "Endorsement pages" (+ grid 3×2 / 4×2 / 3×3 / 4×3) adds endorsement pages at the
-   end of the logbook, before the QR backup sheets. Only filled fields are printed; empty boxes fill the last page
-   so further endorsements can be handwritten. */
-(function(){
-'use strict';
-function $(id){return document.getElementById(id)}
-function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function newId(){try{if(typeof uid==='function')return uid()}catch(e){}return 'en-'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
-var PRINT_KEY='easa-logbook-endorsement-print-v153',GRID_KEY='easa-logbook-endorsement-grid-v153';
-var GRIDS={'3x2':[3,2],'4x2':[4,2],'3x3':[3,3],'4x3':[4,3]};
-
-function list(){if(typeof settings==='undefined')return [];if(!Array.isArray(settings.endorsements))settings.endorsements=[];return settings.endorsements}
-function persist(){try{saveData()}catch(e){console.error(e)}}
-function lbApi(){return window.EASALOG_LOGBOOK}
-function lbCount(){var a=lbApi();return a?a.config().count:1}
-function lbName(n){var a=lbApi();return a?a.name(n):''}
-function lbOf(e){var n=Number(e&&e.logbook);return n===2||n===3?n:1}
-function fmtDate(iso){if(!iso)return '';var p=String(iso).split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0].slice(2):iso}
-function kindLabel(k){return k==='remark'?'Remark':'Endorsement'}
-
-/* ================= page ================= */
-var form={id:null,kind:'endorsement',signature:''};
-function buildPage(){
-  if($('endorsementsPage'))return;
-  var main=document.querySelector('main');if(!main)return;
-  var page=document.createElement('div');page.id='endorsementsPage';page.className='app-page';
-  page.innerHTML=
-   '<section class="card" id="v153FormCard">'+
-    '<div class="section-title" id="v153FormTitle">Add endorsement or remark</div>'+
-    '<div class="entry-switch v153-kind"><button type="button" id="v153KindEnd" class="active">Endorsement</button><button type="button" id="v153KindRem">Remark</button></div>'+
-    '<div class="grid v153-grid">'+
-      '<div class="field"><label>Date (optional)</label><input id="v153Date" type="date"></div>'+
-      '<div class="field"><label>Name (optional)</label><input id="v153Name" autocapitalize="characters" placeholder="e.g. instructor or examiner"></div>'+
-      '<div class="field"><label>Licence number (optional)</label><input id="v153Licence" autocapitalize="characters" placeholder="e.g. LT.FCL.12345"></div>'+
-    '</div>'+
-    '<div class="field"><label>Text</label><textarea id="v153Text" rows="4" placeholder="Endorsement or remark text"></textarea></div>'+
-    '<div class="v153-sign-row">'+
-      '<label class="v153-sign-chip"><input type="checkbox" id="v153Signed"><span>Signed</span></label>'+
-      '<img id="v153SigPreview" class="v153-sig-preview" alt="Signature" style="display:none">'+
-      '<span id="v153SigHint" class="v153-hint">Tick to sign</span>'+
-    '</div>'+
-    '<div class="actions"><button type="button" class="primary" id="v153Save">Add</button><button type="button" class="secondary" id="v153Cancel" style="display:none">Cancel edit</button><button type="button" class="secondary" id="v153Clear">Clear</button></div>'+
-   '</section>'+
-   '<section class="card"><div class="section-title">Endorsements &amp; remarks</div><div id="v153List"></div>'+
-   '<div class="notice" style="margin-top:10px">To print them, open the Flights tab → Print customization → tick <b>Endorsement pages</b> and choose how many fit on a page. They print at the end of the logbook, before the QR backup sheets.</div></section>';
-  main.appendChild(page);
-  $('v153KindEnd').addEventListener('click',function(){setKind('endorsement')});
-  $('v153KindRem').addEventListener('click',function(){setKind('remark')});
-  $('v153Signed').addEventListener('click',function(e){
-    if(this.checked){this.checked=!!form.signature;openPad()} // ticks itself once a signature is saved
-    else{if(form.signature&&!confirm('Remove the signature from this entry?')){this.checked=true;return}form.signature='';syncSig()}
-  });
-  $('v153SigPreview').addEventListener('click',openPad);
-  $('v153Save').addEventListener('click',save);
-  $('v153Cancel').addEventListener('click',resetForm);
-  $('v153Clear').addEventListener('click',resetForm);
-  $('v153List').addEventListener('click',function(e){var b=e.target.closest('button[data-act]');if(!b)return;var id=b.dataset.id;
-    if(b.dataset.act==='edit')editEntry(id);else if(b.dataset.act==='del')delEntry(id)});
-}
-function addMenuItem(){
-  var menu=$('moreMenu');if(!menu||$('endorsementsTab'))return;
-  var b=document.createElement('button');b.id='endorsementsTab';b.className='more-item';
-  b.innerHTML='<span class="field-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 17c1.2-1.6 2.2-2.4 3-2.4 1.2 0 .8 2 2 2 .7 0 1.3-.6 2-1.4"/></svg></span> <span>Endorsements</span>';
-  b.addEventListener('click',function(){window.showTab('endorsementsPage',b);closeMoreMenu()});
-  var settingsTab=$('settingsTab');menu.insertBefore(b,settingsTab||null);
-}
-var baseShowTab=window.showTab;
-window.showTab=function(id,btn){var r=baseShowTab.apply(this,arguments);
-  if(id==='endorsementsPage'){document.querySelectorAll('.v16-bottom-nav .tab').forEach(function(x){x.classList.remove('active')});var m=$('moreTab');if(m)m.classList.add('active');refreshLbSelect();renderList()}
-  return r};
-
-function setKind(k){form.kind=k;$('v153KindEnd').classList.toggle('active',k!=='remark');$('v153KindRem').classList.toggle('active',k==='remark');
-  if(!form.id)$('v153Save').textContent='Add '+(k==='remark'?'remark':'endorsement');$('v153FormTitle').textContent=(form.id?'Edit ':'Add ')+(k==='remark'?'remark':'endorsement')}
-function syncSig(){var has=!!form.signature;$('v153Signed').checked=has;var im=$('v153SigPreview');im.style.display=has?'':'none';if(has)im.src=form.signature;
-  $('v153SigHint').textContent=has?'Tap the signature to sign again':'Tick to sign'}
-function refreshLbSelect(){}
-function resetForm(){form={id:null,kind:form.kind||'endorsement',signature:'',logbook:null};['v153Date','v153Name','v153Licence','v153Text'].forEach(function(i){$(i).value=''});
-  $('v153Cancel').style.display='none';setKind(form.kind);syncSig();refreshLbSelect()}
-function save(){
-  var e={date:$('v153Date').value,name:$('v153Name').value.trim(),licence:$('v153Licence').value.trim(),text:$('v153Text').value.replace(/\s+$/,''),signature:form.signature||'',kind:form.kind};
-  if(!e.date&&!e.name&&!e.licence&&!e.text.trim()&&!e.signature){alert('Fill in at least one field (text, name, date, licence number or signature).');return}
-  if(lbCount()>1){askLogbook(form.id?(form.logbook||1):0,e.kind,function(n){commit(e,n)});return}
-  commit(e,1);
-}
-function commit(e,lb){
-  if(lb>1)e.logbook=lb;
-  var L=list();
-  if(form.id){var i=L.findIndex(function(x){return x.id===form.id});if(i>=0){e.id=form.id;e.created=L[i].created;e.updated=new Date().toISOString();L[i]=e}}
-  else{e.id=newId();e.created=new Date().toISOString();L.push(e)}
-  persist();resetForm();renderList();
-}
-function editEntry(id){var e=list().find(function(x){return x.id===id});if(!e)return;
-  form={id:id,kind:e.kind||'endorsement',signature:e.signature||''};
-  $('v153Date').value=e.date||'';$('v153Name').value=e.name||'';$('v153Licence').value=e.licence||'';$('v153Text').value=e.text||'';
-  form.logbook=lbOf(e);setKind(form.kind);syncSig();
-  $('v153Save').textContent='Save changes';$('v153Cancel').style.display='';
-  $('v153FormCard').scrollIntoView({behavior:'smooth',block:'start'})}
-function delEntry(id){var L=list(),e=L.find(function(x){return x.id===id});if(!e)return;
-  if(!confirm('Delete this '+kindLabel(e.kind).toLowerCase()+'?'))return;settings.endorsements=L.filter(function(x){return x.id!==id});persist();if(form.id===id)resetForm();renderList()}
-function sortKey(e){return e.date||String(e.created||'').slice(0,10)||'9999'} // undated: placed by the day it was entered
-function sorted(L){return L.slice().sort(function(a,b){var da=sortKey(a),db=sortKey(b);if(da!==db)return da<db?-1:1;return String(a.created||'').localeCompare(String(b.created||''))})}
-function renderList(){
-  var el=$('v153List');if(!el)return;var L=sorted(list()),multi=lbCount()>1;
-  if(!L.length){el.innerHTML='<div class="v153-empty">No endorsements or remarks yet.</div>';return}
-  el.innerHTML=L.map(function(e){
-    var meta=[e.date?fmtDate(e.date):'',e.name||'',e.licence?'Licence '+e.licence:''].filter(Boolean).map(esc).join(' · ');
-    return '<div class="library-item v153-item">'+
-      '<div class="v153-item-head"><span class="v153-kind-chip'+(e.kind==='remark'?' remark':'')+'">'+kindLabel(e.kind)+'</span>'+(multi?'<span class="v151-lb-badge">'+esc(lbName(lbOf(e)))+'</span>':'')+(meta?'<span class="library-meta">'+meta+'</span>':'')+'</div>'+
-      (e.text?'<div class="v153-item-text">'+esc(e.text)+'</div>':'')+
-      (e.signature?'<img class="v153-item-sig" src="'+e.signature+'" alt="Signature">':'')+
-      '<div class="library-actions"><button type="button" class="secondary small" data-act="edit" data-id="'+esc(e.id)+'">Edit</button><button type="button" class="danger small" data-act="del" data-id="'+esc(e.id)+'">Delete</button></div></div>'}).join('');
-}
-
-/* ================= which logbook? ================= */
-function askLogbook(current,kind,done){
-  var m=$('v153LbModal');
-  if(!m){m=document.createElement('div');m.id='v153LbModal';m.className='modal-overlay';m.style.display='none';
-    m.innerHTML='<div class="modal-card v153-lb-card"><div class="section-title" id="v153LbTitle">Which logbook?</div><div class="notice" id="v153LbNote" style="margin-bottom:12px"></div><div id="v153LbChoices" class="v153-lb-choices"></div><div class="actions" style="justify-content:flex-end;margin-top:12px"><button type="button" class="secondary" id="v153LbCancel">Cancel</button></div></div>';
-    document.body.appendChild(m);
-    m.addEventListener('click',function(ev){if(ev.target===m)m.style.display='none'});
-    $('v153LbCancel').addEventListener('click',function(){m.style.display='none'})}
-  var what=kind==='remark'?'remark':'endorsement';
-  $('v153LbTitle').textContent='Save '+what+' to which logbook?';
-  $('v153LbNote').textContent='It will print only with that logbook.'+(current?' Currently: '+lbName(current)+'.':'');
-  var h='';for(var n=1;n<=lbCount();n++)h+='<button type="button" class="'+(n===current?'primary':'secondary')+' v153-lb-choice" data-n="'+n+'">'+esc(lbName(n))+(n===current?' (current)':'')+'</button>';
-  var box=$('v153LbChoices');box.innerHTML=h;
-  box.onclick=function(ev){var b=ev.target.closest('button[data-n]');if(!b)return;m.style.display='none';done(Number(b.dataset.n))};
-  m.style.display='flex';
-}
-
-/* ================= signature pad ================= */
-function buildPad(){
-  if($('v153SigModal'))return;
-  var m=document.createElement('div');m.id='v153SigModal';m.className='modal-overlay';m.style.display='none';
-  m.innerHTML='<div class="modal-card signature-card"><div class="section-title">Signature</div>'+
-   '<div class="notice">Sign below with a finger, Apple Pencil, mouse or trackpad.</div>'+
-   '<div class="signature-canvas-wrap"><canvas id="v153SigCanvas" width="1200" height="500"></canvas></div>'+
-   '<div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap">'+
-   '<button type="button" class="secondary" id="v153SigClear">Clear</button>'+
-   '<div style="display:flex;gap:8px"><button type="button" class="secondary" id="v153SigCancel">Cancel</button><button type="button" class="primary" id="v153SigSave">Save signature</button></div></div></div>';
-  document.body.appendChild(m);
-  m.addEventListener('click',function(e){if(e.target===m)closePad()});
-  var c=$('v153SigCanvas'),ctx=c.getContext('2d'),drawing=false,ink=false,last=null;
-  ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111';ctx.lineWidth=5;
-  function pt(e){var r=c.getBoundingClientRect();return {x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}
-  c.style.touchAction='none';
-  c.addEventListener('pointerdown',function(e){e.preventDefault();drawing=true;last=pt(e);try{c.setPointerCapture(e.pointerId)}catch(x){}ctx.beginPath();ctx.arc(last.x,last.y,2.4,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();ink=true});
-  c.addEventListener('pointermove',function(e){if(!drawing)return;e.preventDefault();var p=pt(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;ink=true});
-  ['pointerup','pointercancel','pointerleave'].forEach(function(t){c.addEventListener(t,function(){drawing=false})});
-  $('v153SigClear').addEventListener('click',function(){ctx.clearRect(0,0,c.width,c.height);ink=false});
-  $('v153SigCancel').addEventListener('click',closePad);
-  $('v153SigSave').addEventListener('click',function(){if(!ink){alert('Please sign first, or press Cancel.');return}form.signature=trimmed(c);syncSig();closePad()});
-  window.__v153PadReset=function(){ctx.clearRect(0,0,c.width,c.height);ink=false};
-}
-function trimmed(c){ // crop to the ink so the signature prints large in small boxes
-  var ctx=c.getContext('2d'),d=ctx.getImageData(0,0,c.width,c.height).data,x0=c.width,y0=c.height,x1=-1,y1=-1;
-  for(var y=0;y<c.height;y+=2)for(var x=0;x<c.width;x+=2){if(d[(y*c.width+x)*4+3]>10){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}}
-  if(x1<0)return c.toDataURL('image/png');
-  var pad=12;x0=Math.max(0,x0-pad);y0=Math.max(0,y0-pad);x1=Math.min(c.width,x1+pad);y1=Math.min(c.height,y1+pad);
-  var o=document.createElement('canvas');o.width=x1-x0;o.height=y1-y0;o.getContext('2d').drawImage(c,x0,y0,o.width,o.height,0,0,o.width,o.height);
-  return o.toDataURL('image/png')}
-function openPad(){buildPad();window.__v153PadReset();$('v153SigModal').style.display='flex'}
-function closePad(){var m=$('v153SigModal');if(m)m.style.display='none'}
-
-/* ================= print ================= */
-function buildPrintControls(){
-  var wrap=document.querySelector('.v103-print-controls');if(!wrap||$('v153PrintEnd'))return;
-  var qr=$('qrBackupMode'),anchor=qr?qr.closest('label'):null;
-  var chk=document.createElement('label');chk.className='v103-check';chk.innerHTML='<input type="checkbox" id="v153PrintEnd"> Endorsement pages';
-  var grid=document.createElement('label');grid.id='v153GridLabel';grid.innerHTML='Endorsements per page<select id="v153Grid"><option value="3x2">3 × 2 (6)</option><option value="4x2">4 × 2 (8)</option><option value="3x3">3 × 3 (9)</option><option value="4x3">4 × 3 (12)</option></select>';
-  if(anchor){wrap.insertBefore(chk,anchor);wrap.insertBefore(grid,anchor)}else{wrap.appendChild(chk);wrap.appendChild(grid)}
-  try{$('v153PrintEnd').checked=localStorage.getItem(PRINT_KEY)==='1';var g=localStorage.getItem(GRID_KEY);if(g&&GRIDS[g])$('v153Grid').value=g}catch(e){}
-  function sync(){grid.style.display=$('v153PrintEnd').checked?'':'none'}
-  $('v153PrintEnd').addEventListener('change',function(){try{localStorage.setItem(PRINT_KEY,this.checked?'1':'0')}catch(e){}sync()});
-  $('v153Grid').addEventListener('change',function(){try{localStorage.setItem(GRID_KEY,this.value)}catch(e){}});
-  sync();
-}
-function printing(){var c=$('v153PrintEnd');return !!(c&&c.checked)}
-function pageHeight(area){var p=area.querySelector('.print-page, .v134-sheet');var h=p&&p.style&&p.style.height;
-  var portrait=($('v103Orientation')||{}).value==='portrait';return h&&/mm$/.test(h)?h:(portrait?'283mm':'196mm')}
-function cellHtml(e){
-  if(!e)return '<div class="v153-cell blank"><div class="v153-cell-text"></div><div class="v153-blank-fields"><span>Date</span><span>Name</span><span>Licence No.</span><span>Signature</span></div></div>';
-  var head='<div class="v153-cell-head"><b>'+kindLabel(e.kind).toUpperCase()+'</b>'+(e.date?'<span>'+esc(fmtDate(e.date))+'</span>':'')+'</div>';
-  var foot=[];if(e.name)foot.push('<div><small>Name</small>'+esc(e.name)+'</div>');if(e.licence)foot.push('<div><small>Licence No.</small>'+esc(e.licence)+'</div>');
-  var sig=e.signature?'<div class="v153-cell-sig"><small>Signature</small><img src="'+e.signature+'" alt=""></div>':'';
-  return '<div class="v153-cell">'+head+'<div class="v153-cell-text">'+esc(e.text||'')+'</div>'+((foot.length||sig)?'<div class="v153-cell-foot"><div class="v153-cell-who">'+foot.join('')+'</div>'+sig+'</div>':'')+'</div>'}
-var BASE_PT={'3x2':9.5,'4x2':8.5,'3x3':8,'4x3':7.2};
-function buildSheets(area){
-  var g=($('v153Grid')||{}).value||'3x2';if(!GRIDS[g])g='3x2';var cols=GRIDS[g][0],rows=GRIDS[g][1],per=cols*rows;
-  var n=(lbApi()&&lbApi().printing().n)||1,lbn=(lbApi()&&lbApi().printing().name)||'';
-  var items=sorted(list()).filter(function(e){return lbOf(e)===n});
-  var pages=Math.max(1,Math.ceil(items.length/per)),h=pageHeight(area),portrait=($('v103Orientation')||{}).value==='portrait';
-  var pilot=String((typeof settings!=='undefined'&&settings.pilotName)||'').trim();
-  // lay out off-screen first so long texts can be shrunk to fit their box
-  var stage=document.createElement('div');stage.className='v153-stage';stage.style.width=portrait?'196mm':'283mm';document.body.appendChild(stage);
-  var sheets=[];
-  for(var p=0;p<pages;p++){
-    var s=document.createElement('div');s.className='v153-end-sheet';s.style.height=h;s.style.minHeight=h;s.style.maxHeight=h;
-    var cells='';for(var i=0;i<per;i++)cells+=cellHtml(items[p*per+i]);
-    s.innerHTML='<div class="v153-end-title"><span>ENDORSEMENTS &amp; REMARKS'+(lbn?' · '+esc(lbn.toUpperCase()):'')+(pages>1?' · '+(p+1)+'/'+pages:'')+'</span><span>'+esc(pilot)+'</span></div>'+
-      '<div class="v153-end-grid" style="grid-template-columns:repeat('+cols+',minmax(0,1fr));grid-template-rows:repeat('+rows+',minmax(0,1fr))">'+cells+'</div>';
-    stage.appendChild(s);sheets.push(s);
-  }
-  var base=BASE_PT[g];
-  stage.querySelectorAll('.v153-cell:not(.blank) .v153-cell-text').forEach(function(t){
-    var pt=base;t.style.fontSize=pt+'pt';while(t.scrollHeight>t.clientHeight+1&&pt>5){pt-=0.25;t.style.fontSize=pt+'pt'}});
-  sheets.forEach(function(s){stage.removeChild(s)});stage.remove();
-  return sheets;
-}
-function appendEndorsements(){
-  var area=$('printArea');if(!area)return;
-  area.querySelectorAll('.v153-end-sheet').forEach(function(x){x.remove()});
-  if(!printing())return;
-  var sheets;try{sheets=buildSheets(area)}catch(e){console.error('endorsement pages failed',e);return}
-  var before=area.querySelector('.v150-qr-index-sheet');
-  sheets.forEach(function(s){if(before)area.insertBefore(s,before);else area.appendChild(s)});
-}
-var origQR=window.__v148AppendQRPages;
-window.__v148AppendQRPages=function(){var r=typeof origQR==='function'?origQR.apply(this,arguments):undefined;try{appendEndorsements()}catch(e){console.error(e)}return r};
-var origApply=window.v103ApplyPrintCustomization;
-window.v103ApplyPrintCustomization=function(){var r=typeof origApply==='function'?origApply.apply(this,arguments):undefined;try{appendEndorsements()}catch(e){}return r};
-window.EASALOG_ENDORSEMENTS={list:list,append:appendEndorsements};
-
-function init(){buildPage();addMenuItem();buildPad();buildPrintControls();resetForm();renderList()}
-var origRender=window.render;
-if(typeof origRender==='function')window.render=function(){var r=origRender.apply(this,arguments);try{renderList();refreshLbSelect()}catch(e){}return r};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();
-
-</script>
 </body>
 </html>
 <style id="v147-front-frame-css">
@@ -9216,7 +8709,7 @@ function indexCard(book){
   d.innerHTML=Q.toSVG(book.index.qr,'v150-qr-svg',4)+'<div class="v150-qr-cap"><b>INDEX</b><span>'+book.entries+' entries · '+book.pages+' pages · years '+esc(book.years[0]+(book.years.length>1?'–'+book.years[book.years.length-1]:''))+'</span></div>';
   return d}
 function titleBar(book,extra){var t=document.createElement('div');t.className='v150-qr-title';
-  t.innerHTML='<span>FLIGHT DATA — QR BACKUP'+(extra?' · '+extra:'')+'</span><span>'+esc(book.pilot)+' · ID '+esc(book.id)+' · APP V153.1</span>';return t}
+  t.innerHTML='<span>FLIGHT DATA — QR BACKUP'+(extra?' · '+extra:'')+'</span><span>'+esc(book.pilot)+' · ID '+esc(book.id)+' · APP V154</span>';return t}
 
 /* Safari/WebKit adds a table cell's padding and border ON TOP of an explicit cell height, while Chrome counts
    them inside it. Older print patches set the same height on every <td> as on its row, so in Safari each row grew
@@ -9472,11 +8965,1323 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="v150-version">
 (function(){
  function setV(){
-  document.querySelectorAll('.sub').forEach(function(e){e.textContent='V153.1 • local/offline-first test build'});
-  var b=document.getElementById('v36VersionBadge');if(b)b.textContent='V153.1';
-  document.title='EASA Flight Logbook V153.1';
+  document.querySelectorAll('.sub').forEach(function(e){e.textContent='V154 • local/offline-first test build'});
+  var b=document.getElementById('v36VersionBadge');if(b)b.textContent='V154';
+  document.title='EASA Flight Logbook V154';
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setV);else setV();
  setTimeout(setV,50);setTimeout(setV,300);
 })();
+</script>
+<style id="v151-logbooks-css">
+.v151-lb-buttons{display:contents}
+.v151-lb-chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:650;background:rgba(10,132,255,.12);color:#0A84FF;white-space:nowrap}
+.v151-lb-badge{display:inline-block;max-width:9em;overflow:hidden;text-overflow:ellipsis;margin-left:6px;padding:1px 6px;border-radius:999px;font-size:10.5px;font-weight:700;line-height:1.5;background:rgba(10,132,255,.13);color:#0A84FF;vertical-align:middle;white-space:nowrap}
+body.v80-dark .v151-lb-badge,body.v80-dark .v151-lb-chip{background:rgba(10,132,255,.26);color:#7cc0ff}
+@media print{.v151-lb-badge{display:none!important}#printArea .v151-lb-front{font:700 13pt Arial,Helvetica,sans-serif!important;letter-spacing:.06em!important;margin:2mm 0 4mm!important;color:inherit!important}}
+</style>
+<style id="v152-dark-fixes">
+/* V152: dark-mode completion. Most text/surfaces use the theme variables from :root (--ink #1C1C1E etc.), which
+   dark mode never redefined, so titles, bold text and suggestions stayed near-black on dark grey. Screen only:
+   printing and light mode are untouched. */
+@media screen{
+body.v80-dark{
+  --bg:#000;--card:#17181c;--card-solid:#17181c;--card-border:#2a2c33;--glass-highlight:rgba(255,255,255,.06);
+  --ink:#f5f6f8;--muted:#a3a8b4;--muted-2:#6f7480;--line:#2a2c33;--accent:#1683ff;--accent-dark:#0a6fe0;--accent-soft:rgba(22,131,255,.24);
+  --input-bg:#1d1f24;--input-border:#30323a;--chip-bg:#22242a;--danger-soft:rgba(255,69,58,.22);--ok-soft:rgba(48,209,88,.2);
+  --shadow-card:none;--shadow-pop:0 24px 60px rgba(0,0,0,.65);
+}
+/* selected role / default chips: the dark theme's "!important" dark grey overrode the blue selected state */
+body.v80-dark .v17-role-grid label:has(input:checked),
+body.v80-dark .default-checks label:has(input:checked){background:#1683ff!important;border-color:#1683ff!important;color:#fff!important;box-shadow:0 3px 12px rgba(22,131,255,.45)!important}
+/* titles, bold text, suggestion lists, status lines */
+body.v80-dark .section-title,body.v80-dark .card b,body.v80-dark .card strong,body.v80-dark .modal-card b,body.v80-dark .notice b,
+body.v80-dark .suggestions div,body.v80-dark .library-item b,body.v80-dark #v34DriveStatus{color:#f5f6f8!important}
+body.v80-dark .suggestions{border-color:#30323a!important;box-shadow:0 12px 30px rgba(0,0,0,.6)!important}
+body.v80-dark .suggestions div:hover,body.v80-dark .suggestions div.active,body.v80-dark .suggestions div[aria-selected="true"]{background:rgba(22,131,255,.26)!important}
+/* Flights page: period total tiles, print customization panel, table header */
+body.v80-dark #totalsSummaryV23 > *{background:#22242a!important;border-color:#30323a!important;color:#f5f6f8!important}
+body.v80-dark #totalsSummaryV23 > * *{color:inherit}
+body.v80-dark #totalsSummaryV23 > * :not(b):not(strong):last-child{color:#a3a8b4!important}
+body.v80-dark .v103-print-controls{background:#111216!important;border-color:#30323a!important}
+body.v80-dark .v103-print-controls label{color:#b8bcc6!important}
+body.v80-dark table thead th{background:#111216!important;color:#8e93a0!important;border-color:#2a2c33!important}
+body.v80-dark #flightTable td{border-color:#24262c!important}
+/* destructive buttons keep their red text */
+body.v80-dark button.danger{color:#ff6b61!important;border-color:rgba(255,107,97,.35)!important}
+/* "Reset Auto" in Flight times */
+body.v80-dark #timeAllocation .time-actions button{background:#22242a!important;color:#fff!important;border-color:#30323a!important}
+}
+</style>
+
+<style id="v153-endorsements-css">
+/* ---- Endorsements tab ---- */
+.v153-kind{margin:2px 0 12px}
+.v153-lb-card{max-width:420px!important;width:100%}
+.v153-lb-choices{display:flex;flex-direction:column;gap:8px}
+.v153-lb-choices button{width:100%;padding:12px 14px;font-size:15px}
+.v153-grid{margin-bottom:2px}
+#endorsementsPage textarea#v153Text{min-height:96px;resize:vertical;width:100%;box-sizing:border-box}
+.v153-sign-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 4px}
+.v153-sign-chip{position:relative;display:inline-flex;align-items:center;gap:8px;padding:9px 16px 9px 12px;border-radius:999px;border:1px solid var(--input-border);background:var(--chip-bg);font-weight:650;font-size:14px;color:var(--ink);cursor:pointer;user-select:none}
+.v153-sign-chip input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;width:100%;height:100%}
+.v153-sign-chip span:before{content:"";display:inline-block;width:16px;height:16px;margin-right:8px;vertical-align:-3px;border-radius:5px;border:1.5px solid currentColor;opacity:.7}
+.v153-sign-chip:has(input:checked){background:var(--accent);border-color:var(--accent);color:#fff}
+.v153-sign-chip:has(input:checked) span:before{content:"✓";opacity:1;border-color:#fff;font-size:12px;line-height:14px;text-align:center}
+.v153-sig-preview{height:46px;max-width:180px;object-fit:contain;background:#fff;border-radius:10px;border:1px solid var(--input-border);padding:3px 8px;cursor:pointer}
+.v153-hint{font-size:12px;color:var(--muted)}
+.v153-empty{color:var(--muted);font-size:14px;padding:6px 2px}
+.v153-item{display:block}
+.v153-item-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.v153-kind-chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.03em;background:var(--accent-soft);color:var(--accent)}
+.v153-kind-chip.remark{background:rgba(142,142,147,.18);color:var(--muted)}
+.v153-item-text{white-space:pre-wrap;font-size:14px;line-height:1.4;margin:4px 0 6px;color:var(--ink)}
+.v153-item-sig{display:block;height:44px;max-width:200px;object-fit:contain;background:#fff;border-radius:8px;padding:2px 8px;margin:4px 0 6px}
+body.v80-dark .v153-sign-chip{background:#22242a!important;border-color:#30323a!important;color:#fff!important}
+body.v80-dark .v153-sign-chip:has(input:checked){background:#1683ff!important;border-color:#1683ff!important}
+body.v80-dark .v153-item-text{color:#f5f6f8}
+/* ---- printed endorsement sheets (also used off-screen for fitting) ---- */
+.v153-stage{position:fixed!important;left:-40000px!important;top:0!important;visibility:hidden!important;pointer-events:none!important}
+.v153-end-sheet{box-sizing:border-box!important;width:100%!important;margin:0!important;padding:3mm 2mm!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;font-family:Arial,Helvetica,sans-serif!important;background:#fff!important;color:#000!important}
+#printArea .v153-end-sheet{break-before:auto!important;page-break-before:auto!important;break-after:page!important;page-break-after:always!important;break-inside:avoid!important;page-break-inside:avoid!important}
+#printArea .v153-end-sheet:last-child{break-after:auto!important;page-break-after:auto!important}
+#printArea .v153-end-sheet *,.v153-stage .v153-end-sheet *{background:#fff!important;color:#000!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-shadow:none!important}
+.v153-end-title{display:flex!important;justify-content:space-between!important;align-items:baseline!important;gap:6mm!important;font:700 9.5pt Arial,Helvetica,sans-serif!important;letter-spacing:.02em!important;border-bottom:.3mm solid #000!important;padding:0 0 1.6mm!important;margin:0 0 3mm!important}
+.v153-end-title span:last-child{font-weight:400!important;font-size:8pt!important}
+.v153-end-grid{flex:1 1 auto!important;min-height:0!important;display:grid!important;gap:3mm!important}
+.v153-cell{box-sizing:border-box!important;min-height:0!important;min-width:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;border:.3mm solid #555!important;border-radius:1.5mm!important;padding:2.4mm 3mm!important}
+.v153-cell-head{display:flex!important;justify-content:space-between!important;gap:2mm!important;font:7.2pt Arial,Helvetica,sans-serif!important;letter-spacing:.05em!important;border-bottom:.2mm solid #bbb!important;padding-bottom:1mm!important;margin-bottom:1.6mm!important}
+.v153-cell-text{flex:1 1 auto!important;min-height:0!important;overflow:hidden!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;line-height:1.3!important;font-family:Arial,Helvetica,sans-serif!important}
+.v153-cell-foot{display:flex!important;justify-content:space-between!important;align-items:flex-end!important;gap:3mm!important;margin-top:1.4mm!important;padding-top:1.2mm!important;border-top:.2mm solid #bbb!important;font:7.4pt/1.25 Arial,Helvetica,sans-serif!important}
+.v153-cell-who{display:flex!important;flex-direction:column!important;gap:1mm!important;min-width:0!important}
+.v153-cell-foot small{display:block!important;font-size:5.4pt!important;color:#555!important;text-transform:uppercase!important;letter-spacing:.05em!important}
+.v153-cell-sig{flex:0 1 auto!important;text-align:right!important;min-width:0!important}
+.v153-cell-sig img{display:block!important;margin-left:auto!important;max-height:13mm!important;max-width:42mm!important;width:auto!important;height:auto!important;object-fit:contain!important}
+.v153-cell.blank{border-style:solid!important;border-color:#999!important}
+.v153-blank-fields{display:grid!important;grid-template-columns:1fr 1.3fr 1.3fr 1.3fr!important;gap:2mm!important;border-top:.2mm solid #bbb!important;padding-top:1mm!important;font:5.4pt Arial,Helvetica,sans-serif!important;color:#888!important;text-transform:uppercase!important;letter-spacing:.05em!important}
+.v153-blank-fields span{color:#888!important}
+</style>
+
+<style id="v154-css">
+/* ===== shared ===== */
+.v154-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.v154-head .section-title{margin-bottom:0}
+.v154-empty{color:var(--muted);font-size:14px;padding:4px 2px}
+.v154-note{margin-top:10px;font-size:12.5px}
+.v154-sub{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.v154-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12.5px;font-weight:650;white-space:nowrap;background:var(--chip-bg);color:var(--ink)}
+.v154-chip b{font-size:11px;line-height:1}
+.v154-chip.ok{background:rgba(48,179,104,.14);color:#1b7f46}
+.v154-chip.soon{background:rgba(234,179,8,.16);color:#8a6100}
+.v154-chip.warn{background:rgba(245,124,0,.15);color:#a84e00}
+.v154-chip.critical,.v154-chip.expired{background:rgba(255,59,48,.13);color:#c4251a}
+.v154-chip.none{background:var(--chip-bg);color:var(--muted)}
+body.v80-dark .v154-chip.ok{color:#5be08d}body.v80-dark .v154-chip.soon{color:#f5c84b}body.v80-dark .v154-chip.warn{color:#ffa94d}
+body.v80-dark .v154-chip.critical,body.v80-dark .v154-chip.expired{color:#ff7b72}
+.v154-rows{display:flex;flex-direction:column;gap:8px}
+.v154-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:14px;background:var(--input-bg);border:1px solid var(--input-border)}
+.v154-row-main b{font-size:15px}
+.v154-row-chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.v154-meter{padding:10px 12px;border-radius:14px;background:var(--input-bg);border:1px solid var(--input-border);margin-bottom:8px}
+.v154-meter-top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:14px}
+.v154-meter-top span{color:var(--muted);font-variant-numeric:tabular-nums}
+.v154-bar{height:8px;border-radius:999px;background:var(--line);overflow:hidden;margin:8px 0 6px}
+.v154-bar i{display:block;height:100%;border-radius:999px;background:var(--accent)}
+.v154-meter.warn .v154-bar i{background:#f08c00}.v154-meter.critical .v154-bar i,.v154-meter.expired .v154-bar i{background:#e03131}
+.v154-limit-form{margin-top:6px}
+.v154-exp-form{margin-top:12px}
+/* banner on the New Flight page */
+.v154-banner{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px 10px 14px;border-radius:16px;cursor:pointer;font-size:13.5px;border:1px solid transparent}
+.v154-banner-body{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.v154-banner-body span{overflow:hidden;text-overflow:ellipsis}
+.v154-banner.soon,.v154-banner.warn{background:rgba(245,124,0,.12);border-color:rgba(245,124,0,.3);color:#8a4500}
+.v154-banner.critical,.v154-banner.expired{background:rgba(255,59,48,.10);border-color:rgba(255,59,48,.3);color:#b42318}
+body.v80-dark .v154-banner.soon,body.v80-dark .v154-banner.warn{background:rgba(245,124,0,.16);color:#ffc078}
+body.v80-dark .v154-banner.critical,body.v80-dark .v154-banner.expired{background:rgba(255,59,48,.16);color:#ffa39e}
+.v154-banner-x{flex:none;width:30px;height:30px;padding:0!important;border-radius:999px!important;font-size:18px;line-height:1;background:transparent!important;border:0!important;color:inherit!important}
+/* ===== accent picker ===== */
+.v154-accent{margin-top:12px}
+.v154-accent-label{font-size:13px;font-weight:650;color:var(--muted);margin-bottom:8px}
+.v154-swatches{display:flex;gap:10px;flex-wrap:wrap}
+.v154-swatch{width:34px!important;height:34px!important;min-width:0!important;padding:0!important;border-radius:999px!important;border:2px solid transparent!important;background:transparent!important;display:inline-flex!important;align-items:center;justify-content:center}
+.v154-swatch span{width:24px;height:24px;border-radius:999px;background:var(--sw);display:block}
+body.v80-dark .v154-swatch span{background:var(--swd)}
+.v154-swatch.on{border-color:var(--ink)!important}
+/* ===== tags & list ===== */
+.v154-tag-field{position:relative}
+.v154-tag-sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.v154-tag-sug:empty{display:none}
+.v154-tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:650;background:var(--accent-soft)!important;color:var(--accent)!important;border:0!important;white-space:nowrap}
+.v154-tag.sm{padding:1px 7px;font-size:11px}
+button.v154-tag{cursor:pointer;min-height:0!important}
+.v154-list-tools{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:4px 0 10px;font-size:13px;color:var(--muted)}
+.v154-list-tools label{display:flex;align-items:center;gap:6px}
+.v154-list-tools select{padding:6px 8px;font-size:13px}
+.v154-check{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.v154-check input{width:16px;height:16px}
+.v154-cols{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 12px;margin-bottom:10px;border-radius:14px;background:var(--input-bg);border:1px solid var(--input-border);font-size:13px}
+.v154-tag-sum{padding:8px 12px;margin-bottom:10px;border-radius:12px;background:var(--accent-soft);font-size:13px;color:var(--ink)}
+table.v154-list.compact td,table.v154-list.compact th{padding-top:4px!important;padding-bottom:4px!important;font-size:12.5px}
+table.v154-list.compact .small{padding:3px 8px!important;font-size:12px!important}
+table.v154-list td.c-remarks{max-width:260px}
+.v154-rem{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+table.v154-list td.c-act{white-space:nowrap}
+/* ===== statistics ===== */
+.v154-period{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.v154-period select{padding:6px 8px;font-size:13px}
+.v154-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;margin-top:8px}
+.v154-kpi{padding:10px 12px;border-radius:14px;background:var(--input-bg);border:1px solid var(--input-border)}
+.v154-kpi b{display:block;font-size:20px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.v154-kpi span{font-size:11.5px;font-weight:650;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.v154-chart{display:block;width:100%;height:auto;overflow:visible}
+.v154-grid{stroke:var(--line);stroke-width:1}
+.v154-axis{fill:var(--muted);font-size:10px;font-family:inherit}
+.v154-barmark{fill:var(--accent)}
+.v154-hit{fill:transparent;cursor:default}
+.v154-hit:hover{fill:var(--accent-soft)}
+.v154-route{fill:none;stroke:var(--accent);stroke-opacity:.45;stroke-linecap:round}
+.v154-dot{fill:var(--accent);stroke:var(--card-solid,#fff);stroke-width:2}
+body.v80-dark .v154-dot{stroke:#17181c}
+.v154-maplabel{fill:var(--ink);font-size:10.5px;font-weight:650;paint-order:stroke;stroke:var(--card-solid,#fff);stroke-width:3px;stroke-linejoin:round}
+body.v80-dark .v154-maplabel{stroke:#17181c}
+.v154-tip{position:fixed;z-index:3000;pointer-events:none;padding:6px 9px;border-radius:8px;font-size:12px;font-weight:600;background:#1c1c1e;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.25);white-space:nowrap}
+body.v80-dark .v154-tip{background:#f5f6f8;color:#111}
+.v154-two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:640px){.v154-two{grid-template-columns:1fr}}
+.v154-subhead{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:2px 0 8px}
+.v154-hbars{display:flex;flex-direction:column;gap:8px}
+.v154-hrow{display:grid;grid-template-columns:118px 1fr auto;gap:10px;align-items:center;font-size:13px}
+.v154-hl{color:var(--ink)}
+.v154-htrack{height:10px;border-radius:999px;background:var(--line);overflow:hidden}
+.v154-htrack i{display:block;height:100%;border-radius:999px;background:var(--accent)}
+.v154-hv{font-variant-numeric:tabular-nums;color:var(--muted);min-width:64px;text-align:right}
+table.v154-table{width:100%;border-collapse:collapse;font-size:13px}
+table.v154-table th{text-align:left;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:6px 6px;border-bottom:1px solid var(--line)}
+table.v154-table td{padding:7px 6px;border-bottom:1px solid var(--line);color:var(--ink)}
+table.v154-table .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.v154-table td .v154-sub{display:inline;margin-left:4px}
+.v154-next{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+@media(max-width:640px){.v154-next{grid-template-columns:1fr}}
+.v154-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.v154-badge-m{padding:10px 12px;border-radius:14px;background:var(--accent-soft);border:1px solid transparent}
+.v154-badge-m b{display:block;font-size:14px;color:var(--ink)}
+.v154-badge-m span{font-size:12px;color:var(--muted)}
+/* ===== hours summary (screen preview + print) ===== */
+.v154-sum-card{max-width:860px!important;width:100%}
+.v154-sum-preview{max-height:58vh;overflow:auto;border-radius:12px;border:1px solid var(--input-border);background:#fff;padding:16px}
+.v154-sum{color:#111;font-family:Arial,Helvetica,sans-serif;font-size:9.5pt;line-height:1.35}
+.v154-sum *{color:#111}
+body.v80-dark .v154-sum b,body.v80-dark .v154-sum strong{color:#111!important} /* the preview is paper-white in both themes */
+.v154-sum-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;border-bottom:.4mm solid #111;padding-bottom:6px;margin-bottom:10px}
+.v154-sum-title{font-size:8.5pt;letter-spacing:.08em;text-transform:uppercase;color:#555!important;font-weight:700}
+.v154-sum-name{font-size:16pt;font-weight:700}
+.v154-sum-meta{text-align:right;font-size:8.5pt;color:#444!important}
+.v154-sum-grid{display:grid;grid-template-columns:1fr 1.25fr;gap:16px;margin-bottom:6px}
+.v154-sum-kv{width:100%;border-collapse:collapse}
+.v154-sum-kv td{padding:3px 0;border-bottom:.2mm solid #ddd}
+.v154-sum-kv td:last-child{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.v154-sum-h{font-size:8pt;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:#555!important;margin:8px 0 4px}
+.v154-sum-t{width:100%;border-collapse:collapse}
+.v154-sum-t th{font-size:7.5pt;text-transform:uppercase;letter-spacing:.04em;color:#555!important;text-align:right;padding:3px 4px;border-bottom:.3mm solid #999}
+.v154-sum-t th:first-child,.v154-sum-t td:first-child{text-align:left}
+.v154-sum-t td{padding:3px 4px;border-bottom:.2mm solid #ddd;text-align:right;font-variant-numeric:tabular-nums}
+.v154-sum-dim{color:#777!important;font-size:8pt}
+.v154-sum-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:20mm;padding-top:8px;border-top:.3mm solid #999;font-size:8pt;color:#444!important}
+.v154-sum-sign{min-width:55mm;text-align:center;border-top:.3mm solid #111;padding-top:2px;position:relative}
+.v154-sum-sign img{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);max-height:14mm;max-width:50mm}
+.v154-sum-sign span{font-size:7.5pt;color:#555!important}
+@media print{
+  #printArea.v154-summary-mode{zoom:1!important}
+  #printArea .v154-sum-sheet{background:#fff!important;padding:0!important}
+  #printArea .v154-sum-sheet *{background:transparent!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+/* ===== footer + page numbers on logbook pages ===== */
+#printArea .print-page,#printArea .v134-sheet{position:relative}
+#printArea .v154-footer{position:absolute!important;left:1.5mm!important;right:1.5mm!important;bottom:.8mm!important;display:flex!important;justify-content:space-between!important;gap:6mm!important;font:6.8pt/1 Arial,Helvetica,sans-serif!important;color:#333!important;background:transparent!important}
+#printArea.v110-dark-print .v154-footer{color:#ddd!important}
+/* two-page sheets have no fixed height: footer follows the table in normal flow (rows gave up the same 4 mm) */
+#printArea .v134-sheet .v154-footer{position:static!important;margin:1.2mm 0 0!important;height:2.8mm!important;align-items:flex-end!important}
+/* ===== totals per year page ===== */
+.v154-yt-sheet{box-sizing:border-box!important;width:100%!important;margin:0!important;padding:3mm 2mm!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;font-family:Arial,Helvetica,sans-serif!important;background:#fff!important;color:#000!important}
+#printArea .v154-yt-sheet{break-before:auto!important;page-break-before:auto!important;break-after:page!important;page-break-after:always!important;break-inside:avoid!important}
+#printArea .v154-yt-sheet:last-child{break-after:auto!important;page-break-after:auto!important}
+#printArea .v154-yt-sheet *{background:#fff!important;color:#000!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+.v154-yt-title{display:flex!important;justify-content:space-between!important;font:700 9.5pt Arial,Helvetica,sans-serif!important;border-bottom:.3mm solid #000!important;padding:0 0 1.6mm!important;margin:0 0 4mm!important}
+.v154-yt-title span:last-child{font-weight:400!important;font-size:8pt!important}
+table.v154-yt{width:100%!important;border-collapse:collapse!important;font:8pt Arial,Helvetica,sans-serif!important;table-layout:fixed!important}
+table.v154-yt th{font-size:7pt!important;text-transform:uppercase!important;letter-spacing:.03em!important;border-bottom:.35mm solid #000!important;padding:1.6mm 1mm!important;text-align:center!important}
+table.v154-yt td{border-bottom:.2mm solid #aaa!important;padding:1.8mm 1mm!important;text-align:center!important;font-variant-numeric:tabular-nums}
+table.v154-yt td:first-child,table.v154-yt th:first-child{text-align:left!important;width:15%!important}
+table.v154-yt tr.tot td{font-weight:700!important;border-top:.35mm solid #000!important;border-bottom:.35mm solid #000!important}
+table.v154-yt tr.sub td{color:#333!important}
+.v154-yt-note{margin-top:3mm!important;font:7pt Arial,Helvetica,sans-serif!important;color:#555!important}
+</style>
+
+<script id="v151-logbooks">
+/* V151 — Additional logbooks (2nd / 3rd).
+   Settings → "Logbooks" turns them on (1, 2 or 3 logbooks, optional names).
+   A flight/FSTD entry belongs to logbook 1 unless it carries `logbook: 2|3`.
+   New Flight page: "Add to 2nd logbook" / "Add to 3rd logbook" next to "Add flight" (and next to "Add FSTD
+   session"); while editing, "Move to …" buttons. All entries stay in one list (with a small badge).
+   Printing: Print customization → "Logbook" chooses which logbook is printed; brought-forward totals and the
+   QR backup then only count that logbook.
+   Implementation note: the app has many layered add/edit implementations; they all end in saveData(), so the
+   logbook is applied there instead of patching each one. */
+(function(){
+'use strict';
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+var PRINT_KEY='easa-logbook-print-logbook-v151';
+
+function cfg(){var c=(typeof settings!=='undefined'&&settings&&settings.logbooks)||{};
+  return {count:Math.min(3,Math.max(1,Number(c.count)||1)),name1:String(c.name1||'').trim(),name2:String(c.name2||'').trim(),name3:String(c.name3||'').trim()}}
+function ord(n){return n===1?'1st':n===2?'2nd':'3rd'}
+function lbName(n){var c=cfg();var custom=n===1?c.name1:n===2?c.name2:n===3?c.name3:'';return custom||(ord(n)+' logbook')}
+function lbOf(x){var n=Number(x&&x.logbook);return n===2||n===3?n:1}
+function setLb(x,n){if(n>1)x.logbook=n;else delete x.logbook}
+
+/* ---------- applying the chosen logbook on save ---------- */
+var pending=null,known={};
+function remember(){known={};(flights||[]).forEach(function(f){var n=lbOf(f);if(n>1)known[f.id]=n})}
+function apply(){
+  (flights||[]).forEach(function(f){
+    if(pending&&pending.kind==='move'&&f.id===pending.id){setLb(f,pending.n);return}
+    if(f.logbook==null&&known[f.id])f.logbook=known[f.id];             // a rebuilt flight object keeps its logbook
+    if(pending&&pending.kind==='new'&&pending.before&&!pending.before[f.id]&&f.logbook==null)setLb(f,pending.n);
+  });
+  remember();
+}
+var origSave=window.saveData;
+window.saveData=function(){try{apply()}catch(e){console.error('logbook assignment failed',e)}return origSave.apply(this,arguments)};
+
+function idSet(arr){var s={};(arr||[]).forEach(function(x){s[x.id]=1});return s}
+function picusOpen(){var m=$('picusModal');return !!(m&&m.style.display&&m.style.display!=='none')}
+function settle(){ // keep the target while the PICUS signature dialog is open, then clear it
+  if(!picusOpen()){pending=null;refreshButtons();return}
+  var t=setInterval(function(){if(!picusOpen()){clearInterval(t);setTimeout(function(){pending=null;refreshButtons()},50)}},300);
+}
+function addTo(n){
+  pending={kind:'new',n:n,before:idSet(flights)};
+  try{window.addFlight()}finally{settle()}
+}
+function moveTo(n){
+  var id=lastEditId;if(!id){alert('Open a flight with Edit first.');return}
+  pending={kind:'move',id:id,n:n};
+  try{window.saveEditedFlight()}finally{settle()}
+}
+function addSimTo(n){
+  var before=idSet(simSessions);
+  window.addSimSession();
+  var changed=false;(simSessions||[]).forEach(function(s){if(!before[s.id]&&s.logbook==null){setLb(s,n);changed=true}});
+  if(changed){try{localStorage.setItem(SIMSESSION_STORAGE_KEY,JSON.stringify(simSessions))}catch(e){}refreshBadges()}
+}
+
+/* ---------- New Flight page buttons ---------- */
+var lastEditId=null;
+var origEdit=window.editFlight;
+if(typeof origEdit==='function')window.editFlight=function(id){lastEditId=id;var r=origEdit.apply(this,arguments);setTimeout(refreshButtons,0);return r};
+function editing(){var b=$('saveChangesBtn');return !!(b&&b.style.display!=='none'&&lastEditId)}
+function refreshButtons(){
+  var c=cfg(),save=$('saveFlightBtn');if(!save)return;
+  var box=$('v151LbButtons');
+  if(!box){box=document.createElement('span');box.id='v151LbButtons';box.className='v151-lb-buttons';save.parentNode.insertBefore(box,save.nextSibling)}
+  var html='';
+  if(c.count>1){
+    if(editing()){
+      var f=(flights||[]).find(function(x){return x.id===lastEditId}),cur=f?lbOf(f):1;
+      html+='<span class="v151-lb-chip" title="This flight is in: '+esc(lbName(cur))+'">'+esc(lbName(cur))+'</span>';
+      for(var n=1;n<=c.count;n++)if(n!==cur)html+='<button type="button" class="secondary small v151-lb-btn" data-move="'+n+'">Move to '+esc(lbName(n))+'</button>';
+    }else for(var k=2;k<=c.count;k++)html+='<button type="button" class="secondary small v151-lb-btn" data-add="'+k+'">Add to '+esc(lbName(k))+'</button>';
+  }
+  box.innerHTML=html;
+  // FSTD form
+  var simBtn=document.querySelector('button[onclick="addSimSession()"]');
+  if(simBtn){var sb=$('v151LbSimButtons');
+    if(!sb){sb=document.createElement('span');sb.id='v151LbSimButtons';sb.className='v151-lb-buttons';simBtn.parentNode.insertBefore(sb,simBtn.nextSibling)}
+    var sh='';if(c.count>1)for(var j=2;j<=c.count;j++)sh+='<button type="button" class="secondary v151-lb-btn" data-addsim="'+j+'">Add to '+esc(lbName(j))+'</button>';
+    sb.innerHTML=sh}
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('.v151-lb-btn');if(!b)return;
+  if(b.dataset.add)addTo(Number(b.dataset.add));else if(b.dataset.move)moveTo(Number(b.dataset.move));else if(b.dataset.addsim)addSimTo(Number(b.dataset.addsim));
+});
+
+/* ---------- badges in the flight list ---------- */
+function refreshBadges(){
+  var c=cfg();
+  document.querySelectorAll('.v151-lb-badge').forEach(function(x){x.remove()});
+  if(c.count<2)return;
+  var byId={};(flights||[]).forEach(function(f){byId[f.id]=lbOf(f)});(simSessions||[]).forEach(function(s){byId[s.id]=lbOf(s)});
+  document.querySelectorAll('[onclick*="editFlight(\'"],[onclick*="deleteSimSession(\'"]').forEach(function(btn){
+    var m=btn.getAttribute('onclick').match(/\('([^']+)'\)/);if(!m)return;var n=byId[m[1]];if(!n||n<2)return;
+    var row=btn.closest('tr, .library-item, .flight-card, li');if(!row||row.querySelector('.v151-lb-badge'))return;
+    var cell=row.querySelector('td')||row;var s=document.createElement('span');s.className='v151-lb-badge';s.textContent=lbName(n);s.title=lbName(n);
+    cell.appendChild(s)});
+}
+['render','renderSimLibrary'].forEach(function(name){var o=window[name];if(typeof o==='function')window[name]=function(){var r=o.apply(this,arguments);try{refreshBadges()}catch(e){}return r}});
+
+/* ---------- printing one logbook ---------- */
+function printLb(){var s=$('v151PrintLogbook');var n=s?Number(s.value):1;return cfg().count>1?Math.min(n,cfg().count):1}
+var swapped=false;
+function withLogbook(fn){return function(){
+  if(swapped||cfg().count<2)return fn.apply(this,arguments);
+  var n=printLb(),F=flights,S=simSessions;
+  flights=F.filter(function(f){return lbOf(f)===n});simSessions=S.filter(function(s){return lbOf(s)===n});swapped=true;
+  try{return fn.apply(this,arguments)}finally{flights=F;simSessions=S;swapped=false}
+}}
+['printLogbook','proceedToPrint','renderPrintPreview'].forEach(function(name){var o=window[name];if(typeof o==='function')window[name]=withLogbook(o)});
+function labelPrint(){
+  var area=$('printArea');if(!area||cfg().count<2)return;var n=printLb(),name=lbName(n).toUpperCase();
+  area.querySelectorAll('.print-header').forEach(function(h){var d=h.querySelector('div > div:nth-child(2)');if(!d||d.querySelector('.v151-lb-label'))return;
+    var s=document.createElement('span');s.className='v151-lb-label';s.textContent=' · '+name;d.appendChild(s)});
+  var fp=area.querySelector('.v103-front-page');
+  if(fp&&!fp.querySelector('.v151-lb-label')){var t=fp.querySelector('h1, .v103-front-title, [class*="title"]');var p=document.createElement('div');p.className='v151-lb-label v151-lb-front';p.textContent=name;
+    if(t&&t.parentNode)t.parentNode.insertBefore(p,t.nextSibling);else fp.appendChild(p)}
+}
+var origQR=window.__v148AppendQRPages;
+window.__v148AppendQRPages=function(){try{labelPrint()}catch(e){}return typeof origQR==='function'?origQR.apply(this,arguments):undefined};
+var origApply=window.v103ApplyPrintCustomization;
+window.v103ApplyPrintCustomization=function(){var r=typeof origApply==='function'?origApply.apply(this,arguments):undefined;try{labelPrint()}catch(e){}return r};
+window.EASALOG_LOGBOOK={printing:function(){var n=printLb();return {n:n,name:(n>1||cfg().count>1)?lbName(n):''}},of:lbOf,name:lbName,config:cfg};
+
+function buildPrintSelect(){
+  var wrap=document.querySelector('.v103-print-controls');if(!wrap)return;
+  var lab=$('v151PrintLogbookLabel');
+  if(!lab){lab=document.createElement('label');lab.id='v151PrintLogbookLabel';lab.innerHTML='Logbook<select id="v151PrintLogbook"></select>';wrap.insertBefore(lab,wrap.firstChild);
+    $('v151PrintLogbook').addEventListener('change',function(){try{localStorage.setItem(PRINT_KEY,this.value)}catch(e){}try{window.renderPrintPreview()}catch(e){}})}
+  var c=cfg(),sel=$('v151PrintLogbook'),keep=sel.value;try{keep=keep||localStorage.getItem(PRINT_KEY)||'1'}catch(e){keep=keep||'1'}
+  var html='';for(var n=1;n<=c.count;n++){var cnt=(flights||[]).filter(function(f){return lbOf(f)===n}).length+(simSessions||[]).filter(function(s){return lbOf(s)===n}).length;
+    html+='<option value="'+n+'">'+esc(lbName(n))+' ('+cnt+')</option>'}
+  sel.innerHTML=html;sel.value=Math.min(Number(keep)||1,c.count);lab.style.display=c.count>1?'':'none';
+  // keep the print summary readable: open the customization panel hint when several logbooks exist
+}
+
+/* ---------- Settings card ---------- */
+function buildSettings(){
+  if($('v151LogbooksCard'))return;
+  var page=$('settingsPage');if(!page)return;
+  var anchor=Array.prototype.find.call(page.querySelectorAll('section.card'),function(s){return /Pilot\s*&(amp;)?\s*data/i.test((s.querySelector('.section-title')||{}).textContent||'')});
+  var card=document.createElement('section');card.className='card';card.id='v151LogbooksCard';
+  card.innerHTML='<div class="section-title">Logbooks</div>'+
+    '<div class="notice" style="margin-bottom:10px">Keep up to three separate logbooks and name them as you like (for example a second licence or a different type of flying). Flights go to the 1st logbook with <b>Add flight</b>; extra buttons on the New Flight page add them to the 2nd or 3rd. Everything stays in one Flights list, and you choose which logbook to print under Print customization.</div>'+
+    '<div class="grid"><div class="field"><label>Logbooks in use</label><select id="v151LbCount"><option value="1">1 (standard)</option><option value="2">2 logbooks</option><option value="3">3 logbooks</option></select></div>'+
+    '<div class="field" id="v151LbName1Field"><label>Name of 1st logbook (optional)</label><input id="v151LbName1" maxlength="40" placeholder="1st logbook" autocapitalize="words"></div>'+
+    '<div class="field" id="v151LbName2Field"><label>Name of 2nd logbook (optional)</label><input id="v151LbName2" maxlength="40" placeholder="2nd logbook" autocapitalize="words"></div>'+
+    '<div class="field" id="v151LbName3Field"><label>Name of 3rd logbook (optional)</label><input id="v151LbName3" maxlength="40" placeholder="3rd logbook" autocapitalize="words"></div></div>'+
+    '<div id="v151LbStats" class="notice" style="margin-top:8px"></div>';
+  if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(card,anchor.nextSibling);else page.appendChild(card);
+  function store(){
+    var c=Number($('v151LbCount').value)||1,cur=cfg();
+    var inUse=[2,3].filter(function(n){return n>c&&((flights||[]).some(function(f){return lbOf(f)===n})||(simSessions||[]).some(function(s){return lbOf(s)===n}))});
+    if(inUse.length&&!confirm(inUse.map(function(n){return '"'+lbName(n)+'"'}).join(' and ')+(inUse.length>1?' still contain':' still contains')+' entries. They stay saved (and come back if you switch this on again), but they will be hidden from printing and the extra buttons until then. Continue?')){$('v151LbCount').value=cur.count;return}
+    settings.logbooks={count:c,name1:$('v151LbName1').value.trim(),name2:$('v151LbName2').value.trim(),name3:$('v151LbName3').value.trim()};
+    saveData();syncAll();
+  }
+  $('v151LbCount').addEventListener('change',store);
+  $('v151LbName1').addEventListener('change',store);$('v151LbName2').addEventListener('change',store);$('v151LbName3').addEventListener('change',store);
+}
+function syncSettings(){
+  if(!$('v151LbCount'))return;var c=cfg();
+  $('v151LbCount').value=String(c.count);$('v151LbName1').value=c.name1;$('v151LbName2').value=c.name2;$('v151LbName3').value=c.name3;
+  $('v151LbName1Field').style.display=c.count>=2?'':'none';$('v151LbName2Field').style.display=c.count>=2?'':'none';$('v151LbName3Field').style.display=c.count>=3?'':'none';
+  var parts=[];for(var n=1;n<=3;n++){var cnt=(flights||[]).filter(function(f){return lbOf(f)===n}).length,sc=(simSessions||[]).filter(function(s){return lbOf(s)===n}).length;
+    if(n<=c.count||cnt||sc)parts.push(esc(lbName(n))+': <b>'+cnt+'</b> flight'+(cnt===1?'':'s')+(sc?', '+sc+' FSTD':''))}
+  $('v151LbStats').innerHTML=parts.join(' · ');$('v151LbStats').style.display=c.count>1?'':'none';
+}
+function syncAll(){try{syncSettings()}catch(e){}try{refreshButtons()}catch(e){}try{buildPrintSelect()}catch(e){}try{refreshBadges()}catch(e){}}
+var origRender=window.render;
+if(typeof origRender==='function')window.render=function(){var r=origRender.apply(this,arguments);try{syncSettings();buildPrintSelect();refreshButtons()}catch(e){}return r};
+
+function init(){
+  remember();buildSettings();syncAll();
+  var sc=$('saveChangesBtn');
+  if(sc&&window.MutationObserver)new MutationObserver(function(){refreshButtons()}).observe(sc,{attributes:true,attributeFilter:['style']});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+</script>
+<script id="v153-endorsements">
+/* V153 — Endorsements & remarks.
+   More → "Endorsements": add an endorsement or remark with optional date, name, licence number, free text and a
+   signature (tick "Signed" → signature pad). Stored in settings.endorsements so JSON backup / Restore JSON /
+   Google Drive backup carry them automatically.
+   Printing: Print customization → "Endorsement pages" (+ grid 3×2 / 4×2 / 3×3 / 4×3) adds endorsement pages at the
+   end of the logbook, before the QR backup sheets. Only filled fields are printed; empty boxes fill the last page
+   so further endorsements can be handwritten. */
+(function(){
+'use strict';
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function newId(){try{if(typeof uid==='function')return uid()}catch(e){}return 'en-'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+var PRINT_KEY='easa-logbook-endorsement-print-v153',GRID_KEY='easa-logbook-endorsement-grid-v153';
+var GRIDS={'3x2':[3,2],'4x2':[4,2],'3x3':[3,3],'4x3':[4,3]};
+
+function list(){if(typeof settings==='undefined')return [];if(!Array.isArray(settings.endorsements))settings.endorsements=[];return settings.endorsements}
+function persist(){try{saveData()}catch(e){console.error(e)}}
+function lbApi(){return window.EASALOG_LOGBOOK}
+function lbCount(){var a=lbApi();return a?a.config().count:1}
+function lbName(n){var a=lbApi();return a?a.name(n):''}
+function lbOf(e){var n=Number(e&&e.logbook);return n===2||n===3?n:1}
+function fmtDate(iso){if(!iso)return '';var p=String(iso).split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0].slice(2):iso}
+function kindLabel(k){return k==='remark'?'Remark':'Endorsement'}
+
+/* ================= page ================= */
+var form={id:null,kind:'endorsement',signature:''};
+function buildPage(){
+  if($('endorsementsPage'))return;
+  var main=document.querySelector('main');if(!main)return;
+  var page=document.createElement('div');page.id='endorsementsPage';page.className='app-page';
+  page.innerHTML=
+   '<section class="card" id="v153FormCard">'+
+    '<div class="section-title" id="v153FormTitle">Add endorsement or remark</div>'+
+    '<div class="entry-switch v153-kind"><button type="button" id="v153KindEnd" class="active">Endorsement</button><button type="button" id="v153KindRem">Remark</button></div>'+
+    '<div class="grid v153-grid">'+
+      '<div class="field"><label>Date (optional)</label><input id="v153Date" type="date"></div>'+
+      '<div class="field"><label>Name (optional)</label><input id="v153Name" autocapitalize="characters" placeholder="e.g. instructor or examiner"></div>'+
+      '<div class="field"><label>Licence number (optional)</label><input id="v153Licence" autocapitalize="characters" placeholder="e.g. LT.FCL.12345"></div>'+
+    '</div>'+
+    '<div class="field"><label>Text</label><textarea id="v153Text" rows="4" placeholder="Endorsement or remark text"></textarea></div>'+
+    '<div class="v153-sign-row">'+
+      '<label class="v153-sign-chip"><input type="checkbox" id="v153Signed"><span>Signed</span></label>'+
+      '<img id="v153SigPreview" class="v153-sig-preview" alt="Signature" style="display:none">'+
+      '<span id="v153SigHint" class="v153-hint">Tick to sign</span>'+
+    '</div>'+
+    '<div class="actions"><button type="button" class="primary" id="v153Save">Add</button><button type="button" class="secondary" id="v153Cancel" style="display:none">Cancel edit</button><button type="button" class="secondary" id="v153Clear">Clear</button></div>'+
+   '</section>'+
+   '<section class="card"><div class="section-title">Endorsements &amp; remarks</div><div id="v153List"></div>'+
+   '<div class="notice" style="margin-top:10px">To print them, open the Flights tab → Print customization → tick <b>Endorsement pages</b> and choose how many fit on a page. They print at the end of the logbook, before the QR backup sheets.</div></section>';
+  main.appendChild(page);
+  $('v153KindEnd').addEventListener('click',function(){setKind('endorsement')});
+  $('v153KindRem').addEventListener('click',function(){setKind('remark')});
+  $('v153Signed').addEventListener('click',function(e){
+    if(this.checked){this.checked=!!form.signature;openPad()} // ticks itself once a signature is saved
+    else{if(form.signature&&!confirm('Remove the signature from this entry?')){this.checked=true;return}form.signature='';syncSig()}
+  });
+  $('v153SigPreview').addEventListener('click',openPad);
+  $('v153Save').addEventListener('click',save);
+  $('v153Cancel').addEventListener('click',resetForm);
+  $('v153Clear').addEventListener('click',resetForm);
+  $('v153List').addEventListener('click',function(e){var b=e.target.closest('button[data-act]');if(!b)return;var id=b.dataset.id;
+    if(b.dataset.act==='edit')editEntry(id);else if(b.dataset.act==='del')delEntry(id)});
+}
+function addMenuItem(){
+  var menu=$('moreMenu');if(!menu||$('endorsementsTab'))return;
+  var b=document.createElement('button');b.id='endorsementsTab';b.className='more-item';
+  b.innerHTML='<span class="field-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 17c1.2-1.6 2.2-2.4 3-2.4 1.2 0 .8 2 2 2 .7 0 1.3-.6 2-1.4"/></svg></span> <span>Endorsements</span>';
+  b.addEventListener('click',function(){window.showTab('endorsementsPage',b);closeMoreMenu()});
+  var settingsTab=$('settingsTab');menu.insertBefore(b,settingsTab||null);
+}
+var baseShowTab=window.showTab;
+window.showTab=function(id,btn){var r=baseShowTab.apply(this,arguments);
+  if(id==='endorsementsPage'){document.querySelectorAll('.v16-bottom-nav .tab').forEach(function(x){x.classList.remove('active')});var m=$('moreTab');if(m)m.classList.add('active');refreshLbSelect();renderList()}
+  return r};
+
+function setKind(k){form.kind=k;$('v153KindEnd').classList.toggle('active',k!=='remark');$('v153KindRem').classList.toggle('active',k==='remark');
+  if(!form.id)$('v153Save').textContent='Add '+(k==='remark'?'remark':'endorsement');$('v153FormTitle').textContent=(form.id?'Edit ':'Add ')+(k==='remark'?'remark':'endorsement')}
+function syncSig(){var has=!!form.signature;$('v153Signed').checked=has;var im=$('v153SigPreview');im.style.display=has?'':'none';if(has)im.src=form.signature;
+  $('v153SigHint').textContent=has?'Tap the signature to sign again':'Tick to sign'}
+function refreshLbSelect(){}
+function resetForm(){form={id:null,kind:form.kind||'endorsement',signature:'',logbook:null};['v153Date','v153Name','v153Licence','v153Text'].forEach(function(i){$(i).value=''});
+  $('v153Cancel').style.display='none';setKind(form.kind);syncSig();refreshLbSelect()}
+function save(){
+  var e={date:$('v153Date').value,name:$('v153Name').value.trim(),licence:$('v153Licence').value.trim(),text:$('v153Text').value.replace(/\s+$/,''),signature:form.signature||'',kind:form.kind};
+  if(!e.date&&!e.name&&!e.licence&&!e.text.trim()&&!e.signature){alert('Fill in at least one field (text, name, date, licence number or signature).');return}
+  if(lbCount()>1){askLogbook(form.id?(form.logbook||1):0,e.kind,function(n){commit(e,n)});return}
+  commit(e,1);
+}
+function commit(e,lb){
+  if(lb>1)e.logbook=lb;
+  var L=list();
+  if(form.id){var i=L.findIndex(function(x){return x.id===form.id});if(i>=0){e.id=form.id;e.created=L[i].created;e.updated=new Date().toISOString();L[i]=e}}
+  else{e.id=newId();e.created=new Date().toISOString();L.push(e)}
+  persist();resetForm();renderList();
+}
+function editEntry(id){var e=list().find(function(x){return x.id===id});if(!e)return;
+  form={id:id,kind:e.kind||'endorsement',signature:e.signature||''};
+  $('v153Date').value=e.date||'';$('v153Name').value=e.name||'';$('v153Licence').value=e.licence||'';$('v153Text').value=e.text||'';
+  form.logbook=lbOf(e);setKind(form.kind);syncSig();
+  $('v153Save').textContent='Save changes';$('v153Cancel').style.display='';
+  $('v153FormCard').scrollIntoView({behavior:'smooth',block:'start'})}
+function delEntry(id){var L=list(),e=L.find(function(x){return x.id===id});if(!e)return;
+  if(!confirm('Delete this '+kindLabel(e.kind).toLowerCase()+'?'))return;settings.endorsements=L.filter(function(x){return x.id!==id});persist();if(form.id===id)resetForm();renderList()}
+function sortKey(e){return e.date||String(e.created||'').slice(0,10)||'9999'} // undated: placed by the day it was entered
+function sorted(L){return L.slice().sort(function(a,b){var da=sortKey(a),db=sortKey(b);if(da!==db)return da<db?-1:1;return String(a.created||'').localeCompare(String(b.created||''))})}
+function renderList(){
+  var el=$('v153List');if(!el)return;var L=sorted(list()),multi=lbCount()>1;
+  if(!L.length){el.innerHTML='<div class="v153-empty">No endorsements or remarks yet.</div>';return}
+  el.innerHTML=L.map(function(e){
+    var meta=[e.date?fmtDate(e.date):'',e.name||'',e.licence?'Licence '+e.licence:''].filter(Boolean).map(esc).join(' · ');
+    return '<div class="library-item v153-item">'+
+      '<div class="v153-item-head"><span class="v153-kind-chip'+(e.kind==='remark'?' remark':'')+'">'+kindLabel(e.kind)+'</span>'+(multi?'<span class="v151-lb-badge">'+esc(lbName(lbOf(e)))+'</span>':'')+(meta?'<span class="library-meta">'+meta+'</span>':'')+'</div>'+
+      (e.text?'<div class="v153-item-text">'+esc(e.text)+'</div>':'')+
+      (e.signature?'<img class="v153-item-sig" src="'+e.signature+'" alt="Signature">':'')+
+      '<div class="library-actions"><button type="button" class="secondary small" data-act="edit" data-id="'+esc(e.id)+'">Edit</button><button type="button" class="danger small" data-act="del" data-id="'+esc(e.id)+'">Delete</button></div></div>'}).join('');
+}
+
+/* ================= which logbook? ================= */
+function askLogbook(current,kind,done){
+  var m=$('v153LbModal');
+  if(!m){m=document.createElement('div');m.id='v153LbModal';m.className='modal-overlay';m.style.display='none';
+    m.innerHTML='<div class="modal-card v153-lb-card"><div class="section-title" id="v153LbTitle">Which logbook?</div><div class="notice" id="v153LbNote" style="margin-bottom:12px"></div><div id="v153LbChoices" class="v153-lb-choices"></div><div class="actions" style="justify-content:flex-end;margin-top:12px"><button type="button" class="secondary" id="v153LbCancel">Cancel</button></div></div>';
+    document.body.appendChild(m);
+    m.addEventListener('click',function(ev){if(ev.target===m)m.style.display='none'});
+    $('v153LbCancel').addEventListener('click',function(){m.style.display='none'})}
+  var what=kind==='remark'?'remark':'endorsement';
+  $('v153LbTitle').textContent='Save '+what+' to which logbook?';
+  $('v153LbNote').textContent='It will print only with that logbook.'+(current?' Currently: '+lbName(current)+'.':'');
+  var h='';for(var n=1;n<=lbCount();n++)h+='<button type="button" class="'+(n===current?'primary':'secondary')+' v153-lb-choice" data-n="'+n+'">'+esc(lbName(n))+(n===current?' (current)':'')+'</button>';
+  var box=$('v153LbChoices');box.innerHTML=h;
+  box.onclick=function(ev){var b=ev.target.closest('button[data-n]');if(!b)return;m.style.display='none';done(Number(b.dataset.n))};
+  m.style.display='flex';
+}
+
+/* ================= signature pad ================= */
+function buildPad(){
+  if($('v153SigModal'))return;
+  var m=document.createElement('div');m.id='v153SigModal';m.className='modal-overlay';m.style.display='none';
+  m.innerHTML='<div class="modal-card signature-card"><div class="section-title">Signature</div>'+
+   '<div class="notice">Sign below with a finger, Apple Pencil, mouse or trackpad.</div>'+
+   '<div class="signature-canvas-wrap"><canvas id="v153SigCanvas" width="1200" height="500"></canvas></div>'+
+   '<div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap">'+
+   '<button type="button" class="secondary" id="v153SigClear">Clear</button>'+
+   '<div style="display:flex;gap:8px"><button type="button" class="secondary" id="v153SigCancel">Cancel</button><button type="button" class="primary" id="v153SigSave">Save signature</button></div></div></div>';
+  document.body.appendChild(m);
+  m.addEventListener('click',function(e){if(e.target===m)closePad()});
+  var c=$('v153SigCanvas'),ctx=c.getContext('2d'),drawing=false,ink=false,last=null;
+  ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111';ctx.lineWidth=5;
+  function pt(e){var r=c.getBoundingClientRect();return {x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}
+  c.style.touchAction='none';
+  c.addEventListener('pointerdown',function(e){e.preventDefault();drawing=true;last=pt(e);try{c.setPointerCapture(e.pointerId)}catch(x){}ctx.beginPath();ctx.arc(last.x,last.y,2.4,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();ink=true});
+  c.addEventListener('pointermove',function(e){if(!drawing)return;e.preventDefault();var p=pt(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;ink=true});
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){c.addEventListener(t,function(){drawing=false})});
+  $('v153SigClear').addEventListener('click',function(){ctx.clearRect(0,0,c.width,c.height);ink=false});
+  $('v153SigCancel').addEventListener('click',closePad);
+  $('v153SigSave').addEventListener('click',function(){if(!ink){alert('Please sign first, or press Cancel.');return}form.signature=trimmed(c);syncSig();closePad()});
+  window.__v153PadReset=function(){ctx.clearRect(0,0,c.width,c.height);ink=false};
+}
+function trimmed(c){ // crop to the ink so the signature prints large in small boxes
+  var ctx=c.getContext('2d'),d=ctx.getImageData(0,0,c.width,c.height).data,x0=c.width,y0=c.height,x1=-1,y1=-1;
+  for(var y=0;y<c.height;y+=2)for(var x=0;x<c.width;x+=2){if(d[(y*c.width+x)*4+3]>10){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}}
+  if(x1<0)return c.toDataURL('image/png');
+  var pad=12;x0=Math.max(0,x0-pad);y0=Math.max(0,y0-pad);x1=Math.min(c.width,x1+pad);y1=Math.min(c.height,y1+pad);
+  var o=document.createElement('canvas');o.width=x1-x0;o.height=y1-y0;o.getContext('2d').drawImage(c,x0,y0,o.width,o.height,0,0,o.width,o.height);
+  return o.toDataURL('image/png')}
+function openPad(){buildPad();window.__v153PadReset();$('v153SigModal').style.display='flex'}
+function closePad(){var m=$('v153SigModal');if(m)m.style.display='none'}
+
+/* ================= print ================= */
+function buildPrintControls(){
+  var wrap=document.querySelector('.v103-print-controls');if(!wrap||$('v153PrintEnd'))return;
+  var qr=$('qrBackupMode'),anchor=qr?qr.closest('label'):null;
+  var chk=document.createElement('label');chk.className='v103-check';chk.innerHTML='<input type="checkbox" id="v153PrintEnd"> Endorsement pages';
+  var grid=document.createElement('label');grid.id='v153GridLabel';grid.innerHTML='Endorsements per page<select id="v153Grid"><option value="3x2">3 × 2 (6)</option><option value="4x2">4 × 2 (8)</option><option value="3x3">3 × 3 (9)</option><option value="4x3">4 × 3 (12)</option></select>';
+  if(anchor){wrap.insertBefore(chk,anchor);wrap.insertBefore(grid,anchor)}else{wrap.appendChild(chk);wrap.appendChild(grid)}
+  try{$('v153PrintEnd').checked=localStorage.getItem(PRINT_KEY)==='1';var g=localStorage.getItem(GRID_KEY);if(g&&GRIDS[g])$('v153Grid').value=g}catch(e){}
+  function sync(){grid.style.display=$('v153PrintEnd').checked?'':'none'}
+  $('v153PrintEnd').addEventListener('change',function(){try{localStorage.setItem(PRINT_KEY,this.checked?'1':'0')}catch(e){}sync()});
+  $('v153Grid').addEventListener('change',function(){try{localStorage.setItem(GRID_KEY,this.value)}catch(e){}});
+  sync();
+}
+function printing(){var c=$('v153PrintEnd');return !!(c&&c.checked)}
+function pageHeight(area){var p=area.querySelector('.print-page, .v134-sheet');var h=p&&p.style&&p.style.height;
+  var portrait=($('v103Orientation')||{}).value==='portrait';return h&&/mm$/.test(h)?h:(portrait?'283mm':'196mm')}
+function cellHtml(e){
+  if(!e)return '<div class="v153-cell blank"><div class="v153-cell-text"></div><div class="v153-blank-fields"><span>Date</span><span>Name</span><span>Licence No.</span><span>Signature</span></div></div>';
+  var head='<div class="v153-cell-head"><b>'+kindLabel(e.kind).toUpperCase()+'</b>'+(e.date?'<span>'+esc(fmtDate(e.date))+'</span>':'')+'</div>';
+  var foot=[];if(e.name)foot.push('<div><small>Name</small>'+esc(e.name)+'</div>');if(e.licence)foot.push('<div><small>Licence No.</small>'+esc(e.licence)+'</div>');
+  var sig=e.signature?'<div class="v153-cell-sig"><small>Signature</small><img src="'+e.signature+'" alt=""></div>':'';
+  return '<div class="v153-cell">'+head+'<div class="v153-cell-text">'+esc(e.text||'')+'</div>'+((foot.length||sig)?'<div class="v153-cell-foot"><div class="v153-cell-who">'+foot.join('')+'</div>'+sig+'</div>':'')+'</div>'}
+var BASE_PT={'3x2':9.5,'4x2':8.5,'3x3':8,'4x3':7.2};
+function buildSheets(area){
+  var g=($('v153Grid')||{}).value||'3x2';if(!GRIDS[g])g='3x2';var cols=GRIDS[g][0],rows=GRIDS[g][1],per=cols*rows;
+  var n=(lbApi()&&lbApi().printing().n)||1,lbn=(lbApi()&&lbApi().printing().name)||'';
+  var items=sorted(list()).filter(function(e){return lbOf(e)===n});
+  var pages=Math.max(1,Math.ceil(items.length/per)),h=pageHeight(area),portrait=($('v103Orientation')||{}).value==='portrait';
+  var pilot=String((typeof settings!=='undefined'&&settings.pilotName)||'').trim();
+  // lay out off-screen first so long texts can be shrunk to fit their box
+  var stage=document.createElement('div');stage.className='v153-stage';stage.style.width=portrait?'196mm':'283mm';document.body.appendChild(stage);
+  var sheets=[];
+  for(var p=0;p<pages;p++){
+    var s=document.createElement('div');s.className='v153-end-sheet';s.style.height=h;s.style.minHeight=h;s.style.maxHeight=h;
+    var cells='';for(var i=0;i<per;i++)cells+=cellHtml(items[p*per+i]);
+    s.innerHTML='<div class="v153-end-title"><span>ENDORSEMENTS &amp; REMARKS'+(lbn?' · '+esc(lbn.toUpperCase()):'')+(pages>1?' · '+(p+1)+'/'+pages:'')+'</span><span>'+esc(pilot)+'</span></div>'+
+      '<div class="v153-end-grid" style="grid-template-columns:repeat('+cols+',minmax(0,1fr));grid-template-rows:repeat('+rows+',minmax(0,1fr))">'+cells+'</div>';
+    stage.appendChild(s);sheets.push(s);
+  }
+  var base=BASE_PT[g];
+  stage.querySelectorAll('.v153-cell:not(.blank) .v153-cell-text').forEach(function(t){
+    var pt=base;t.style.fontSize=pt+'pt';while(t.scrollHeight>t.clientHeight+1&&pt>5){pt-=0.25;t.style.fontSize=pt+'pt'}});
+  sheets.forEach(function(s){stage.removeChild(s)});stage.remove();
+  return sheets;
+}
+function appendEndorsements(){
+  var area=$('printArea');if(!area)return;
+  area.querySelectorAll('.v153-end-sheet').forEach(function(x){x.remove()});
+  if(!printing())return;
+  var sheets;try{sheets=buildSheets(area)}catch(e){console.error('endorsement pages failed',e);return}
+  var before=area.querySelector('.v150-qr-index-sheet');
+  sheets.forEach(function(s){if(before)area.insertBefore(s,before);else area.appendChild(s)});
+}
+var origQR=window.__v148AppendQRPages;
+window.__v148AppendQRPages=function(){var r=typeof origQR==='function'?origQR.apply(this,arguments):undefined;try{appendEndorsements()}catch(e){console.error(e)}return r};
+var origApply=window.v103ApplyPrintCustomization;
+window.v103ApplyPrintCustomization=function(){var r=typeof origApply==='function'?origApply.apply(this,arguments):undefined;try{appendEndorsements()}catch(e){}return r};
+window.EASALOG_ENDORSEMENTS={list:list,append:appendEndorsements};
+
+function init(){buildPage();addMenuItem();buildPad();buildPrintControls();resetForm();renderList()}
+var origRender=window.render;
+if(typeof origRender==='function')window.render=function(){var r=origRender.apply(this,arguments);try{renderList();refreshLbSelect()}catch(e){}return r};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+</script>
+<script id="v154-currency">
+/* V154 — Currency & limits (More → Currency) + warning banner on the New Flight page.
+   - Recency (EASA FCL.060(b)): 3 take-offs & landings in the preceding 90 days per type/class, and 1 at night.
+     The app records landings only, so each landing counts as one take-off + landing. FSTD sessions are not counted.
+     Single-pilot piston aeroplanes are grouped by class (SEP / MEP), everything else by type.
+   - Flight-time limits: block time in the last 28 days / 12 months / calendar year vs editable limits
+     (defaults: ORO.FTL.210 — 100 h, 1000 h, 900 h).
+   - Expiry dates: licence, medical, ratings, checks… with warnings at 60 / 30 / 7 days.
+   Data: settings.limits {d28,m12,cy} and settings.expiries [{id,name,date,note}] (travel with backups). */
+(function(){
+'use strict';
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function newId(){try{if(typeof uid==='function')return uid()}catch(e){}return 'x-'+Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
+var DAY=86400000;
+function today(){var d=new Date();return new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))}
+function dt(s){var t=Date.parse(String(s||'').slice(0,10)+'T00:00:00Z');return isFinite(t)?new Date(t):null}
+function iso(d){return d.toISOString().slice(0,10)}
+function addDays(d,n){return new Date(d.getTime()+n*DAY)}
+function daysBetween(a,b){return Math.round((b-a)/DAY)}
+var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function nice(d){return d?d.getUTCDate()+' '+MON[d.getUTCMonth()]+' '+String(d.getUTCFullYear()).slice(2):''}
+function hm(m){m=Math.round(m||0);return Math.floor(m/60)+':'+String(m%60).padStart(2,'0')}
+function F(){return (typeof flights!=='undefined'&&flights)||[]}
+function S(){return (typeof settings!=='undefined'&&settings)||{}}
+function persist(){try{saveData()}catch(e){}}
+
+/* ---------- recency ---------- */
+function groupOf(f){
+  var A=(typeof aircraftLibrary!=='undefined'&&aircraftLibrary)||[];var ap=A.find(function(a){return a.id===f.aircraftProfileId});
+  if(ap&&ap.operation==='SP'&&/PISTON/i.test(ap.power||'')&&!ap.simulator)return (ap.engine==='ME'?'MEP':'SEP')+' (class)';
+  return String(f.aircraft||'?').toUpperCase();
+}
+function recency(){
+  var t=today(),from=addDays(t,-89),yearAgo=addDays(t,-365),groups={};
+  F().forEach(function(f){var d=dt(f.date);if(!d)return;var g=groupOf(f);var G=groups[g]=groups[g]||{name:g,events:[],night:[],last:null,flights90:0};
+    var day=Number(f.ldgDay||0),night=Number(f.ldgNight||0);for(var i=0;i<day+night;i++)G.events.push(d);for(var j=0;j<night;j++)G.night.push(d);
+    if(!G.last||d>G.last)G.last=d;if(d>=from&&d<=t)G.flights90++});
+  return Object.keys(groups).map(function(k){var G=groups[k];
+    G.events.sort(function(a,b){return b-a});G.night.sort(function(a,b){return b-a});
+    var in90=G.events.filter(function(d){return d>=from&&d<=t}).length,n90=G.night.filter(function(d){return d>=from&&d<=t}).length;
+    var third=G.events[2]||null,until=third?addDays(third,90):null,nightUntil=G.night[0]?addDays(G.night[0],90):null;
+    return {name:G.name,last:G.last,ldg90:in90,night90:n90,until:until,current:in90>=3&&until&&until>t,nightUntil:nightUntil,nightCurrent:n90>=1,daysLeft:until?daysBetween(t,until):null}
+  }).filter(function(r){return r.last&&r.last>=yearAgo}).sort(function(a,b){return b.last-a.last});
+}
+/* ---------- limits ---------- */
+var DEF={d28:100,m12:1000,cy:900};
+function limits(){var l=S().limits||{};return {d28:Number(l.d28)||DEF.d28,m12:Number(l.m12)||DEF.m12,cy:Number(l.cy)||DEF.cy}}
+function usage(){
+  var t=today(),f28=addDays(t,-27),f12=new Date(Date.UTC(t.getUTCFullYear()-1,t.getUTCMonth(),t.getUTCDate()+1)),cy=new Date(Date.UTC(t.getUTCFullYear(),0,1)),u={d28:0,m12:0,cy:0};
+  F().forEach(function(f){var d=dt(f.date);if(!d||d>t)return;var m=Number(f.duration||0);if(d>=f28)u.d28+=m;if(d>=f12)u.m12+=m;if(d>=cy)u.cy+=m});
+  return u;
+}
+/* ---------- expiries ---------- */
+function expiries(){var s=S();if(!Array.isArray(s.expiries))s.expiries=[];return s.expiries}
+function expStatus(e){var d=dt(e.date);if(!d)return {lvl:'none',days:null};var n=daysBetween(today(),d);
+  return {days:n,lvl:n<0?'expired':n<=7?'critical':n<=30?'warn':n<=60?'soon':'ok'}}
+var PRESETS=['Licence','Medical Class 1','Medical Class 2','LAPL medical','Type rating','Class rating (SEP)','Class rating (MEP)','Instrument rating (IR)','OPC','LPC','Line check','Recurrent training (CRM / SEP / DG)','English language proficiency','Passport','Airport ID / crew card','Instructor certificate (FI / TRI)','Examiner certificate'];
+
+/* ---------- status helpers ---------- */
+var ICON={ok:'✓',soon:'•',warn:'!',critical:'!',expired:'✕',none:'–'};
+function chip(lvl,text){return '<span class="v154-chip '+lvl+'"><b>'+ICON[lvl]+'</b>'+esc(text)+'</span>'}
+function recencyLvl(r){if(!r.current)return 'expired';if(r.daysLeft<=7)return 'critical';if(r.daysLeft<=14)return 'warn';return 'ok'}
+function limitLvl(p){return p>=1?'expired':p>=0.9?'critical':p>=0.75?'warn':'ok'}
+
+/* ---------- page ---------- */
+function buildPage(){
+  if($('currencyPage'))return;var main=document.querySelector('main');if(!main)return;
+  var p=document.createElement('div');p.id='currencyPage';p.className='app-page';
+  p.innerHTML=
+   '<section class="card"><div class="section-title">Recency · last 90 days</div><div id="v154Recency"></div>'+
+     '<div class="notice v154-note">EASA FCL.060(b): to carry passengers, 3 take-offs and landings in the preceding 90 days in the same type or class (1 at night to fly as PIC at night without an IR). Each logged landing counts as a take-off and landing; FSTD sessions are not counted. Single-pilot piston aeroplanes are grouped by class.</div></section>'+
+   '<section class="card"><div class="v154-head"><div class="section-title">Flight-time limits</div><button type="button" class="secondary small" id="v154EditLimits">Edit limits</button></div><div id="v154Limits"></div>'+
+     '<div id="v154LimitForm" class="grid v154-limit-form" style="display:none"><div class="field"><label>28 days (h)</label><input id="v154L28" type="number" min="1" step="1"></div><div class="field"><label>12 months (h)</label><input id="v154L12" type="number" min="1" step="1"></div><div class="field"><label>Calendar year (h)</label><input id="v154LCY" type="number" min="1" step="1"></div>'+
+     '<div class="actions" style="grid-column:1/-1"><button type="button" class="primary small" id="v154SaveLimits">Save limits</button><button type="button" class="secondary small" id="v154ResetLimits">EASA defaults</button></div></div>'+
+     '<div class="notice v154-note">Block time of all logged flights (all logbooks). Defaults follow EASA ORO.FTL.210 (100 h / 28 days, 1000 h / 12 months, 900 h / calendar year); your operator may use different limits.</div></section>'+
+   '<section class="card"><div class="section-title">Expiry dates</div><div id="v154Exp"></div>'+
+     '<div class="grid v154-exp-form"><div class="field"><label>Item</label><input id="v154ExpName" list="v154ExpPresets" placeholder="e.g. Medical Class 1" autocapitalize="words"><datalist id="v154ExpPresets">'+PRESETS.map(function(x){return '<option value="'+esc(x)+'">'}).join('')+'</datalist></div>'+
+     '<div class="field"><label>Expires on</label><input id="v154ExpDate" type="date"></div>'+
+     '<div class="field" style="grid-column:1/-1"><label>Note (optional)</label><input id="v154ExpNote" placeholder="e.g. A320, licence no., where to renew"></div></div>'+
+     '<div class="actions"><button type="button" class="primary small" id="v154ExpSave">Add</button><button type="button" class="secondary small" id="v154ExpCancel" style="display:none">Cancel</button></div>'+
+     '<div class="notice v154-note">Warnings appear on the New Flight page 60, 30 and 7 days before expiry.</div></section>';
+  main.appendChild(p);
+  $('v154EditLimits').addEventListener('click',function(){var f=$('v154LimitForm'),open=f.style.display==='none';f.style.display=open?'':'none';if(open){var l=limits();$('v154L28').value=l.d28;$('v154L12').value=l.m12;$('v154LCY').value=l.cy}});
+  $('v154SaveLimits').addEventListener('click',function(){var v=[$('v154L28').value,$('v154L12').value,$('v154LCY').value].map(Number);if(v.some(function(x){return !(x>0)})){alert('Enter limits in hours, greater than 0.');return}
+    S().limits={d28:v[0],m12:v[1],cy:v[2]};persist();$('v154LimitForm').style.display='none';renderAll()});
+  $('v154ResetLimits').addEventListener('click',function(){$('v154L28').value=DEF.d28;$('v154L12').value=DEF.m12;$('v154LCY').value=DEF.cy});
+  $('v154ExpSave').addEventListener('click',saveExp);$('v154ExpCancel').addEventListener('click',resetExp);
+  $('v154Exp').addEventListener('click',function(e){var b=e.target.closest('button[data-act]');if(!b)return;var id=b.dataset.id;
+    if(b.dataset.act==='edit'){var x=expiries().find(function(q){return q.id===id});if(!x)return;editId=id;$('v154ExpName').value=x.name||'';$('v154ExpDate').value=x.date||'';$('v154ExpNote').value=x.note||'';$('v154ExpSave').textContent='Save changes';$('v154ExpCancel').style.display='';$('v154ExpName').focus()}
+    else if(b.dataset.act==='del'){if(!confirm('Delete this expiry item?'))return;S().expiries=expiries().filter(function(q){return q.id!==id});persist();renderAll()}});
+}
+var editId=null;
+function resetExp(){editId=null;$('v154ExpName').value='';$('v154ExpDate').value='';$('v154ExpNote').value='';$('v154ExpSave').textContent='Add';$('v154ExpCancel').style.display='none'}
+function saveExp(){var name=$('v154ExpName').value.trim(),date=$('v154ExpDate').value,note=$('v154ExpNote').value.trim();
+  if(!name||!date){alert('Enter the item and its expiry date.');return}
+  var L=expiries();if(editId){var x=L.find(function(q){return q.id===editId});if(x){x.name=name;x.date=date;x.note=note}}else L.push({id:newId(),name:name,date:date,note:note});
+  persist();resetExp();renderAll()}
+
+function renderRecency(){
+  var el=$('v154Recency');if(!el)return;var R=recency();
+  if(!R.length){el.innerHTML='<div class="v154-empty">No flights with landings in the last 12 months.</div>';return}
+  el.innerHTML='<div class="v154-rows">'+R.map(function(r){var lvl=recencyLvl(r);
+    var main=r.current?chip(lvl,'Current until '+nice(r.until)+(r.daysLeft<=30?' · '+r.daysLeft+' d':'')):chip('expired',r.until?'Lapsed '+nice(r.until):'Not current');
+    var night=r.nightCurrent?chip('ok','Night until '+nice(r.nightUntil)):chip('none',r.nightUntil?'Night lapsed '+nice(r.nightUntil):'No night landing');
+    return '<div class="v154-row"><div class="v154-row-main"><b>'+esc(r.name)+'</b><span class="v154-sub">'+r.ldg90+' landing'+(r.ldg90===1?'':'s')+' in 90 days'+(r.night90?' · '+r.night90+' at night':'')+' · last flown '+nice(r.last)+'</span></div><div class="v154-row-chips">'+main+night+'</div></div>'}).join('')+'</div>';
+}
+function renderLimits(){
+  var el=$('v154Limits');if(!el)return;var l=limits(),u=usage();
+  var rows=[['Last 28 days',u.d28,l.d28],['Last 12 months',u.m12,l.m12],['Calendar year '+today().getUTCFullYear(),u.cy,l.cy]];
+  el.innerHTML=rows.map(function(r){var used=r[1],lim=r[2]*60,p=lim?used/lim:0,lvl=limitLvl(p),left=Math.max(0,lim-used);
+    return '<div class="v154-meter '+lvl+'"><div class="v154-meter-top"><b>'+r[0]+'</b><span>'+hm(used)+' of '+r[2]+' h · '+Math.round(p*100)+'%</span></div>'+
+      '<div class="v154-bar" role="img" aria-label="'+esc(r[0])+' '+Math.round(p*100)+'% of limit"><i style="width:'+Math.min(100,p*100).toFixed(1)+'%"></i></div>'+
+      '<div class="v154-meter-bottom">'+(p>=1?chip('expired','Limit exceeded by '+hm(used-lim)):chip(lvl,hm(left)+' remaining'))+'</div></div>'}).join('');
+}
+function renderExp(){
+  var el=$('v154Exp');if(!el)return;var L=expiries().slice().sort(function(a,b){return String(a.date).localeCompare(String(b.date))});
+  if(!L.length){el.innerHTML='<div class="v154-empty">No expiry dates yet. Add your licence, medical, ratings and checks below.</div>';return}
+  el.innerHTML='<div class="v154-rows">'+L.map(function(x){var s=expStatus(x),d=dt(x.date);
+    var txt=s.days==null?'':s.days<0?'Expired '+(-s.days)+' d ago':s.days===0?'Expires today':s.days+' day'+(s.days===1?'':'s')+' left';
+    return '<div class="v154-row"><div class="v154-row-main"><b>'+esc(x.name)+'</b><span class="v154-sub">'+(d?'Expires '+nice(d):'')+(x.note?' · '+esc(x.note):'')+'</span></div>'+
+      '<div class="v154-row-chips">'+chip(s.lvl==='soon'?'soon':s.lvl,txt)+'<button type="button" class="secondary small" data-act="edit" data-id="'+esc(x.id)+'">Edit</button><button type="button" class="danger small" data-act="del" data-id="'+esc(x.id)+'">Delete</button></div></div>'}).join('')+'</div>';
+}
+
+/* ---------- banner ---------- */
+var DISMISS_KEY='easa-logbook-currency-banner-dismissed-v154';
+function warnings(){
+  var W=[];
+  recency().forEach(function(r){if(r.flights90||r.last>=addDays(today(),-90)){if(!r.current)W.push({lvl:'expired',t:r.name+': recency lapsed'});else if(r.daysLeft<=14)W.push({lvl:recencyLvl(r),t:r.name+': recency ends '+nice(r.until)})}});
+  var l=limits(),u=usage();[['28 days',u.d28,l.d28],['12 months',u.m12,l.m12],['calendar year',u.cy,l.cy]].forEach(function(x){var p=x[1]/(x[2]*60);if(p>=0.9)W.push({lvl:limitLvl(p),t:Math.round(p*100)+'% of '+x[2]+' h ('+x[0]+')'})});
+  expiries().forEach(function(x){var s=expStatus(x);if(s.days!=null&&s.days<=60)W.push({lvl:s.lvl,t:x.name+(s.days<0?' expired':s.days===0?' expires today':' expires in '+s.days+' d')})});
+  var order={expired:0,critical:1,warn:2,soon:3,ok:4};W.sort(function(a,b){return order[a.lvl]-order[b.lvl]});return W;
+}
+function renderBanner(){
+  var page=$('flightsPage');if(!page)return;var b=$('v154Banner');
+  if(!b){b=document.createElement('div');b.id='v154Banner';b.className='v154-banner';page.insertBefore(b,page.firstChild);
+    b.addEventListener('click',function(e){if(e.target.closest('.v154-banner-x')){try{localStorage.setItem(DISMISS_KEY,iso(today())+'|'+b.dataset.sig)}catch(x){}b.style.display='none';return}openPage()})}
+  var W=warnings(),sig=W.map(function(w){return w.t}).join(';');b.dataset.sig=sig;
+  var dismissed='';try{dismissed=localStorage.getItem(DISMISS_KEY)||''}catch(x){}
+  if(!W.length||dismissed===iso(today())+'|'+sig){b.style.display='none';return}
+  var worst=W[0].lvl;b.className='v154-banner '+worst;b.style.display='';
+  b.innerHTML='<div class="v154-banner-body"><b>'+(worst==='expired'?'Action needed':'Coming up')+'</b><span>'+W.slice(0,3).map(function(w){return esc(w.t)}).join(' · ')+(W.length>3?' · +'+(W.length-3)+' more':'')+'</span></div><button type="button" class="v154-banner-x" aria-label="Hide until tomorrow">×</button>';
+}
+
+/* ---------- nav ---------- */
+function openPage(){var b=$('currencyTab');window.showTab('currencyPage',b)}
+function addMenuItem(){var menu=$('moreMenu');if(!menu||$('currencyTab'))return;
+  var b=document.createElement('button');b.id='currencyTab';b.className='more-item';
+  b.innerHTML='<span class="field-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span> <span>Currency</span>';
+  b.addEventListener('click',function(){openPage();closeMoreMenu()});
+  var first=menu.querySelector('.more-item');menu.insertBefore(b,first);
+}
+var baseShow=window.showTab;
+window.showTab=function(id,btn){var r=baseShow.apply(this,arguments);
+  if(id==='currencyPage'){document.querySelectorAll('.v16-bottom-nav .tab').forEach(function(x){x.classList.remove('active')});var m=$('moreTab');if(m)m.classList.add('active');renderAll()}
+  if(id==='flightsPage')renderBanner();return r};
+function renderAll(){try{renderRecency();renderLimits();renderExp();renderBanner()}catch(e){console.error('currency render failed',e)}}
+var origRender=window.render;
+if(typeof origRender==='function')window.render=function(){var r=origRender.apply(this,arguments);try{renderAll()}catch(e){}return r};
+window.EASALOG_CURRENCY={recency:recency,usage:usage,limits:limits,expiries:expiries,expStatus:expStatus,warnings:warnings};
+function init(){buildPage();addMenuItem();renderAll()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+</script>
+<script id="v154-personal">
+/* V154 — Personalisation: accent colour, Flights list (columns / sort / density / tag filter), flight tags.
+   settings.ui = {accent}; list preferences are per device (localStorage); flight.tags = ['LVO','Ferry',…]. */
+(function(){
+'use strict';
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function S(){return (typeof settings!=='undefined'&&settings)||{}}
+function F(){return (typeof flights!=='undefined'&&flights)||[]}
+function hm(m){m=Math.round(Number(m)||0);return Math.floor(m/60)+':'+String(m%60).padStart(2,'0')}
+function fd(s){var p=String(s||'').split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0].slice(2):s}
+
+/* ================= accent colour ================= */
+var ACCENTS={blue:{name:'Blue',l:'#0A84FF',d:'#1683FF'},indigo:{name:'Indigo',l:'#5856D6',d:'#6E6CF0'},teal:{name:'Teal',l:'#0C8599',d:'#0E95AB'},
+  green:{name:'Green',l:'#1E8E3E',d:'#21993F'},orange:{name:'Orange',l:'#D9480F',d:'#E8590C'},red:{name:'Red',l:'#D92D20',d:'#E5484D'},
+  pink:{name:'Pink',l:'#C2255C',d:'#D6336C'},graphite:{name:'Graphite',l:'#4B5563',d:'#6B7280'}};
+function rgb(h){h=h.replace('#','');return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+function shade(h,f){var c=rgb(h).map(function(v){return Math.round(v*f)});return '#'+c.map(function(v){return v.toString(16).padStart(2,'0')}).join('')}
+var recs=[],seen=new Set();
+function scan(){
+  function walk(rules){for(var i=0;i<rules.length;i++){var r=rules[i];
+    if(r.media){if(/print/i.test(r.media.mediaText||'')&&!/screen/i.test(r.media.mediaText||''))continue;try{walk(r.cssRules)}catch(e){}continue}
+    if(r.cssRules&&!r.style){try{walk(r.cssRules)}catch(e){}continue}
+    var st=r.style;if(!st||seen.has(st))continue;seen.add(st);
+    for(var j=0;j<st.length;j++){var p=st[j],v=st.getPropertyValue(p);if(RX.test(v)){RX.lastIndex=0;recs.push({st:st,p:p,v:v,pr:st.getPropertyPriority(p)})}RX.lastIndex=0}}}
+  Array.prototype.forEach.call(document.styleSheets,function(sh){if(sh.ownerNode&&sh.ownerNode.media&&/^print$/i.test(sh.ownerNode.media))return;try{walk(sh.cssRules)}catch(e){}});
+}
+var RX=/#0a84ff|#1683ff|#0064d6|#0a6fe0|rgba?\(\s*(?:10\s*,\s*132|22\s*,\s*131|0\s*,\s*100)\s*,\s*(?:255|214)\s*(?:,\s*[\d.]+\s*)?\)/gi;
+function mapValue(v,A){
+  var L=rgb(A.l),D=rgb(A.d),DK=rgb(shade(A.l,0.82));
+  return v.replace(RX,function(m){var s=m.toLowerCase();
+    if(s==='#0a84ff')return A.l;if(s==='#1683ff')return A.d;if(s==='#0064d6'||s==='#0a6fe0')return shade(A.l,0.82);
+    var a=(s.match(/,\s*([\d.]+)\s*\)$/)&&s.split(',').length===4)?s.match(/,\s*([\d.]+)\s*\)$/)[1]:null;
+    var c=/^rgba?\(\s*22/.test(s)?D:/^rgba?\(\s*0\s*,\s*100/.test(s)?DK:L;
+    return a!==null?'rgba('+c.join(',')+','+a+')':'rgb('+c.join(',')+')'});
+}
+function accentKey(){var k=(S().ui||{}).accent;return ACCENTS[k]?k:'blue'}
+function applyAccent(){
+  scan();var A=ACCENTS[accentKey()];
+  recs.forEach(function(r){try{r.st.setProperty(r.p,accentKey()==='blue'?r.v:mapValue(r.v,A),r.pr)}catch(e){}});
+  document.documentElement.setAttribute('data-accent',accentKey());
+}
+function buildAccentPicker(){
+  if($('v154Accent'))return;
+  var host=document.querySelector('.v80-theme-setting');var card=host?host.closest('section.card')||host.parentNode:null;if(!card)return;
+  var box=document.createElement('div');box.id='v154Accent';box.className='v154-accent';
+  box.innerHTML='<div class="v154-accent-label">Accent colour</div><div class="v154-swatches" role="radiogroup" aria-label="Accent colour">'+
+    Object.keys(ACCENTS).map(function(k){var A=ACCENTS[k];return '<button type="button" class="v154-swatch" role="radio" data-k="'+k+'" title="'+A.name+'" aria-label="'+A.name+'" style="--sw:'+A.l+';--swd:'+A.d+'"><span></span></button>'}).join('')+'</div>';
+  if(host&&host.nextSibling)host.parentNode.insertBefore(box,host.nextSibling);else card.appendChild(box);
+  box.addEventListener('click',function(e){var b=e.target.closest('.v154-swatch');if(!b)return;var s=S();s.ui=s.ui||{};s.ui.accent=b.dataset.k;try{saveData()}catch(x){}applyAccent();syncPicker()});
+  syncPicker();
+}
+function syncPicker(){document.querySelectorAll('.v154-swatch').forEach(function(b){var on=b.dataset.k===accentKey();b.classList.toggle('on',on);b.setAttribute('aria-checked',on?'true':'false')})}
+
+/* ================= tags on flights ================= */
+function parseTags(s){var out=[];String(s||'').split(/[,;]+/).forEach(function(t){t=t.trim().replace(/\s+/g,' ').toUpperCase();if(t&&out.map(function(x){return x.toLowerCase()}).indexOf(t.toLowerCase())<0)out.push(t)});return out.slice(0,12)}
+function allTags(){var c={};F().forEach(function(f){(f.tags||[]).forEach(function(t){c[t]=(c[t]||0)+1})});return Object.keys(c).sort(function(a,b){return c[b]-c[a]||a.localeCompare(b)})}
+function buildTagField(){
+  if($('v154Tags'))return;var rem=$('remarks');if(!rem)return;var field=rem.closest('.field')||rem.parentNode;
+  var f=document.createElement('div');f.className='field v154-tag-field';
+  f.innerHTML='<label><span class="field-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg></span>Tags</label>'+
+    '<input id="v154Tags" placeholder="OPTIONAL · e.g. LVO, Ferry, Check ride" autocomplete="off" autocapitalize="characters"><div id="v154TagSug" class="v154-tag-sug"></div>';
+  field.parentNode.insertBefore(f,field.nextSibling);
+  $('v154Tags').addEventListener('focus',renderTagSug);$('v154Tags').addEventListener('input',renderTagSug);
+  $('v154TagSug').addEventListener('mousedown',function(e){var b=e.target.closest('button[data-t]');if(!b)return;e.preventDefault();var cur=parseTags($('v154Tags').value);if(cur.indexOf(b.dataset.t)<0)cur.push(b.dataset.t);$('v154Tags').value=cur.join(', ')+', ';renderTagSug()});
+  $('v154Tags').addEventListener('blur',function(){setTimeout(function(){$('v154TagSug').innerHTML='';$('v154Tags').value=parseTags($('v154Tags').value).join(', ')},120)});
+}
+function renderTagSug(){var cur=parseTags($('v154Tags').value).map(function(x){return x.toLowerCase()}),T=allTags().filter(function(t){return cur.indexOf(t.toLowerCase())<0}).slice(0,10);
+  $('v154TagSug').innerHTML=T.map(function(t){return '<button type="button" class="v154-tag" data-t="'+esc(t)+'">+ '+esc(t)+'</button>'}).join('')}
+/* apply the form's tags to the flight(s) saved by a user action (add / save changes / return leg / 3rd leg) */
+var action=null,lastEditId=null;
+function idSet(){var s={};F().forEach(function(f){s[f.id]=1});return s}
+var origSave=window.saveData;
+window.saveData=function(){try{if(action){var tags=parseTags(($('v154Tags')||{}).value);F().forEach(function(f){
+    if(action.kind==='edit'&&f.id===action.id){if(tags.length)f.tags=tags;else delete f.tags}
+    else if(!action.before[f.id]&&tags.length&&!f.tags)f.tags=tags.slice()});action.saved=true}}catch(e){console.error(e)}
+  return origSave.apply(this,arguments)};
+function picusOpen(){var m=$('picusModal');return !!(m&&m.style.display&&m.style.display!=='none')}
+function wrapAction(name,kind,clearAfter){var o=window[name];if(typeof o!=='function')return;
+  window[name]=function(){action={kind:kind,id:kind==='edit'?lastEditId:null,before:idSet(),saved:false};var a=action;
+    try{return o.apply(this,arguments)}finally{
+      var done=function(){if(action===a)action=null;if(a.saved&&clearAfter&&$('v154Tags'))$('v154Tags').value=''};
+      if(picusOpen()){var t=setInterval(function(){if(!picusOpen()){clearInterval(t);setTimeout(done,50)}},300)}else done()}}}
+function initTagActions(){
+  wrapAction('addFlight','new',true);wrapAction('saveEditedFlight','edit',true);wrapAction('createReturnLeg','new',false);wrapAction('createThirdLeg','new',false);
+  var oe=window.editFlight;if(typeof oe==='function')window.editFlight=function(id){lastEditId=id;var r=oe.apply(this,arguments);var f=F().find(function(x){return x.id===id});if($('v154Tags'))$('v154Tags').value=(f&&f.tags||[]).join(', ');return r};
+  var oc=window.cancelEdit;if(typeof oc==='function')window.cancelEdit=function(){var r=oc.apply(this,arguments);if($('v154Tags'))$('v154Tags').value='';return r};
+}
+
+/* ================= Flights list ================= */
+var PREF_KEY='easa-logbook-list-prefs-v154';
+var COLS=[['date','Date'],['from','From'],['to','To'],['type','Aircraft'],['reg','Reg'],['dep','Dep'],['arr','Arr'],['total','Total'],['night','Night'],['ifr','IFR'],['role','Role'],['pic','PIC / Instructor'],['crew','Other crew'],['ldg','Landings'],['remarks','Remarks'],['tags','Tags']];
+var DEFAULT_COLS=['date','from','to','type','reg','dep','arr','total','night','ifr','role','tags'];
+function prefs(){var p={};try{p=JSON.parse(localStorage.getItem(PREF_KEY)||'{}')||{}}catch(e){}
+  return {cols:Array.isArray(p.cols)&&p.cols.length?p.cols:DEFAULT_COLS.slice(),sort:p.sort==='oldest'?'oldest':'newest',compact:!!p.compact,tag:p.tag||''}}
+function savePrefs(p){try{localStorage.setItem(PREF_KEY,JSON.stringify(p))}catch(e){}}
+function lbApi(){return window.EASALOG_LOGBOOK}
+function cell(f,k){switch(k){
+  case 'date':var lb=lbApi(),n=lb?lb.of(f):1,multi=lb&&lb.config().count>1;return fd(f.date)+(multi&&n>1?' <span class="v151-lb-badge" title="'+esc(lb.name(n))+'">'+esc(lb.name(n))+'</span>':'');
+  case 'from':return esc(f.dep);case 'to':return esc(f.arr);case 'type':return esc(f.aircraft);case 'reg':return esc(f.reg);case 'dep':return esc(f.dt);case 'arr':return esc(f.at);
+  case 'total':return hm(f.duration);case 'night':return hm(f.night);case 'ifr':return hm(f.ifrTime!=null?f.ifrTime:(f.ifr?f.duration:0));
+  case 'role':return esc(f.role==='Co-pilot'?'SIC':f.role);case 'pic':return esc(f.pic);case 'crew':return esc(f.otherCrewName||'');
+  case 'ldg':var d=Number(f.ldgDay||0),nn=Number(f.ldgNight||0);return d+nn?(d+(nn?' / '+nn+' N':'')):'';
+  case 'remarks':return '<span class="v154-rem">'+esc(f.remarks||'')+'</span>';
+  case 'tags':return (f.tags||[]).map(function(t){return '<span class="v154-tag sm">'+esc(t)+'</span>'}).join(' ')}}
+function renderList(){
+  var el=$('flightTable');if(!el)return;var P=prefs(),all=F();
+  if(!all.length)return; // keep the app's own empty-state message
+  var tags=allTags();if(P.tag&&tags.indexOf(P.tag)<0)P.tag='';
+  var list=all.filter(function(f){return !P.tag||(f.tags||[]).indexOf(P.tag)>=0});
+  list.sort(function(a,b){var r=String(a.date||'').localeCompare(String(b.date||''))||String(a.dt||'').localeCompare(String(b.dt||''))||String(a.id||'').localeCompare(String(b.id||''));return P.sort==='oldest'?r:-r});
+  var cols=COLS.filter(function(c){return P.cols.indexOf(c[0])>=0&&(c[0]!=='tags'||tags.length)});
+  var tb='<div class="v154-list-tools"><label>Sort<select id="v154Sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label>'+
+    (tags.length?'<label>Tag<select id="v154TagFilter"><option value="">All flights</option>'+tags.map(function(t){return '<option>'+esc(t)+'</option>'}).join('')+'</select></label>':'')+
+    '<label>Rows<select id="v154Compact"><option value="0">Comfortable</option><option value="1">Compact</option></select></label><button type="button" class="secondary small" id="v154ColsBtn">Columns</button></div>'+
+    '<div id="v154ColsPanel" class="v154-cols" style="display:none">'+COLS.map(function(c){return '<label class="v154-check"><input type="checkbox" data-col="'+c[0]+'"'+(P.cols.indexOf(c[0])>=0?' checked':'')+'> '+c[1]+'</label>'}).join('')+'<button type="button" class="secondary small" id="v154ColsReset">Default</button></div>';
+  var sum='';
+  if(P.tag){var t=printTimeBuckets(list);sum='<div class="v154-tag-sum"><b>'+esc(P.tag)+'</b> · '+list.length+' flight'+(list.length===1?'':'s')+' · '+hm(t.duration)+' total · '+hm(t.night)+' night · '+hm(t.ifr)+' IFR · '+hm(t.pic)+' PIC · '+hm(t.co)+' co-pilot · '+(t.ldgDay+t.ldgNight)+' landing'+((t.ldgDay+t.ldgNight)===1?'':'s')+'</div>'}
+  el.innerHTML=tb+sum+'<div style="overflow:auto"><table class="v154-list'+(P.compact?' compact':'')+'"><thead><tr>'+cols.map(function(c){return '<th>'+c[1]+'</th>'}).join('')+'<th></th></tr></thead><tbody>'+
+    list.map(function(f){var id=esc(f.id);return '<tr>'+cols.map(function(c){return '<td class="c-'+c[0]+'">'+cell(f,c[0])+'</td>'}).join('')+
+      '<td class="c-act"><button class="secondary small" onclick="editFlight(\''+id+'\')">Edit</button> <button class="danger small" onclick="removeFlight(\''+id+'\')">Delete</button></td></tr>'}).join('')+'</tbody></table></div>';
+  $('v154Sort').value=P.sort;$('v154Compact').value=P.compact?'1':'0';if($('v154TagFilter'))$('v154TagFilter').value=P.tag;
+  $('v154Sort').onchange=function(){P.sort=this.value;savePrefs(P);renderList()};
+  $('v154Compact').onchange=function(){P.compact=this.value==='1';savePrefs(P);renderList()};
+  if($('v154TagFilter'))$('v154TagFilter').onchange=function(){P.tag=this.value;savePrefs(P);renderList()};
+  $('v154ColsBtn').onclick=function(){var p=$('v154ColsPanel');p.style.display=p.style.display==='none'?'':'none'};
+  $('v154ColsPanel').onchange=function(e){var c=e.target.dataset.col;if(!c)return;var i=P.cols.indexOf(c);if(e.target.checked&&i<0)P.cols.push(c);if(!e.target.checked&&i>=0)P.cols.splice(i,1);if(!P.cols.length)P.cols=['date'];savePrefs(P);renderList();$('v154ColsPanel').style.display=''};
+  $('v154ColsReset').onclick=function(){P.cols=DEFAULT_COLS.slice();savePrefs(P);renderList();$('v154ColsPanel').style.display=''};
+}
+var origRender=window.render;
+if(typeof origRender==='function')window.render=function(){var r=origRender.apply(this,arguments);try{renderList()}catch(e){console.error('list render failed',e)}return r};
+window.EASALOG_PERSONAL={applyAccent:applyAccent,accents:ACCENTS,renderList:renderList,allTags:allTags};
+
+function init(){buildTagField();initTagActions();buildAccentPicker();applyAccent();try{renderList()}catch(e){}
+  setTimeout(applyAccent,600)} // catch styles injected late by older scripts
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+</script>
+<script id="v154-stats">
+/* V154 — Statistics (More → Statistics): headline numbers, hours per year / month, time by function and
+   condition, aircraft types & registrations, top routes & airports, a route map of airports visited, milestones.
+   Flights from all logbooks; FSTD time is shown separately. Charts are plain SVG (single accent colour, hover
+   tooltips); numbers are always also visible as text. */
+(function(){
+'use strict';
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function F(){return (typeof flights!=='undefined'&&flights)||[]}
+function SS(){return (typeof simSessions!=='undefined'&&simSessions)||[]}
+function hm(m){m=Math.round(Number(m)||0);return Math.floor(m/60)+':'+String(m%60).padStart(2,'0')}
+function hrs(m){return Math.round((Number(m)||0)/60)}
+var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function nice(s){var p=String(s||'').split('-');return p.length===3?Number(p[2])+' '+MON[Number(p[1])-1]+' '+p[0]:s}
+function ap(code){try{return typeof airport==='function'?airport(code):null}catch(e){return null}}
+var PERIOD_KEY='easa-logbook-stats-period-v154';
+
+function period(){var s=$('v154StatPeriod');return s?s.value:'all'}
+function inPeriod(f,p){var d=String(f.date||'');if(p==='all')return true;if(p==='12m'){var t=new Date();t.setFullYear(t.getFullYear()-1);return d>t.toISOString().slice(0,10)}return d.slice(0,4)===p}
+
+/* ---------- small SVG chart helpers ---------- */
+function niceMax(v){if(v<=0)return 1;var p=Math.pow(10,Math.floor(Math.log10(v))),n=v/p;var steps=[1,1.5,2,2.5,3,4,5,6,8,10];for(var i=0;i<steps.length;i++)if(n<=steps[i])return steps[i]*p;return 10*p}
+function barChart(data,opts){ // data: [{label,value(min),tip}]
+  var W=opts.w||640,H=opts.h||200,pl=34,pb=24,pt=10,pr=6,iw=W-pl-pr,ih=H-pt-pb,max=niceMax(Math.max.apply(null,data.map(function(d){return d.value/60}).concat([0]))),n=data.length;
+  var bw=Math.max(2,Math.min(28,iw/n*0.62)),step=iw/n,g='';
+  for(var i=0;i<=4;i++){var y=pt+ih-ih*i/4;g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y+'" y2="'+y+'" class="v154-grid"/><text x="'+(pl-6)+'" y="'+(y+3)+'" class="v154-axis" text-anchor="end">'+Math.round(max*i/4)+'</text>'}
+  var every=Math.ceil(n/(opts.maxLabels||12));
+  data.forEach(function(d,i){var h=ih*(d.value/60)/max,x=pl+step*i+(step-bw)/2,y=pt+ih-h;
+    if(h>0.5)g+='<path class="v154-barmark" d="M'+x+','+(pt+ih)+'V'+(y+Math.min(4,h))+'q0,-'+Math.min(4,h)+' '+Math.min(4,bw/2)+',-'+Math.min(4,h)+'H'+(x+bw-Math.min(4,bw/2))+'q'+Math.min(4,bw/2)+',0 '+Math.min(4,bw/2)+','+Math.min(4,h)+'V'+(pt+ih)+'Z"/>';
+    g+='<rect class="v154-hit" x="'+(pl+step*i)+'" y="'+pt+'" width="'+step+'" height="'+ih+'" data-tip="'+esc(d.tip)+'"/>';
+    if(i%every===0)g+='<text x="'+(pl+step*i+step/2)+'" y="'+(H-7)+'" class="v154-axis" text-anchor="middle">'+esc(d.label)+'</text>'});
+  return '<svg class="v154-chart" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(opts.aria||'')+'">'+g+'</svg>';
+}
+function hbars(rows){ // rows: [{label,value,text}]
+  var max=Math.max.apply(null,rows.map(function(r){return r.value}).concat([1]));
+  return '<div class="v154-hbars">'+rows.map(function(r){return '<div class="v154-hrow"><span class="v154-hl">'+esc(r.label)+'</span><span class="v154-htrack"><i style="width:'+(r.value/max*100).toFixed(1)+'%"></i></span><span class="v154-hv">'+esc(r.text)+'</span></div>'}).join('')+'</div>';
+}
+function mapSvg(list){
+  var pts={},routes={};
+  list.forEach(function(f){[f.dep,f.arr].forEach(function(c){if(!c)return;var a=ap(c);if(!a||!isFinite(a.lat)||!isFinite(a.lon))return;pts[c]=pts[c]||{c:c,lat:+a.lat,lon:+a.lon,n:0,name:a.name||''};pts[c].n++});
+    if(f.dep&&f.arr&&f.dep!==f.arr&&pts[f.dep]&&pts[f.arr]){var k=[f.dep,f.arr].sort().join('-');routes[k]=(routes[k]||0)+1}});
+  var P=Object.keys(pts).map(function(k){return pts[k]});if(!P.length)return '<div class="v154-empty">No airport coordinates available for these flights.</div>';
+  var la=P.map(function(p){return p.lat}),lo=P.map(function(p){return p.lon});
+  var minLa=Math.min.apply(null,la),maxLa=Math.max.apply(null,la),minLo=Math.min.apply(null,lo),maxLo=Math.max.apply(null,lo);
+  var padLa=Math.max(1.5,(maxLa-minLa)*0.12),padLo=Math.max(2,(maxLo-minLo)*0.08);minLa-=padLa;maxLa+=padLa;minLo-=padLo;maxLo+=padLo;
+  var k=Math.cos((minLa+maxLa)/2*Math.PI/180),W=640,wDeg=(maxLo-minLo)*k,hDeg=(maxLa-minLa),H=Math.max(220,Math.min(460,W*hDeg/Math.max(wDeg,0.01)));
+  var sx=W/wDeg,sy=H/hDeg,s=Math.min(sx,sy),ox=(W-wDeg*s)/2,oy=(H-hDeg*s)/2;
+  function X(lon){return ox+(lon-minLo)*k*s}function Y(lat){return oy+(maxLa-lat)*s}
+  var g='',step=hDeg>40?20:hDeg>15?10:5;
+  for(var a=Math.ceil(minLa/step)*step;a<=maxLa;a+=step)g+='<line class="v154-grid" x1="0" x2="'+W+'" y1="'+Y(a)+'" y2="'+Y(a)+'"/><text class="v154-axis" x="4" y="'+(Y(a)-3)+'">'+a+'°</text>';
+  for(var o=Math.ceil(minLo/step)*step;o<=maxLo;o+=step)g+='<line class="v154-grid" y1="0" y2="'+H+'" x1="'+X(o)+'" x2="'+X(o)+'"/><text class="v154-axis" x="'+(X(o)+3)+'" y="'+(H-4)+'">'+o+'°</text>';
+  var maxR=Math.max.apply(null,Object.keys(routes).map(function(k){return routes[k]}).concat([1]));
+  Object.keys(routes).forEach(function(r){var ab=r.split('-'),A=pts[ab[0]],B=pts[ab[1]];var w=0.8+2.2*routes[r]/maxR;
+    var mx=(X(A.lon)+X(B.lon))/2,my=(Y(A.lat)+Y(B.lat))/2,dx=X(B.lon)-X(A.lon),dy=Y(B.lat)-Y(A.lat),cx=mx-dy*0.12,cy=my+dx*0.12;
+    g+='<path class="v154-route" stroke-width="'+w.toFixed(2)+'" d="M'+X(A.lon).toFixed(1)+','+Y(A.lat).toFixed(1)+' Q'+cx.toFixed(1)+','+cy.toFixed(1)+' '+X(B.lon).toFixed(1)+','+Y(B.lat).toFixed(1)+'"><title>'+esc(ab[0]+' ⇄ '+ab[1]+': '+routes[r]+' flight'+(routes[r]===1?'':'s'))+'</title></path>'});
+  var maxN=Math.max.apply(null,P.map(function(p){return p.n})),top=P.slice().sort(function(a,b){return b.n-a.n}).slice(0,12).map(function(p){return p.c});
+  P.sort(function(a,b){return a.n-b.n}).forEach(function(p){var r=3+5*Math.sqrt(p.n/maxN);
+    g+='<circle class="v154-dot" cx="'+X(p.lon).toFixed(1)+'" cy="'+Y(p.lat).toFixed(1)+'" r="'+r.toFixed(1)+'" data-tip="'+esc(p.c+(p.name?' · '+p.name:'')+' · '+p.n+' movement'+(p.n===1?'':'s'))+'"/>';
+    if(top.indexOf(p.c)>=0)g+='<text class="v154-maplabel" x="'+(X(p.lon)+r+3).toFixed(1)+'" y="'+(Y(p.lat)+3).toFixed(1)+'">'+esc(p.c)+'</text>'});
+  return '<svg class="v154-chart v154-map" viewBox="0 0 '+W+' '+H.toFixed(0)+'" role="img" aria-label="Route map of airports visited">'+g+'</svg><div class="v154-sub">'+P.length+' airports · '+Object.keys(routes).length+' routes · dot size = movements, line width = flights on the route</div>';
+}
+
+/* ---------- milestones ---------- */
+function milestones(){
+  var L=F().slice().sort(function(a,b){return String(a.date).localeCompare(String(b.date))||String(a.dt).localeCompare(String(b.dt))}),out=[],cum=0,sec=0;
+  var HRS=[50,100,250,500,750,1000,1500,2000,2500,3000,4000,5000,7500,10000],SEC=[1,10,50,100,250,500,1000,1500,2000,3000,5000],hi=0,si=0;
+  var firsts={pic:null,night:null,ifr:null,mp:null,me:null};
+  L.forEach(function(f){cum+=Number(f.duration||0);sec++;
+    while(hi<HRS.length&&cum>=HRS[hi]*60){out.push({t:HRS[hi].toLocaleString('en-GB')+' hours',d:f.date,k:'h'});hi++}
+    while(si<SEC.length&&sec>=SEC[si]){out.push({t:SEC[si]===1?'First flight':SEC[si].toLocaleString('en-GB')+' flights',d:f.date,k:'s'});si++}
+    if(!firsts.pic&&(f.picLog||f.role==='PIC')&&!f.picusLog){firsts.pic=1;out.push({t:'First flight as PIC',d:f.date})}
+    if(!firsts.night&&Number(f.ldgNight||0)>0){firsts.night=1;out.push({t:'First night landing',d:f.date})}
+    if(!firsts.ifr&&Number(f.ifrTime||0)>0){firsts.ifr=1;out.push({t:'First IFR flight',d:f.date})}
+    if(!firsts.me&&f.engine==='ME'){firsts.me=1;out.push({t:'First multi-engine flight',d:f.date})}});
+  var next=[];if(hi<HRS.length)next.push({t:HRS[hi].toLocaleString('en-GB')+' hours',p:cum/(HRS[hi]*60),left:hm(HRS[hi]*60-cum)+' to go'});
+  if(si<SEC.length)next.push({t:SEC[si].toLocaleString('en-GB')+' flights',p:sec/SEC[si],left:(SEC[si]-sec)+' to go'});
+  out.sort(function(a,b){return String(b.d).localeCompare(String(a.d))});return {done:out,next:next};
+}
+
+/* ---------- page ---------- */
+function buildPage(){
+  if($('statsPage'))return;var main=document.querySelector('main');if(!main)return;
+  var p=document.createElement('div');p.id='statsPage';p.className='app-page';
+  p.innerHTML='<section class="card"><div class="v154-head"><div class="section-title">Statistics</div><label class="v154-period">Period <select id="v154StatPeriod"></select></label></div><div id="v154Kpis" class="v154-kpis"></div></section>'+
+    '<section class="card"><div class="section-title">Hours per year</div><div id="v154Years"></div></section>'+
+    '<section class="card"><div class="section-title" id="v154MonthsTitle">Hours per month</div><div id="v154Months"></div></section>'+
+    '<section class="card"><div class="section-title">Where the time went</div><div class="v154-two"><div><div class="v154-subhead">Function</div><div id="v154Roles"></div></div><div><div class="v154-subhead">Conditions &amp; operation</div><div id="v154Cond"></div></div></div></section>'+
+    '<section class="card"><div class="section-title">Route map</div><div id="v154Map"></div></section>'+
+    '<section class="card"><div class="v154-two"><div><div class="section-title">Top routes</div><div id="v154Routes"></div></div><div><div class="section-title">Top airports</div><div id="v154Airports"></div></div></div></section>'+
+    '<section class="card"><div class="v154-two"><div><div class="section-title">Aircraft types</div><div id="v154Types"></div></div><div><div class="section-title">Registrations</div><div id="v154Regs"></div></div></div></section>'+
+    '<section class="card"><div class="section-title">Milestones</div><div id="v154Miles"></div></section>';
+  main.appendChild(p);
+  $('v154StatPeriod').addEventListener('change',function(){try{localStorage.setItem(PERIOD_KEY,this.value)}catch(e){}render()});
+  // hover tooltip for chart marks
+  var tip=document.createElement('div');tip.className='v154-tip';tip.style.display='none';document.body.appendChild(tip);
+  p.addEventListener('pointermove',function(e){var t=e.target.closest('[data-tip]');if(!t){tip.style.display='none';return}tip.textContent=t.getAttribute('data-tip');tip.style.display='block';
+    var x=Math.min(window.innerWidth-tip.offsetWidth-8,e.clientX+12),y=e.clientY-tip.offsetHeight-10;tip.style.left=x+'px';tip.style.top=(y<4?e.clientY+16:y)+'px'});
+  p.addEventListener('pointerleave',function(){tip.style.display='none'});
+}
+function fillPeriods(){var sel=$('v154StatPeriod');var years={};F().forEach(function(f){var y=String(f.date||'').slice(0,4);if(/^\d{4}$/.test(y))years[y]=1});
+  var keep=sel.value;try{keep=keep||localStorage.getItem(PERIOD_KEY)||'all'}catch(e){keep=keep||'all'}
+  sel.innerHTML='<option value="all">All time</option><option value="12m">Last 12 months</option>'+Object.keys(years).sort().reverse().map(function(y){return '<option value="'+y+'">'+y+'</option>'}).join('');
+  sel.value=Array.prototype.some.call(sel.options,function(o){return o.value===keep})?keep:'all'}
+function table(head,rows){return '<table class="v154-table"><thead><tr>'+head.map(function(h,i){return '<th'+(i?' class="num"':'')+'>'+h+'</th>'}).join('')+'</tr></thead><tbody>'+rows.map(function(r){return '<tr>'+r.map(function(c,i){return '<td'+(i?' class="num"':'')+'>'+c+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table>'}
+function render(){
+  if(!$('statsPage'))return;fillPeriods();var p=period(),list=F().filter(function(f){return inPeriod(f,p)}),sims=SS().filter(function(s){return inPeriod(s,p)});
+  var t=printTimeBuckets(list),simMin=sims.reduce(function(a,s){return a+Number(s.duration||0)},0);
+  var apSet={},countries={};list.forEach(function(f){[f.dep,f.arr].forEach(function(c){if(c){apSet[c]=1;var a=ap(c);if(a&&a.country)countries[a.country]=1}})});
+  var types={};list.forEach(function(f){types[f.aircraft]=1});
+  var kp=[['Total time',hm(t.duration)],['Flights',list.length.toLocaleString('en-GB')],['Landings',(t.ldgDay+t.ldgNight).toLocaleString('en-GB')],['Night',hm(t.night)],['IFR',hm(t.ifr)],['Airports',Object.keys(apSet).length],['Countries',Object.keys(countries).length||'–'],['Aircraft types',Object.keys(types).length],['FSTD',hm(simMin)]];
+  $('v154Kpis').innerHTML=kp.map(function(k){return '<div class="v154-kpi"><b>'+k[1]+'</b><span>'+k[0]+'</span></div>'}).join('');
+  if(!F().length){['v154Years','v154Months','v154Roles','v154Cond','v154Map','v154Routes','v154Airports','v154Types','v154Regs','v154Miles'].forEach(function(id){$(id).innerHTML='<div class="v154-empty">No flights yet.</div>'});return}
+  // years (all time)
+  var byY={};F().forEach(function(f){var y=String(f.date).slice(0,4);byY[y]=(byY[y]||0)+Number(f.duration||0)});
+  var ys=Object.keys(byY).sort(),y0=+ys[0],y1=+ys[ys.length-1],yd=[];for(var y=y0;y<=y1;y++)yd.push({label:String(y),value:byY[y]||0,tip:y+': '+hm(byY[y]||0)});
+  $('v154Years').innerHTML=barChart(yd,{h:190,aria:'Hours per year'});
+  // months (selected period; all time = last 24 months)
+  var end=new Date(),months=[];
+  if(/^\d{4}$/.test(p)){for(var m=0;m<12;m++)months.push(p+'-'+String(m+1).padStart(2,'0'))}
+  else{var n=p==='12m'?12:24;for(var i=n-1;i>=0;i--){var d=new Date(end.getFullYear(),end.getMonth()-i,1);months.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'))}}
+  var byM={};F().forEach(function(f){var k=String(f.date).slice(0,7);byM[k]=(byM[k]||0)+Number(f.duration||0)});
+  $('v154MonthsTitle').textContent='Hours per month'+(p==='all'?' · last 24 months':p==='12m'?' · last 12 months':' · '+p);
+  $('v154Months').innerHTML=barChart(months.map(function(k){var mm=Number(k.slice(5))-1;return {label:MON[mm]+(mm===0||months.length<=12?'':'')+(mm===0&&months.length>12?" '"+k.slice(2,4):''),value:byM[k]||0,tip:MON[mm]+' '+k.slice(0,4)+': '+hm(byM[k]||0)}}),{h:190,maxLabels:12,aria:'Hours per month'});
+  // roles & conditions
+  var picus=list.reduce(function(a,f){return a+(f.picusLog?Number(f.picusTime||f.duration||0):0)},0);
+  $('v154Roles').innerHTML=hbars([{label:'PIC (incl. PICUS)',value:t.pic,text:hm(t.pic)},{label:'PICUS',value:picus,text:hm(picus)},{label:'Co-pilot',value:t.co,text:hm(t.co)},{label:'Dual',value:t.dual,text:hm(t.dual)},{label:'Instructor',value:t.instructor,text:hm(t.instructor)}]);
+  var pct=function(v){return t.duration?' · '+Math.round(v/t.duration*100)+'%':''};
+  $('v154Cond').innerHTML=hbars([{label:'Night',value:t.night,text:hm(t.night)+pct(t.night)},{label:'IFR',value:t.ifr,text:hm(t.ifr)+pct(t.ifr)},{label:'Multi-pilot',value:t.multi,text:hm(t.multi)+pct(t.multi)},{label:'Single-pilot SE',value:t.spSE,text:hm(t.spSE)},{label:'Single-pilot ME',value:t.spME,text:hm(t.spME)}]);
+  // map, routes, airports
+  $('v154Map').innerHTML=mapSvg(list);
+  var R={},A={};list.forEach(function(f){if(f.dep&&f.arr){var k=f.dep===f.arr?f.dep+' (local)':[f.dep,f.arr].sort().join(' ⇄ ');R[k]=R[k]||{n:0,m:0};R[k].n++;R[k].m+=Number(f.duration||0)}[f.dep,f.arr].forEach(function(c){if(c)A[c]=(A[c]||0)+1})});
+  var topR=Object.keys(R).sort(function(a,b){return R[b].n-R[a].n||R[b].m-R[a].m}).slice(0,10);
+  $('v154Routes').innerHTML=table(['Route','Flights','Hours'],topR.map(function(k){return [esc(k),R[k].n,hm(R[k].m)]}));
+  var topA=Object.keys(A).sort(function(a,b){return A[b]-A[a]}).slice(0,10);
+  $('v154Airports').innerHTML=table(['Airport','Movements'],topA.map(function(c){var a=ap(c);return ['<b>'+esc(c)+'</b>'+(a&&a.name?' <span class="v154-sub">'+esc(a.name)+'</span>':''),A[c]]}));
+  // types & regs
+  var T={},G={};list.forEach(function(f){var k=f.aircraft||'?';T[k]=T[k]||{n:0,m:0,last:''};T[k].n++;T[k].m+=Number(f.duration||0);if(f.date>T[k].last)T[k].last=f.date;
+    var r=f.reg||'?';G[r]=G[r]||{n:0,m:0,type:f.aircraft};G[r].n++;G[r].m+=Number(f.duration||0)});
+  $('v154Types').innerHTML=table(['Type','Flights','Hours','Last flown'],Object.keys(T).sort(function(a,b){return T[b].m-T[a].m}).map(function(k){return ['<b>'+esc(k)+'</b>',T[k].n,hm(T[k].m),nice(T[k].last)]}));
+  $('v154Regs').innerHTML=table(['Registration','Flights','Hours'],Object.keys(G).sort(function(a,b){return G[b].m-G[a].m}).slice(0,10).map(function(k){return ['<b>'+esc(k)+'</b> <span class="v154-sub">'+esc(G[k].type||'')+'</span>',G[k].n,hm(G[k].m)]}));
+  // milestones (all time)
+  var M=milestones();
+  $('v154Miles').innerHTML=(M.next.length?'<div class="v154-next">'+M.next.map(function(n){return '<div class="v154-meter ok"><div class="v154-meter-top"><b>Next: '+esc(n.t)+'</b><span>'+esc(n.left)+'</span></div><div class="v154-bar"><i style="width:'+Math.min(100,n.p*100).toFixed(1)+'%"></i></div></div>'}).join('')+'</div>':'')+
+    '<div class="v154-badges">'+M.done.map(function(b){return '<div class="v154-badge-m"><b>'+esc(b.t)+'</b><span>'+nice(b.d)+'</span></div>'}).join('')+'</div>';
+}
+function addMenuItem(){var menu=$('moreMenu');if(!menu||$('statsTab'))return;
+  var b=document.createElement('button');b.id='statsTab';b.className='more-item';
+  b.innerHTML='<span class="field-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span> <span>Statistics</span>';
+  b.addEventListener('click',function(){window.showTab('statsPage',b);closeMoreMenu()});
+  var cur=$('currencyTab');menu.insertBefore(b,cur?cur.nextSibling:menu.firstChild);
+}
+var baseShow=window.showTab;
+window.showTab=function(id,btn){var r=baseShow.apply(this,arguments);
+  if(id==='statsPage'){document.querySelectorAll('.v16-bottom-nav .tab').forEach(function(x){x.classList.remove('active')});var m=$('moreTab');if(m)m.classList.add('active');try{render()}catch(e){console.error('stats failed',e)}}return r};
+window.EASALOG_STATS={render:render,milestones:milestones};
+function init(){buildPage();addMenuItem()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+</script>
+<script id="v154-printx">
+/* V154 — Print extras.
+   - Footer text + page numbering on every logbook page (styles: "Page 7", "7 / 31", "Page 7 of 31", "7"; custom
+     first page number for continuing a paper logbook). The flight rows give up 4 mm in total so the footer fits;
+     with both off nothing changes.
+   - "Totals per year" page after the logbook pages (before endorsements / QR backup).
+   - Hours summary for job applications (Flights tab → "Hours summary"): preview, print/save PDF, copy as text. */
+(function(){
+'use strict';
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function hm(m){m=Math.round(Number(m)||0);return Math.floor(m/60)+':'+String(m%60).padStart(2,'0')}
+var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function nice(s){var p=String(s||'').split('-');return p.length===3?Number(p[2])+' '+MON[Number(p[1])-1]+' '+p[0]:s}
+function S(){return (typeof settings!=='undefined'&&settings)||{}}
+var K={foot:'easa-logbook-footer-text-v154',num:'easa-logbook-page-numbers-v154',start:'easa-logbook-first-page-v154',yt:'easa-logbook-year-totals-v154'};
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+
+/* ---------- controls in Print customization ---------- */
+function buildControls(){
+  var wrap=document.querySelector('.v103-print-controls');if(!wrap||$('v154Footer'))return;
+  var html=[
+    '<label class="v103-check"><input type="checkbox" id="v154YearTotals"> Totals per year page</label>',
+    '<label>Page numbers<select id="v154PageNum"><option value="off">Off</option><option value="page">Page 7</option><option value="slash">7 / 31</option><option value="of">Page 7 of 31</option><option value="plain">7</option></select></label>',
+    '<label id="v154StartLabel">First page no.<input id="v154PageStart" type="number" min="1" step="1" style="width:64px"></label>',
+    '<label class="v103-free">Footer text<input id="v154Footer" type="text" maxlength="120" placeholder="Optional text at the bottom of every page"></label>'].join('');
+  var tmp=document.createElement('div');tmp.innerHTML=html;
+  var free=wrap.querySelector('.v103-free');Array.prototype.slice.call(tmp.children).forEach(function(n){wrap.insertBefore(n,free||null)});
+  $('v154YearTotals').checked=ls(K.yt)==='1';$('v154PageNum').value=ls(K.num)||'off';$('v154PageStart').value=ls(K.start)||'1';$('v154Footer').value=ls(K.foot)||'';
+  function sync(){$('v154StartLabel').style.display=$('v154PageNum').value==='off'?'none':''}
+  $('v154YearTotals').addEventListener('change',function(){ls(K.yt,this.checked?'1':'0')});
+  $('v154PageNum').addEventListener('change',function(){ls(K.num,this.value);sync()});
+  $('v154PageStart').addEventListener('change',function(){var v=Math.max(1,Math.floor(Number(this.value)||1));this.value=v;ls(K.start,String(v))});
+  $('v154Footer').addEventListener('change',function(){ls(K.foot,this.value.trim())});
+  sync();
+}
+
+/* ---------- footer + page numbers ---------- */
+var FOOT_MM=4;
+function sheetsOf(area){ // logical logbook pages -> [ [sheet(, sheet)] ]
+  var two=area.querySelectorAll('.v134-sheet.left-sheet');
+  if(two.length)return Array.prototype.map.call(two,function(l){var r=l.nextElementSibling;return r&&r.classList.contains('right-sheet')?[l,r]:[l]});
+  return Array.prototype.map.call(area.querySelectorAll('.print-page'),function(p){return [p]});
+}
+function mm(v){return /mm$/.test(v||'')?parseFloat(v):null}
+function restore(sheet){
+  if(!sheet.hasAttribute('data-v154-shrunk'))return;
+  sheet.querySelectorAll('tr[data-v154h]').forEach(function(tr){var h=Number(tr.getAttribute('data-v154h'));tr.style.setProperty('height',h.toFixed(3)+'mm','important');
+    Array.prototype.forEach.call(tr.cells,function(c){var ch=c.getAttribute('data-v154ch');if(ch){c.style.setProperty('height',ch,'important');c.style.setProperty('min-height',ch,'important');c.removeAttribute('data-v154ch')}});tr.removeAttribute('data-v154h')});
+  sheet.querySelectorAll('table[data-v154th]').forEach(function(t){var h=t.getAttribute('data-v154th');t.style.setProperty('height',h,'important');t.style.setProperty('min-height',h,'important');t.removeAttribute('data-v154th')});
+  sheet.removeAttribute('data-v154-shrunk');
+}
+function shrink(sheet){
+  var rows=sheet.querySelectorAll('tr.flight-row'),n=rows.length;if(!n)return false;var d=FOOT_MM/n;
+  rows.forEach(function(tr){var h=mm(tr.style.height);if(h==null)return;tr.setAttribute('data-v154h',h);var nh=Math.max(2,h-d);tr.style.setProperty('height',nh.toFixed(3)+'mm','important');
+    Array.prototype.forEach.call(tr.cells,function(c){var ch=mm(c.style.height);if(ch==null)return;c.setAttribute('data-v154ch',c.style.height);var v=Math.max(0.5,ch-d).toFixed(3)+'mm';c.style.setProperty('height',v,'important');c.style.setProperty('min-height',v,'important')})});
+  sheet.querySelectorAll('table').forEach(function(t){var h=mm(t.style.height);if(h==null)return;t.setAttribute('data-v154th',t.style.height);var v=(h-FOOT_MM).toFixed(3)+'mm';t.style.setProperty('height',v,'important');t.style.setProperty('min-height',v,'important')});
+  sheet.setAttribute('data-v154-shrunk','1');return true;
+}
+function label(style,n,total){return style==='page'?'Page '+n:style==='slash'?n+' / '+total:style==='of'?'Page '+n+' of '+total:style==='plain'?String(n):''}
+function applyFooter(){
+  var area=$('printArea');if(!area)return;
+  area.querySelectorAll('.v154-footer').forEach(function(x){x.remove()});
+  var pages=sheetsOf(area);pages.forEach(function(g){g.forEach(restore)});
+  var text=(ls(K.foot)||'').trim(),style=ls(K.num)||'off';if(!text&&style==='off')return;
+  var start=Math.max(1,Number(ls(K.start))||1),total=start+pages.length-1;
+  pages.forEach(function(g,i){g.forEach(function(sheet){shrink(sheet);
+    var f=document.createElement('div');f.className='v154-footer';f.innerHTML='<span>'+esc(text)+'</span><span>'+esc(label(style,start+i,total))+'</span>';
+    sheet.appendChild(f)})});
+}
+
+/* ---------- totals per year page ---------- */
+function pageHeight(area){var p=area.querySelector('.print-page, .v134-sheet');var h=p&&p.style&&p.style.height;var portrait=($('v103Orientation')||{}).value==='portrait';return h&&/mm$/.test(h)?h:(portrait?'283mm':'196mm')}
+function yearTotals(){
+  var area=$('printArea');if(!area)return;area.querySelectorAll('.v154-yt-sheet').forEach(function(x){x.remove()});
+  if(!($('v154YearTotals')&&$('v154YearTotals').checked))return;
+  var E=typeof getPrintFlights==='function'?getPrintFlights():[];if(!E.length)return;
+  var byY={};E.forEach(function(f){var y=String(f.date||'').slice(0,4);(byY[y]=byY[y]||[]).push(f)});
+  var first=String(E[0].date||'').slice(0,10);
+  var before=printTimeBuckets(((typeof flights!=='undefined'&&flights)||[]).filter(function(f){return String(f.date||'').slice(0,10)<first}));
+  var cols=[['spSE','SE'],['spME','ME'],['multi','Multi-pilot'],['duration','Total'],['night','Night'],['ifr','IFR'],['pic','PIC'],['co','Co-pilot'],['dual','Dual'],['instructor','Instr.'],['simulator','FSTD'],['ldgDay','Ldg day'],['ldgNight','Ldg night']];
+  function row(label,n,t,cls){return '<tr class="'+(cls||'')+'"><td>'+label+'</td><td>'+(n==null?'':n)+'</td>'+cols.map(function(c){var v=t[c[0]]||0;return '<td>'+(/^ldg/.test(c[0])?v:hm(v))+'</td>'}).join('')+'</tr>'}
+  var body='',all=null;Object.keys(byY).sort().forEach(function(y){var t=printTimeBuckets(byY[y]);body+=row(y,byY[y].filter(function(f){return !f.isSimSession}).length,t);all=all?sum(all,t):t});
+  function sum(a,b){var o={};Object.keys(a).forEach(function(k){o[k]=(a[k]||0)+(b[k]||0)});return o}
+  var hasBefore=Object.keys(before).some(function(k){return before[k]});
+  var foot=row('Total of these pages',E.filter(function(f){return !f.isSimSession}).length,all,'tot');
+  if(hasBefore){foot=row('Brought forward from earlier pages',null,before,'sub')+foot+row('Grand total',null,sum(before,all),'tot')}
+  var lb=window.EASALOG_LOGBOOK&&window.EASALOG_LOGBOOK.printing(),pilot=String(S().pilotName||'').trim(),h=pageHeight(area);
+  var s=document.createElement('div');s.className='v154-yt-sheet';s.style.height=h;s.style.minHeight=h;s.style.maxHeight=h;
+  s.innerHTML='<div class="v154-yt-title"><span>TOTALS PER YEAR'+(lb&&lb.name?' · '+esc(lb.name.toUpperCase()):'')+'</span><span>'+esc(pilot)+'</span></div>'+
+    '<table class="v154-yt"><thead><tr><th>Year</th><th>Flights</th>'+cols.map(function(c){return '<th>'+c[1]+'</th>'}).join('')+'</tr></thead><tbody>'+body+'</tbody><tfoot>'+foot+'</tfoot></table>'+
+    '<div class="v154-yt-note">Times in hours:minutes, counted exactly as on the logbook pages. Flights excludes FSTD sessions.</div>';
+  var before2=area.querySelector('.v153-end-sheet, .v150-qr-index-sheet');if(before2)area.insertBefore(s,before2);else area.appendChild(s);
+}
+
+/* ---------- hook into the print pipeline (runs after QR / endorsements) ---------- */
+function after(){try{yearTotals()}catch(e){console.error('year totals failed',e)}try{applyFooter()}catch(e){console.error('footer failed',e)}}
+var oq=window.__v148AppendQRPages;window.__v148AppendQRPages=function(){var r=typeof oq==='function'?oq.apply(this,arguments):undefined;after();return r};
+var oa=window.v103ApplyPrintCustomization;window.v103ApplyPrintCustomization=function(){var r=typeof oa==='function'?oa.apply(this,arguments):undefined;after();return r};
+
+/* ================= hours summary for job applications ================= */
+function summaryData(lbSel){
+  var L=window.EASALOG_LOGBOOK,all=(typeof flights!=='undefined'&&flights)||[],sims=(typeof simSessions!=='undefined'&&simSessions)||[];
+  var F=lbSel&&L?all.filter(function(f){return L.of(f)===lbSel}):all.slice(),SS=lbSel&&L?sims.filter(function(s){return L.of(s)===lbSel}):sims.slice();
+  F.sort(function(a,b){return String(a.date).localeCompare(String(b.date))});
+  var t=printTimeBuckets(F),sim=SS.reduce(function(a,s){return a+Number(s.duration||0)},0),picus=F.reduce(function(a,f){return a+(f.picusLog?Number(f.picusTime||f.duration||0):0)},0);
+  var now=new Date(),td=now.toISOString().slice(0,10);function back(days){var d=new Date(now.getTime()-days*86400000);return d.toISOString().slice(0,10)}
+  function win(from){var L2=F.filter(function(f){return f.date>=from&&f.date<=td}),b=printTimeBuckets(L2);return {n:L2.length,t:b}}
+  var types={};F.forEach(function(f){var k=f.aircraft||'?';var T=types[k]=types[k]||{list:[],last:''};T.list.push(f);if(f.date>T.last)T.last=f.date});
+  var exp=(S().expiries||[]).slice().sort(function(a,b){return String(a.date).localeCompare(String(b.date))});
+  return {F:F,t:t,sim:sim,picus:picus,from:F[0]&&F[0].date,to:F.length&&F[F.length-1].date,w90:win(back(89)),w12:win(back(365)),wy:win(td.slice(0,4)+'-01-01'),year:td.slice(0,4),
+    types:Object.keys(types).map(function(k){var b=printTimeBuckets(types[k].list);return {k:k,n:types[k].list.length,t:b,last:types[k].last}}).sort(function(a,b){return b.t.duration-a.t.duration}),exp:exp,
+    lbName:lbSel&&L&&L.config().count>1?L.name(lbSel):''};
+}
+function summaryHTML(d){
+  var pilot=String(S().pilotName||'').trim(),t=d.t,today=new Date().toISOString().slice(0,10);
+  var kv=[['Total flight time',hm(t.duration)],['PIC (incl. PICUS)',hm(t.pic)],['of which PICUS',hm(d.picus)],['Co-pilot',hm(t.co)],['Dual received',hm(t.dual)],['Instructor',hm(t.instructor)],
+    ['Multi-pilot',hm(t.multi)],['Single-pilot single-engine',hm(t.spSE)],['Single-pilot multi-engine',hm(t.spME)],['Night',hm(t.night)],['IFR',hm(t.ifr)],['FSTD (simulator)',hm(d.sim)],['Flights (sectors)',d.F.length.toLocaleString('en-GB')],['Landings day / night',t.ldgDay+' / '+t.ldgNight]];
+  var rec=[['Last 90 days',d.w90],['Last 12 months',d.w12],['Calendar year '+d.year,d.wy]];
+  var sig=S().signature&&String(S().signature).indexOf('data:image/')===0?'<img src="'+S().signature+'" alt="">':'';
+  return '<div class="v154-sum">'+
+    '<div class="v154-sum-head"><div><div class="v154-sum-title">Flight experience summary</div><div class="v154-sum-name">'+esc(pilot||'Pilot')+'</div></div><div class="v154-sum-meta">As of '+nice(today)+(d.lbName?'<br>'+esc(d.lbName):'')+(d.from?'<br>Logged '+nice(d.from)+' – '+nice(d.to):'')+'</div></div>'+
+    '<div class="v154-sum-grid"><table class="v154-sum-kv"><tbody>'+kv.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>'}).join('')+'</tbody></table>'+
+    '<div><div class="v154-sum-h">Recent experience</div><table class="v154-sum-t"><thead><tr><th></th><th>Total</th><th>PIC</th><th>Flights</th><th>Landings</th></tr></thead><tbody>'+
+      rec.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+hm(r[1].t.duration)+'</td><td>'+hm(r[1].t.pic)+'</td><td>'+r[1].n+'</td><td>'+(r[1].t.ldgDay+r[1].t.ldgNight)+'</td></tr>'}).join('')+'</tbody></table>'+
+      (d.exp.length?'<div class="v154-sum-h">Licences, ratings &amp; validity</div><table class="v154-sum-t"><tbody>'+d.exp.map(function(e){return '<tr><td>'+esc(e.name)+(e.note?' <span class="v154-sum-dim">'+esc(e.note)+'</span>':'')+'</td><td>'+(e.date?'Valid until '+nice(e.date):'')+'</td></tr>'}).join('')+'</tbody></table>':'')+
+    '</div></div>'+
+    '<div class="v154-sum-h">By aircraft type</div><table class="v154-sum-t"><thead><tr><th>Type</th><th>Total</th><th>PIC</th><th>Co-pilot</th><th>Multi-pilot</th><th>Night</th><th>Flights</th><th>Last flown</th></tr></thead><tbody>'+
+      d.types.map(function(x){return '<tr><td><b>'+esc(x.k)+'</b></td><td>'+hm(x.t.duration)+'</td><td>'+hm(x.t.pic)+'</td><td>'+hm(x.t.co)+'</td><td>'+hm(x.t.multi)+'</td><td>'+hm(x.t.night)+'</td><td>'+x.n+'</td><td>'+nice(x.last)+'</td></tr>'}).join('')+'</tbody></table>'+
+    '<div class="v154-sum-foot"><div>Compiled from '+d.F.length.toLocaleString('en-GB')+' logged flights (EASA Part-FCL logbook). I certify that this summary is a true extract of my flight logbook.</div><div class="v154-sum-sign">'+sig+'<span>Signature</span></div></div>'+
+  '</div>';
+}
+function summaryText(d){var t=d.t,L=[];var pilot=String(S().pilotName||'').trim();
+  L.push('FLIGHT EXPERIENCE SUMMARY — '+(pilot||'Pilot')+(d.lbName?' ('+d.lbName+')':''),'As of '+nice(new Date().toISOString().slice(0,10))+(d.from?' · logged '+nice(d.from)+' – '+nice(d.to):''),'');
+  [['Total flight time',hm(t.duration)],['PIC (incl. PICUS)',hm(t.pic)],['of which PICUS',hm(d.picus)],['Co-pilot',hm(t.co)],['Dual received',hm(t.dual)],['Instructor',hm(t.instructor)],['Multi-pilot',hm(t.multi)],['Single-pilot SE',hm(t.spSE)],['Single-pilot ME',hm(t.spME)],['Night',hm(t.night)],['IFR',hm(t.ifr)],['FSTD',hm(d.sim)],['Flights',d.F.length],['Landings day/night',t.ldgDay+'/'+t.ldgNight]].forEach(function(r){L.push(r[0]+': '+r[1])});
+  L.push('','Last 90 days: '+hm(d.w90.t.duration)+' ('+d.w90.n+' flights) · Last 12 months: '+hm(d.w12.t.duration)+' ('+d.w12.n+' flights) · '+d.year+': '+hm(d.wy.t.duration),'','By aircraft type:');
+  d.types.forEach(function(x){L.push('  '+x.k+': '+hm(x.t.duration)+' total, '+hm(x.t.pic)+' PIC, '+hm(x.t.co)+' co-pilot, '+x.n+' flights, last flown '+nice(x.last))});
+  if(d.exp.length){L.push('','Validity:');d.exp.forEach(function(e){L.push('  '+e.name+(e.date?': valid until '+nice(e.date):'')+(e.note?' ('+e.note+')':''))})}
+  return L.join('\n')}
+function buildSummaryUI(){
+  if($('v154SumBtn'))return;var csv=document.querySelector('button[onclick="exportCSV()"]');if(!csv)return;
+  var b=document.createElement('button');b.id='v154SumBtn';b.type='button';b.className='secondary small';b.textContent='Hours summary';b.title='One-page flight experience summary for job applications';
+  csv.parentNode.insertBefore(b,csv.nextSibling);b.addEventListener('click',openSummary);
+  var m=document.createElement('div');m.id='v154SumModal';m.className='modal-overlay';m.style.display='none';
+  m.innerHTML='<div class="modal-card v154-sum-card"><div class="v154-head"><div class="section-title">Hours summary</div><label class="v154-period" id="v154SumLbLabel">Logbook <select id="v154SumLb"></select></label></div>'+
+    '<div class="notice" style="margin-bottom:10px">A one-page extract of your experience, as airline application forms ask for it. Print it or save it as a PDF, or copy it as text.</div>'+
+    '<div id="v154SumPreview" class="v154-sum-preview"></div>'+
+    '<div class="actions" style="justify-content:flex-end;margin-top:10px"><button type="button" class="secondary" id="v154SumCopy">Copy as text</button><button type="button" class="secondary" id="v154SumClose">Close</button><button type="button" class="primary" id="v154SumPrint">Print / Save PDF</button></div></div>';
+  document.body.appendChild(m);
+  m.addEventListener('click',function(e){if(e.target===m)m.style.display='none'});
+  $('v154SumClose').addEventListener('click',function(){m.style.display='none'});
+  $('v154SumLb').addEventListener('change',refreshSummary);
+  $('v154SumCopy').addEventListener('click',function(){var txt=summaryText(summaryData(curLb()));
+    (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){$('v154SumCopy').textContent='Copied ✓';setTimeout(function(){$('v154SumCopy').textContent='Copy as text'},1500)},function(){prompt('Copy the summary:',txt)})});
+  $('v154SumPrint').addEventListener('click',printSummary);
+}
+function curLb(){var s=$('v154SumLb');var v=s?Number(s.value):0;return v||0}
+function openSummary(){var L=window.EASALOG_LOGBOOK,c=L?L.config().count:1,sel=$('v154SumLb');
+  sel.innerHTML='<option value="0">All logbooks</option>'+(c>1?[1,2,3].slice(0,c).map(function(n){return '<option value="'+n+'">'+esc(L.name(n))+'</option>'}).join(''):'');
+  $('v154SumLbLabel').style.display=c>1?'':'none';refreshSummary();$('v154SumModal').style.display='flex'}
+function refreshSummary(){$('v154SumPreview').innerHTML=summaryHTML(summaryData(curLb()))}
+function printSummary(){
+  if(typeof isIOSStandalone==='function'&&isIOSStandalone()){alert('Printing is not available from the Home Screen app on iPhone/iPad. Open the logbook in Safari to print the summary.');return}
+  var area=$('printArea');if(!area)return;
+  area.innerHTML='<div class="v154-sum-sheet">'+summaryHTML(summaryData(curLb()))+'</div>';area.classList.add('v154-summary-mode');
+  // The logbook's own @page rules (several marked !important) would keep the page landscape: take them out
+  // for the duration of this print and put them back afterwards.
+  var removed=[];Array.prototype.forEach.call(document.styleSheets,function(sh){
+    function walk(parent){var rules;try{rules=parent.cssRules}catch(e){return}for(var i=rules.length-1;i>=0;i--){var r=rules[i];
+      if(r.type===4)walk(r);else if(r.type===6){removed.push({parent:parent,index:i,text:r.cssText});try{parent.deleteRule(i)}catch(e){}}}}
+    walk(sh)});
+  function putBack(){for(var i=removed.length-1;i>=0;i--){var x=removed[i];try{x.parent.insertRule(x.text,Math.min(x.index,x.parent.cssRules.length))}catch(e){}}removed=[]}
+  var st=document.createElement('style');st.id='v154SumPage';st.textContent='@media print{@page{size:A4 portrait;margin:12mm}html.v150-safari #printArea{zoom:1!important}}';document.body.appendChild(st); // last in the document so it beats the logbook's landscape @page rules
+  $('v154SumModal').style.display='none';
+  var done=false;function cleanup(){if(done)return;done=true;st.remove();putBack();area.classList.remove('v154-summary-mode');area.innerHTML='';try{window.renderPrintPreview()}catch(e){}}
+  window.addEventListener('afterprint',cleanup,{once:true});
+  try{window.print()}finally{setTimeout(cleanup,1500)}
+}
+window.EASALOG_PRINTX={applyFooter:applyFooter,yearTotals:yearTotals,summaryData:summaryData,summaryText:summaryText,summaryHTML:summaryHTML};
+function init(){buildControls();buildSummaryUI()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
 </script>
