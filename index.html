@@ -8564,7 +8564,7 @@ var FORMAT='EASALOG1';
 var MODE_KEY='easa-logbook-qr-mode-v150';
 var TOT_KEYS=['spSE','spME','multi','duration','ldgDay','ldgNight','night','ifr','pic','co','dual','instructor','simulator'];
 var TOT_LABELS=['SE','ME','MP','TOTAL','LDG_D','LDG_N','NIGHT','IFR','PIC','COP','DUAL','INSTR','SIM'];
-var COLS=['kind','date','dep','out','arr','in','type','reg','eng','op','total','night','ifr','pic','cop','dual','instr','picus','sim','ldgD','ldgN','role','flags','name','crew','captain','remarks'];
+var COLS=['kind','date','dep','out','arr','in','type','reg','eng','op','total','night','ifr','pic','cop','dual','instr','picus','sim','ldgD','ldgN','role','flags','name','crew','captain','remarks','cx'];
 function $(id){return document.getElementById(id)}
 
 /* ---------- small helpers ---------- */
@@ -8587,13 +8587,14 @@ function fmtDate(iso){if(!iso)return '';var p=String(iso).slice(0,10).split('-')
 function newId(){try{if(typeof uid==='function')return uid()}catch(e){}return 'qr-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10)}
 
 /* ---------- entry <-> CSV row ---------- */
+function CX(){return window.EASALOG_CUSTOM||null}
 function lib(name){try{switch(name){case 'flights':return flights;case 'simSessions':return simSessions;case 'simulatorLibrary':return simulatorLibrary;case 'aircraftLibrary':return aircraftLibrary}}catch(e){}return []}
 function aircraftProfile(f){var A=lib('aircraftLibrary')||[];return A.find(function(x){return x.id===f.aircraftProfileId})}
 function rowFor(f){
   if(f.isSimSession){
     var sid=String(f.id||'').replace(/^sim_/,''),S=(lib('simSessions')||[]).find(function(s){return s.id===sid})||{};
     var sp=(lib('simulatorLibrary')||[]).find(function(x){return x.id===S.simulatorProfileId})||{};
-    return ['S',f.date,'','','','',sp.name||f.aircraft||'',sp.reg||f.reg||'','','','','','','','','','','',hm(f.simDuration),'','','','',f.pic||'','','',S.remarks!=null?S.remarks:(f.remarks||'')];
+    return ['S',f.date,'','','','',sp.name||f.aircraft||'',sp.reg||f.reg||'','','','','','','','','','','',hm(f.simDuration),'','','','',f.pic||'','','',S.remarks!=null?S.remarks:(f.remarks||''),''];
   }
   var ap=aircraftProfile(f),op=(ap&&ap.operation)||(f.engine==='SE'?'SP':'MP'),eng=(ap&&ap.engine)||f.engine||'ME';
   var flags=(f.ifr?'I':'')+(f.pf?'F':'')+(f.pm?'M':'')+(f.picLog?'P':'')+(f.sicLog?'S':'')+(f.dualLog?'D':'')+(f.instructorLog?'T':'')+(f.picusLog?'U':'')+(ap&&ap.simulator?'X':'');
@@ -8602,7 +8603,7 @@ function rowFor(f){
   function eff(v,cond){return v!=null?v:(cond?d:0)}
   return ['F',f.date,f.dep||'',f.dt||'',f.arr||'',f.at||'',f.aircraft||'',f.reg||'',eng,op,hm(d),hm(f.night),hm(f.ifrTime!=null?f.ifrTime:(f.ifr?d:0)),
     hm(eff(f.picTime,r==='PIC'||r==='PICUS')),hm(eff(f.sicTime,r==='SIC')),hm(eff(f.dualTime,r==='Dual')),hm(eff(f.instructorTime,r==='Instructor')),hm(f.picusTime),'',f.ldgDay?String(f.ldgDay):'',f.ldgNight?String(f.ldgNight):'',
-    f.role||'',flags,f.pic||'',f.otherCrewName||'',f.picusCaptain||'',f.remarks||''];
+    f.role||'',flags,f.pic||'',f.otherCrewName||'',f.picusCaptain||'',f.remarks||'',CX()?CX().encode(f.cx):''];
 }
 function storedRole(f){ // mirrors v15StoredRole()
   if(f.picusLog||f.role==='PICUS')return 'PICUS';if(f.picLog||f.role==='PIC')return 'PIC';
@@ -8645,12 +8646,14 @@ function buildBook(){
   var pages=paginate(area,entries);
   var firstDate=String(entries[0].date||'').slice(0,10);
   var beforeWindow=printTimeBuckets((lib('flights')||[]).filter(function(f){return String(f.date||'').slice(0,10)<firstDate}));
+  var prevExp=CX()?CX().printPrev():null;if(prevExp)beforeWindow=addT(beforeWindow,prevExp); // previous experience (Settings) is part of page 1's brought-forward line
+  var cxNames=CX()?CX().namesMeta():[];
   var bf=Object.assign({},beforeWindow),start=Object.assign({},beforeWindow),codes=[];
   pages.forEach(function(pg,pi){
     var thisPage=printTimeBuckets(pg.entries);
     var rows=pg.entries.map(rowFor);
     var head=function(part,parts){return ['#'+FORMAT+',1','#book,'+csvCell(id)+','+csvCell(pilot),'#page,'+(pi+1)+','+pages.length+','+part+','+parts,'#logbook,'+lb.n+','+csvCell(lb.name),
-      '#totals,'+TOT_LABELS.join(','),'#brought_forward,'+totLine(bf).join(','),'#this_page,'+totLine(thisPage).join(','),csvLine(COLS)].join('\n')};
+      '#totals,'+TOT_LABELS.join(','),'#brought_forward,'+totLine(bf).join(','),'#this_page,'+totLine(thisPage).join(',')].concat(cxNames.length?['#custom,'+cxNames.map(csvCell).join(',')]:[],[csvLine(COLS)]).join('\n')};
     // One code per page; split into parts only if a page would need a denser code than version 27.
     // Prefer error-correction level Q (25% damage tolerance) up to version 25, else M (15%) up to version 27.
     var parts=1,made;
@@ -8677,6 +8680,8 @@ function buildBook(){
     'ENTRIES: '+entries.length+' ('+(entries.length-nSim)+' FLIGHTS, '+nSim+' FSTD)','DATES: '+firstDate+' TO '+String(entries[entries.length-1].date||'').slice(0,10),
     'PAGES: '+pages.length+' (PAGE CODES: '+codes.length+')','LOGBOOK: '+lb.n+(lb.name?' ('+lb.name+')':''),'',
     'YEAR,ENTRIES,'+TOT_LABELS.join(','),'START,0,'+totLine(start).join(',')];
+  if(prevExp){lines.push('PREVIOUS,0,'+totLine(prevExp).join(',')+(prevExp.asOf?' (UP TO '+prevExp.asOf+')':''));
+    var pc=[];['f','c','y'].forEach(function(x){for(var i=1;i<=3;i++){var v=prevExp[x+i];if(v)pc.push(x+i+'='+(x==='f'?hm(v):v))}});if(pc.length)lines.push('PREVIOUS_CUSTOM,'+pc.join(';'))}
   Object.keys(years).sort().forEach(function(y){var t=printTimeBuckets(years[y]);all=addT(all,t);lines.push(y+','+years[y].length+','+totLine(t).join(','))});
   lines.push('ALL,'+entries.length+','+totLine(all).join(','));
   lines.push('END,'+entries.length+','+totLine(addT(start,all)).join(','));
@@ -8691,7 +8696,7 @@ var LEGEND=[
  '<b>What this is.</b> Every logbook page has a QR code holding that page\'s entries and its printed totals. Together with the index code they rebuild the complete digital logbook. A lost page loses only its own code.',
  '<b>With the app:</b> Flights tab → <i>Restore from QR</i>. Scan or paste the codes; every total is checked before anything is imported.',
  '<b>Without the app:</b> scan a page code with any QR reader. It reads <i>EASALOG1 ID… PAGE n/N PART p/P N&lt;len&gt; &lt;data&gt;</i>. Take the &lt;len&gt; characters of &lt;data&gt; (add back trailing spaces if your reader dropped them), decode <b>Base45</b> (RFC 9285), then <b>zlib inflate</b>. Free tool: CyberChef, recipe "From Base45" → "Zlib Inflate". The result is a CSV file (UTF-8) any spreadsheet opens.',
- '<b>Columns:</b> kind (F flight, S simulator) · date · dep · out · arr · in · type · reg · eng (SE/ME) · op (SP single-pilot / MP multi-pilot) · total · night · ifr · pic · cop · dual · instr · picus · sim · ldgD · ldgN · role · flags · name (PIC/instructor) · crew · captain (PICUS) · remarks. Times are hours:minutes, blank = 0, UTC.',
+ '<b>Columns:</b> kind (F flight, S simulator) · date · dep · out · arr · in · type · reg · eng (SE/ME) · op (SP single-pilot / MP multi-pilot) · total · night · ifr · pic · cop · dual · instr · picus · sim · ldgD · ldgN · role · flags · name (PIC/instructor) · crew · captain (PICUS) · remarks · cx (custom fields: f1-f3 extra function times, t1-t3 text, c1-c3 counters, y1-y3 yes/no; names in the #custom line). Times are hours:minutes, blank = 0, UTC.',
  '<b>Flags:</b> I IFR · F pilot flying · M pilot monitoring · P PIC · S co-pilot · D dual · T instructor · U PICUS · X aircraft is a simulator.',
  '<b>Checks:</b> each page\'s rows add up to its <i>#this_page</i> line; <i>#brought_forward</i> + <i>#this_page</i> = next page\'s <i>#brought_forward</i>; the index code (plain text) lists totals per year.'];
 
@@ -8709,7 +8714,7 @@ function indexCard(book){
   d.innerHTML=Q.toSVG(book.index.qr,'v150-qr-svg',4)+'<div class="v150-qr-cap"><b>INDEX</b><span>'+book.entries+' entries · '+book.pages+' pages · years '+esc(book.years[0]+(book.years.length>1?'–'+book.years[book.years.length-1]:''))+'</span></div>';
   return d}
 function titleBar(book,extra){var t=document.createElement('div');t.className='v150-qr-title';
-  t.innerHTML='<span>FLIGHT DATA — QR BACKUP'+(extra?' · '+extra:'')+'</span><span>'+esc(book.pilot)+' · ID '+esc(book.id)+' · APP V154</span>';return t}
+  t.innerHTML='<span>FLIGHT DATA — QR BACKUP'+(extra?' · '+extra:'')+'</span><span>'+esc(book.pilot)+' · ID '+esc(book.id)+' · APP V155</span>';return t}
 
 /* Safari/WebKit adds a table cell's padding and border ON TOP of an explicit cell height, while Chrome counts
    them inside it. Older print patches set the same height on every <td> as on its row, so in Safari each row grew
@@ -8795,13 +8800,14 @@ function readPage(c){
     if(r[0].charAt(0)==='#'){meta[r[0].slice(1)]=r.slice(1);return}
     if(!header){header=r;return}
     var o={};header.forEach(function(h,i){o[h]=r[i]==null?'':r[i]});data.push(o)});
-  var lbn=Number((meta.logbook||[])[0])||1;data.forEach(function(r){r.__lb=lbn});
+  var lbn=Number((meta.logbook||[])[0])||1,cxn=meta.custom||null;data.forEach(function(r){r.__lb=lbn;if(cxn)r.__cxn=cxn});
   return {meta:meta,rows:data,bf:totFromLine(meta.brought_forward||[]),page:totFromLine(meta.this_page||[]),pilot:(meta.book||[])[1]||''};
 }
 function readIndex(text){var res={years:{},start:null,end:null,all:null,pilot:''};
   text.split('\n').forEach(function(l){var m;if((m=l.match(/^PILOT: (.*)$/)))res.pilot=m[1]==='-'?'':m[1];
-    var a=l.split(',');if(a.length===2+TOT_KEYS.length&&/^(\d{4}|START|ALL|END)$/.test(a[0])){var t=totFromLine(a.slice(2));t.n=Number(a[1]);
-      if(a[0]==='START')res.start=t;else if(a[0]==='ALL')res.all=t;else if(a[0]==='END')res.end=t;else res.years[a[0]]=t}});
+    if((m=l.match(/^PREVIOUS_CUSTOM,(.*)$/))){res.prevCustom={};m[1].split(';').forEach(function(p){var q=p.split('=');if(/^[fcy][1-3]$/.test(q[0]))res.prevCustom[q[0]]=q[0][0]==='f'?parseHM(q[1]):Number(q[1])||0})}
+    var a=l.replace(/ \(UP TO ([0-9-]+)\)$/,'').split(',');if(a.length===2+TOT_KEYS.length&&/^(\d{4}|START|ALL|END|PREVIOUS)$/.test(a[0])){var t=totFromLine(a.slice(2));t.n=Number(a[1]);
+      if(a[0]==='PREVIOUS'){var u=l.match(/ \(UP TO ([0-9-]+)\)$/);t.asOf=u?u[1]:'';res.previous=t}else if(a[0]==='START')res.start=t;else if(a[0]==='ALL')res.all=t;else if(a[0]==='END')res.end=t;else res.years[a[0]]=t}});
   return res}
 
 function analyse(raw){
@@ -8835,7 +8841,7 @@ function analyse(raw){
       }else checks.push({ok:null,msg:'Year totals will be checked once all pages are scanned'});
     }else checks.push({ok:null,msg:'Index code not scanned (optional — it adds per-year checks)'});
     var pilot=(b.index&&b.index.pilot)||(pages.find(function(x){return x&&x.pilot})||{}).pilot||'';
-    report.push({logbook:(entries[0]&&entries[0].__lb)||1,id:id,of:b.of,found:pages.filter(Boolean).length,missing:missing,checks:checks,entries:entries,pilot:pilot,hasIndex:!!b.index});
+    report.push({logbook:(entries[0]&&entries[0].__lb)||1,id:id,of:b.of,found:pages.filter(Boolean).length,missing:missing,checks:checks,entries:entries,pilot:pilot,hasIndex:!!b.index,previous:(b.index&&b.index.previous)||null,prevCustom:(b.index&&b.index.prevCustom)||null});
   });
   return {books:report,errors:parsed.errors};
 }
@@ -8846,7 +8852,7 @@ function importRows(rows,pilot){
   var F=flights,AL=aircraftLibrary,CL=crewLibrary,SL=simulatorLibrary,SS=simSessions;
   var have={};F.forEach(function(f){have[keyF(f)]=1});
   var haveS={};SS.forEach(function(s){var sp=SL.find(function(x){return x.id===s.simulatorProfileId})||{};haveS[[s.date,String(sp.reg||'').toUpperCase(),Number(s.duration||0)].join('|')]=1});
-  var addedF=0,addedS=0,skipped=0,newAc=0,newCrew=0,newSim=0;
+  var addedF=0,addedS=0,skipped=0,newAc=0,newCrew=0,newSim=0,cxNames={};
   rows.forEach(function(r){
     if(r.kind==='S'){var dur=parseHM(r.sim),k=[r.date,String(r.reg).toUpperCase(),dur].join('|');if(haveS[k]){skipped++;return}haveS[k]=1;
       var sp=SL.find(function(x){return String(x.reg||'').toUpperCase()===String(r.reg).toUpperCase()&&(!r.type||String(x.name||'').toUpperCase()===String(r.type).toUpperCase())})||SL.find(function(x){return r.reg&&String(x.reg||'').toUpperCase()===String(r.reg).toUpperCase()});
@@ -8863,9 +8869,13 @@ function importRows(rows,pilot){
       picTime:parseHM(r.pic),dualTime:parseHM(r.dual),instructorTime:parseHM(r.instr),picusTime:parseHM(r.picus),picusCaptain:r.captain||'',picusSignature:'',
       ldgDay:Number(r.ldgD||0),ldgNight:Number(r.ldgN||0),remarks:r.remarks||'',ifrTime:parseHM(r.ifr),sicLog:fl.indexOf('S')>=0,sicTime:parseHM(r.cop)};
     if(r.crew)f.otherCrewName=r.crew;
+    if(r.cx&&CX()){var cx=CX().decode(r.cx);if(cx){f.cx=cx;if(r.__cxn)cxNames[r.__cxn.join(',')]=r.__cxn}}
     if(r.__lb>1)f.logbook=r.__lb;
     var k2=keyF(f);if(have[k2]){skipped++;return}have[k2]=1;F.push(f);addedF++});
   if(pilot&&typeof settings!=='undefined'&&!String(settings.pilotName||'').trim())settings.pilotName=pilot;
+  // custom fields used by the restored flights: switch those slots on, with the names printed in the codes
+  if(CX())Object.keys(cxNames).forEach(function(k){CX().adoptNames(cxNames[k])});
+  if(CX())rows.forEach(function(r){if(r.cx){var d=CX().decode(r.cx);if(d)CX().adoptNames(Object.keys(d).map(function(k){return k+'='}))}});
   // entries restored into a 2nd/3rd logbook: make sure that many logbooks are switched on so they're visible
   var maxLb=rows.reduce(function(m,r){return Math.max(m,r.__lb||1)},1);
   if(maxLb>1&&typeof settings!=='undefined'){settings.logbooks=settings.logbooks||{};if((Number(settings.logbooks.count)||1)<maxLb)settings.logbooks.count=maxLb}
@@ -8933,8 +8943,11 @@ function doImport(){
   var rows=[],pilot='';r.books.forEach(function(b){rows=rows.concat(b.entries);pilot=pilot||b.pilot});
   if(bad&&!confirm('Some pages are missing or some totals do not match. Import the entries that were decoded anyway?'))return;
   var res=importRows(rows,pilot);
+  // previous experience printed in the index code: restore it when none is set in Settings
+  var pv=null;r.books.forEach(function(b){if(b.previous&&!pv)pv={t:b.previous,lb:b.logbook,c:b.prevCustom}});
+  if(pv&&CX()&&!CX().prev()&&typeof settings!=='undefined'){var p={asOf:pv.t.asOf||'',logbook:pv.lb||1};TOT_KEYS.forEach(function(k){p[k]=pv.t[k]||0});if(pv.c)Object.keys(pv.c).forEach(function(k){p[k]=pv.c[k]});settings.previousExperience=p;saveData();res.prev=true}
   alert('Restored '+res.addedF+' flight(s) and '+res.addedS+' simulator session(s).'+(res.skipped?' '+res.skipped+' already in the app were skipped.':'')+
-    ((res.newAc||res.newCrew||res.newSim)?'\nAlso added '+res.newAc+' aircraft, '+res.newCrew+' crew and '+res.newSim+' simulator profile(s).':'')+'\n\nTip: make a JSON backup now.');
+    ((res.newAc||res.newCrew||res.newSim)?'\nAlso added '+res.newAc+' aircraft, '+res.newCrew+' crew and '+res.newSim+' simulator profile(s).':'')+(res.prev?'\nPrevious experience from the index code was restored in Settings.':'')+'\n\nTip: make a JSON backup now.');
   closeModal();
 }
 
@@ -8965,9 +8978,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="v150-version">
 (function(){
  function setV(){
-  document.querySelectorAll('.sub').forEach(function(e){e.textContent='V154 • local/offline-first test build'});
-  var b=document.getElementById('v36VersionBadge');if(b)b.textContent='V154';
-  document.title='EASA Flight Logbook V154';
+  document.querySelectorAll('.sub').forEach(function(e){e.textContent='V155 • local/offline-first test build'});
+  var b=document.getElementById('v36VersionBadge');if(b)b.textContent='V155';
+  document.title='EASA Flight Logbook V155';
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setV);else setV();
  setTimeout(setV,50);setTimeout(setV,300);
@@ -9898,7 +9911,8 @@ function prefs(){var p={};try{p=JSON.parse(localStorage.getItem(PREF_KEY)||'{}')
   return {cols:Array.isArray(p.cols)&&p.cols.length?p.cols:DEFAULT_COLS.slice(),sort:p.sort==='oldest'?'oldest':'newest',compact:!!p.compact,tag:p.tag||''}}
 function savePrefs(p){try{localStorage.setItem(PREF_KEY,JSON.stringify(p))}catch(e){}}
 function lbApi(){return window.EASALOG_LOGBOOK}
-function cell(f,k){switch(k){
+function allCols(){var C=window.EASALOG_CUSTOM;return C?COLS.concat(C.listCols()):COLS}
+function cell(f,k){if(/^cx:/.test(k))return window.EASALOG_CUSTOM?window.EASALOG_CUSTOM.cell(f,k):'';switch(k){
   case 'date':var lb=lbApi(),n=lb?lb.of(f):1,multi=lb&&lb.config().count>1;return fd(f.date)+(multi&&n>1?' <span class="v151-lb-badge" title="'+esc(lb.name(n))+'">'+esc(lb.name(n))+'</span>':'');
   case 'from':return esc(f.dep);case 'to':return esc(f.arr);case 'type':return esc(f.aircraft);case 'reg':return esc(f.reg);case 'dep':return esc(f.dt);case 'arr':return esc(f.at);
   case 'total':return hm(f.duration);case 'night':return hm(f.night);case 'ifr':return hm(f.ifrTime!=null?f.ifrTime:(f.ifr?f.duration:0));
@@ -9912,11 +9926,11 @@ function renderList(){
   var tags=allTags();if(P.tag&&tags.indexOf(P.tag)<0)P.tag='';
   var list=all.filter(function(f){return !P.tag||(f.tags||[]).indexOf(P.tag)>=0});
   list.sort(function(a,b){var r=String(a.date||'').localeCompare(String(b.date||''))||String(a.dt||'').localeCompare(String(b.dt||''))||String(a.id||'').localeCompare(String(b.id||''));return P.sort==='oldest'?r:-r});
-  var cols=COLS.filter(function(c){return P.cols.indexOf(c[0])>=0&&(c[0]!=='tags'||tags.length)});
+  var cols=allCols().filter(function(c){return P.cols.indexOf(c[0])>=0&&(c[0]!=='tags'||tags.length)});
   var tb='<div class="v154-list-tools"><label>Sort<select id="v154Sort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></label>'+
     (tags.length?'<label>Tag<select id="v154TagFilter"><option value="">All flights</option>'+tags.map(function(t){return '<option>'+esc(t)+'</option>'}).join('')+'</select></label>':'')+
     '<label>Rows<select id="v154Compact"><option value="0">Comfortable</option><option value="1">Compact</option></select></label><button type="button" class="secondary small" id="v154ColsBtn">Columns</button></div>'+
-    '<div id="v154ColsPanel" class="v154-cols" style="display:none">'+COLS.map(function(c){return '<label class="v154-check"><input type="checkbox" data-col="'+c[0]+'"'+(P.cols.indexOf(c[0])>=0?' checked':'')+'> '+c[1]+'</label>'}).join('')+'<button type="button" class="secondary small" id="v154ColsReset">Default</button></div>';
+    '<div id="v154ColsPanel" class="v154-cols" style="display:none">'+allCols().map(function(c){return '<label class="v154-check"><input type="checkbox" data-col="'+c[0]+'"'+(P.cols.indexOf(c[0])>=0?' checked':'')+'> '+c[1]+'</label>'}).join('')+'<button type="button" class="secondary small" id="v154ColsReset">Default</button></div>';
   var sum='';
   if(P.tag){var t=printTimeBuckets(list);sum='<div class="v154-tag-sum"><b>'+esc(P.tag)+'</b> · '+list.length+' flight'+(list.length===1?'':'s')+' · '+hm(t.duration)+' total · '+hm(t.night)+' night · '+hm(t.ifr)+' IFR · '+hm(t.pic)+' PIC · '+hm(t.co)+' co-pilot · '+(t.ldgDay+t.ldgNight)+' landing'+((t.ldgDay+t.ldgNight)===1?'':'s')+'</div>'}
   el.innerHTML=tb+sum+'<div style="overflow:auto"><table class="v154-list'+(P.compact?' compact':'')+'"><thead><tr>'+cols.map(function(c){return '<th>'+c[1]+'</th>'}).join('')+'<th></th></tr></thead><tbody>'+
@@ -10051,6 +10065,8 @@ function render(){
   var apSet={},countries={};list.forEach(function(f){[f.dep,f.arr].forEach(function(c){if(c){apSet[c]=1;var a=ap(c);if(a&&a.country)countries[a.country]=1}})});
   var types={};list.forEach(function(f){types[f.aircraft]=1});
   var kp=[['Total time',hm(t.duration)],['Flights',list.length.toLocaleString('en-GB')],['Landings',(t.ldgDay+t.ldgNight).toLocaleString('en-GB')],['Night',hm(t.night)],['IFR',hm(t.ifr)],['Airports',Object.keys(apSet).length],['Countries',Object.keys(countries).length||'–'],['Aircraft types',Object.keys(types).length],['FSTD',hm(simMin)]];
+  var C=window.EASALOG_CUSTOM;if(C){var pv=p==='all'?C.prev():null;if(pv&&pv.duration)kp.splice(1,0,['Incl. previous experience',hm(t.duration+pv.duration)]);
+    C.summaryRows(list,null).forEach(function(r){if(r[2]!=='fn')kp.push([esc(r[0]),r[1]])})}
   $('v154Kpis').innerHTML=kp.map(function(k){return '<div class="v154-kpi"><b>'+k[1]+'</b><span>'+k[0]+'</span></div>'}).join('');
   if(!F().length){['v154Years','v154Months','v154Roles','v154Cond','v154Map','v154Routes','v154Airports','v154Types','v154Regs','v154Miles'].forEach(function(id){$(id).innerHTML='<div class="v154-empty">No flights yet.</div>'});return}
   // years (all time)
@@ -10066,7 +10082,7 @@ function render(){
   $('v154Months').innerHTML=barChart(months.map(function(k){var mm=Number(k.slice(5))-1;return {label:MON[mm]+(mm===0||months.length<=12?'':'')+(mm===0&&months.length>12?" '"+k.slice(2,4):''),value:byM[k]||0,tip:MON[mm]+' '+k.slice(0,4)+': '+hm(byM[k]||0)}}),{h:190,maxLabels:12,aria:'Hours per month'});
   // roles & conditions
   var picus=list.reduce(function(a,f){return a+(f.picusLog?Number(f.picusTime||f.duration||0):0)},0);
-  $('v154Roles').innerHTML=hbars([{label:'PIC (incl. PICUS)',value:t.pic,text:hm(t.pic)},{label:'PICUS',value:picus,text:hm(picus)},{label:'Co-pilot',value:t.co,text:hm(t.co)},{label:'Dual',value:t.dual,text:hm(t.dual)},{label:'Instructor',value:t.instructor,text:hm(t.instructor)}]);
+  $('v154Roles').innerHTML=hbars([{label:'PIC (incl. PICUS)',value:t.pic,text:hm(t.pic)},{label:'PICUS',value:picus,text:hm(picus)},{label:'Co-pilot',value:t.co,text:hm(t.co)},{label:'Dual',value:t.dual,text:hm(t.dual)},{label:'Instructor',value:t.instructor,text:hm(t.instructor)}].concat(C?C.summaryRows(list,null).filter(function(r){return r[2]==='fn'}).map(function(r){var v=C.sums(list)[r[3]];return {label:r[0],value:v,text:hm(v)}}):[]));
   var pct=function(v){return t.duration?' · '+Math.round(v/t.duration*100)+'%':''};
   $('v154Cond').innerHTML=hbars([{label:'Night',value:t.night,text:hm(t.night)+pct(t.night)},{label:'IFR',value:t.ifr,text:hm(t.ifr)+pct(t.ifr)},{label:'Multi-pilot',value:t.multi,text:hm(t.multi)+pct(t.multi)},{label:'Single-pilot SE',value:t.spSE,text:hm(t.spSE)},{label:'Single-pilot ME',value:t.spME,text:hm(t.spME)}]);
   // map, routes, airports
@@ -10184,10 +10200,11 @@ function yearTotals(){
   var cols=[['spSE','SE'],['spME','ME'],['multi','Multi-pilot'],['duration','Total'],['night','Night'],['ifr','IFR'],['pic','PIC'],['co','Co-pilot'],['dual','Dual'],['instructor','Instr.'],['simulator','FSTD'],['ldgDay','Ldg day'],['ldgNight','Ldg night']];
   function row(label,n,t,cls){return '<tr class="'+(cls||'')+'"><td>'+label+'</td><td>'+(n==null?'':n)+'</td>'+cols.map(function(c){var v=t[c[0]]||0;return '<td>'+(/^ldg/.test(c[0])?v:hm(v))+'</td>'}).join('')+'</tr>'}
   var body='',all=null;Object.keys(byY).sort().forEach(function(y){var t=printTimeBuckets(byY[y]);body+=row(y,byY[y].filter(function(f){return !f.isSimSession}).length,t);all=all?sum(all,t):t});
-  function sum(a,b){var o={};Object.keys(a).forEach(function(k){o[k]=(a[k]||0)+(b[k]||0)});return o}
+  function sum(a,b){var o={};cols.forEach(function(c){o[c[0]]=(a[c[0]]||0)+((b||{})[c[0]]||0)});return o}
   var hasBefore=Object.keys(before).some(function(k){return before[k]});
   var foot=row('Total of these pages',E.filter(function(f){return !f.isSimSession}).length,all,'tot');
-  if(hasBefore){foot=row('Brought forward from earlier pages',null,before,'sub')+foot+row('Grand total',null,sum(before,all),'tot')}
+  var C=window.EASALOG_CUSTOM,pv=C?C.printPrev():null;
+  if(hasBefore||pv){foot=foot+(hasBefore?row('Brought forward from earlier pages',null,before,'sub'):'')+(pv?row('Previous experience'+(pv.asOf?' (up to '+nice(pv.asOf)+')':''),null,pv,'sub'):'')+row('Grand total',null,sum(sum(before,pv),all),'tot')}
   var lb=window.EASALOG_LOGBOOK&&window.EASALOG_LOGBOOK.printing(),pilot=String(S().pilotName||'').trim(),h=pageHeight(area);
   var s=document.createElement('div');s.className='v154-yt-sheet';s.style.height=h;s.style.minHeight=h;s.style.maxHeight=h;
   s.innerHTML='<div class="v154-yt-title"><span>TOTALS PER YEAR'+(lb&&lb.name?' · '+esc(lb.name.toUpperCase()):'')+'</span><span>'+esc(pilot)+'</span></div>'+
@@ -10206,23 +10223,25 @@ function summaryData(lbSel){
   var L=window.EASALOG_LOGBOOK,all=(typeof flights!=='undefined'&&flights)||[],sims=(typeof simSessions!=='undefined'&&simSessions)||[];
   var F=lbSel&&L?all.filter(function(f){return L.of(f)===lbSel}):all.slice(),SS=lbSel&&L?sims.filter(function(s){return L.of(s)===lbSel}):sims.slice();
   F.sort(function(a,b){return String(a.date).localeCompare(String(b.date))});
-  var t=printTimeBuckets(F),sim=SS.reduce(function(a,s){return a+Number(s.duration||0)},0),picus=F.reduce(function(a,f){return a+(f.picusLog?Number(f.picusTime||f.duration||0):0)},0);
+  var C=window.EASALOG_CUSTOM,pv=C?C.prevFor(lbSel):null;
+  var t=printTimeBuckets(F),sim=SS.reduce(function(a,s){return a+Number(s.duration||0)},0);if(pv){t=C.addBuckets(t,pv);sim+=pv.simulator||0}
+  var picus=F.reduce(function(a,f){return a+(f.picusLog?Number(f.picusTime||f.duration||0):0)},0);
   var now=new Date(),td=now.toISOString().slice(0,10);function back(days){var d=new Date(now.getTime()-days*86400000);return d.toISOString().slice(0,10)}
   function win(from){var L2=F.filter(function(f){return f.date>=from&&f.date<=td}),b=printTimeBuckets(L2);return {n:L2.length,t:b}}
   var types={};F.forEach(function(f){var k=f.aircraft||'?';var T=types[k]=types[k]||{list:[],last:''};T.list.push(f);if(f.date>T.last)T.last=f.date});
   var exp=(S().expiries||[]).slice().sort(function(a,b){return String(a.date).localeCompare(String(b.date))});
   return {F:F,t:t,sim:sim,picus:picus,from:F[0]&&F[0].date,to:F.length&&F[F.length-1].date,w90:win(back(89)),w12:win(back(365)),wy:win(td.slice(0,4)+'-01-01'),year:td.slice(0,4),
     types:Object.keys(types).map(function(k){var b=printTimeBuckets(types[k].list);return {k:k,n:types[k].list.length,t:b,last:types[k].last}}).sort(function(a,b){return b.t.duration-a.t.duration}),exp:exp,
-    lbName:lbSel&&L&&L.config().count>1?L.name(lbSel):''};
+    lbName:lbSel&&L&&L.config().count>1?L.name(lbSel):'',pv:pv,custom:C?C.summaryRows(F,pv):[]};
 }
 function summaryHTML(d){
   var pilot=String(S().pilotName||'').trim(),t=d.t,today=new Date().toISOString().slice(0,10);
   var kv=[['Total flight time',hm(t.duration)],['PIC (incl. PICUS)',hm(t.pic)],['of which PICUS',hm(d.picus)],['Co-pilot',hm(t.co)],['Dual received',hm(t.dual)],['Instructor',hm(t.instructor)],
-    ['Multi-pilot',hm(t.multi)],['Single-pilot single-engine',hm(t.spSE)],['Single-pilot multi-engine',hm(t.spME)],['Night',hm(t.night)],['IFR',hm(t.ifr)],['FSTD (simulator)',hm(d.sim)],['Flights (sectors)',d.F.length.toLocaleString('en-GB')],['Landings day / night',t.ldgDay+' / '+t.ldgNight]];
+    ['Multi-pilot',hm(t.multi)],['Single-pilot single-engine',hm(t.spSE)],['Single-pilot multi-engine',hm(t.spME)],['Night',hm(t.night)],['IFR',hm(t.ifr)],['FSTD (simulator)',hm(d.sim)],['Flights (sectors)',d.F.length.toLocaleString('en-GB')],['Landings day / night',t.ldgDay+' / '+t.ldgNight]].concat(d.custom.map(function(r){return [esc(r[0]),r[1]]}));
   var rec=[['Last 90 days',d.w90],['Last 12 months',d.w12],['Calendar year '+d.year,d.wy]];
   var sig=S().signature&&String(S().signature).indexOf('data:image/')===0?'<img src="'+S().signature+'" alt="">':'';
   return '<div class="v154-sum">'+
-    '<div class="v154-sum-head"><div><div class="v154-sum-title">Flight experience summary</div><div class="v154-sum-name">'+esc(pilot||'Pilot')+'</div></div><div class="v154-sum-meta">As of '+nice(today)+(d.lbName?'<br>'+esc(d.lbName):'')+(d.from?'<br>Logged '+nice(d.from)+' – '+nice(d.to):'')+'</div></div>'+
+    '<div class="v154-sum-head"><div><div class="v154-sum-title">Flight experience summary</div><div class="v154-sum-name">'+esc(pilot||'Pilot')+'</div></div><div class="v154-sum-meta">As of '+nice(today)+(d.lbName?'<br>'+esc(d.lbName):'')+(d.from?'<br>Logged '+nice(d.from)+' – '+nice(d.to):'')+(d.pv?'<br>Incl. previous experience'+(d.pv.asOf?' to '+nice(d.pv.asOf):''):'')+'</div></div>'+
     '<div class="v154-sum-grid"><table class="v154-sum-kv"><tbody>'+kv.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>'}).join('')+'</tbody></table>'+
     '<div><div class="v154-sum-h">Recent experience</div><table class="v154-sum-t"><thead><tr><th></th><th>Total</th><th>PIC</th><th>Flights</th><th>Landings</th></tr></thead><tbody>'+
       rec.map(function(r){return '<tr><td>'+r[0]+'</td><td>'+hm(r[1].t.duration)+'</td><td>'+hm(r[1].t.pic)+'</td><td>'+r[1].n+'</td><td>'+(r[1].t.ldgDay+r[1].t.ldgNight)+'</td></tr>'}).join('')+'</tbody></table>'+
@@ -10230,12 +10249,12 @@ function summaryHTML(d){
     '</div></div>'+
     '<div class="v154-sum-h">By aircraft type</div><table class="v154-sum-t"><thead><tr><th>Type</th><th>Total</th><th>PIC</th><th>Co-pilot</th><th>Multi-pilot</th><th>Night</th><th>Flights</th><th>Last flown</th></tr></thead><tbody>'+
       d.types.map(function(x){return '<tr><td><b>'+esc(x.k)+'</b></td><td>'+hm(x.t.duration)+'</td><td>'+hm(x.t.pic)+'</td><td>'+hm(x.t.co)+'</td><td>'+hm(x.t.multi)+'</td><td>'+hm(x.t.night)+'</td><td>'+x.n+'</td><td>'+nice(x.last)+'</td></tr>'}).join('')+'</tbody></table>'+
-    '<div class="v154-sum-foot"><div>Compiled from '+d.F.length.toLocaleString('en-GB')+' logged flights (EASA Part-FCL logbook). I certify that this summary is a true extract of my flight logbook.</div><div class="v154-sum-sign">'+sig+'<span>Signature</span></div></div>'+
+    '<div class="v154-sum-foot"><div>Compiled from '+d.F.length.toLocaleString('en-GB')+' logged flights'+(d.pv?' plus '+hm(d.pv.duration)+' of previous experience':'')+' (EASA Part-FCL logbook). I certify that this summary is a true extract of my flight logbook.</div><div class="v154-sum-sign">'+sig+'<span>Signature</span></div></div>'+
   '</div>';
 }
 function summaryText(d){var t=d.t,L=[];var pilot=String(S().pilotName||'').trim();
-  L.push('FLIGHT EXPERIENCE SUMMARY — '+(pilot||'Pilot')+(d.lbName?' ('+d.lbName+')':''),'As of '+nice(new Date().toISOString().slice(0,10))+(d.from?' · logged '+nice(d.from)+' – '+nice(d.to):''),'');
-  [['Total flight time',hm(t.duration)],['PIC (incl. PICUS)',hm(t.pic)],['of which PICUS',hm(d.picus)],['Co-pilot',hm(t.co)],['Dual received',hm(t.dual)],['Instructor',hm(t.instructor)],['Multi-pilot',hm(t.multi)],['Single-pilot SE',hm(t.spSE)],['Single-pilot ME',hm(t.spME)],['Night',hm(t.night)],['IFR',hm(t.ifr)],['FSTD',hm(d.sim)],['Flights',d.F.length],['Landings day/night',t.ldgDay+'/'+t.ldgNight]].forEach(function(r){L.push(r[0]+': '+r[1])});
+  L.push('FLIGHT EXPERIENCE SUMMARY — '+(pilot||'Pilot')+(d.lbName?' ('+d.lbName+')':''),'As of '+nice(new Date().toISOString().slice(0,10))+(d.from?' · logged '+nice(d.from)+' – '+nice(d.to):'')+(d.pv?' · incl. '+hm(d.pv.duration)+' previous experience':''),'');
+  [['Total flight time',hm(t.duration)],['PIC (incl. PICUS)',hm(t.pic)],['of which PICUS',hm(d.picus)],['Co-pilot',hm(t.co)],['Dual received',hm(t.dual)],['Instructor',hm(t.instructor)],['Multi-pilot',hm(t.multi)],['Single-pilot SE',hm(t.spSE)],['Single-pilot ME',hm(t.spME)],['Night',hm(t.night)],['IFR',hm(t.ifr)],['FSTD',hm(d.sim)],['Flights',d.F.length],['Landings day/night',t.ldgDay+'/'+t.ldgNight]].concat(d.custom.map(function(r){return [r[0],r[1]]})).forEach(function(r){L.push(r[0]+': '+r[1])});
   L.push('','Last 90 days: '+hm(d.w90.t.duration)+' ('+d.w90.n+' flights) · Last 12 months: '+hm(d.w12.t.duration)+' ('+d.w12.n+' flights) · '+d.year+': '+hm(d.wy.t.duration),'','By aircraft type:');
   d.types.forEach(function(x){L.push('  '+x.k+': '+hm(x.t.duration)+' total, '+hm(x.t.pic)+' PIC, '+hm(x.t.co)+' co-pilot, '+x.n+' flights, last flown '+nice(x.last))});
   if(d.exp.length){L.push('','Validity:');d.exp.forEach(function(e){L.push('  '+e.name+(e.date?': valid until '+nice(e.date):'')+(e.note?' ('+e.note+')':''))})}
@@ -10281,6 +10300,371 @@ function printSummary(){
 }
 window.EASALOG_PRINTX={applyFooter:applyFooter,yearTotals:yearTotals,summaryData:summaryData,summaryText:summaryText,summaryHTML:summaryHTML};
 function init(){buildControls();buildSummaryUI()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+</script>
+<style id="v155-custom-css">
+/* New Flight form */
+.v155-extra{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px}
+.v155-extra .field{margin:0}
+.v155-extra .v155-yn{grid-column:1/-1}
+.v155-stepper{display:flex;gap:6px;align-items:stretch}
+.v155-stepper input{flex:1;min-width:0;text-align:center}
+.v155-stepper button{flex:0 0 40px;padding:0;font-size:18px;line-height:1}
+.v155-fn span,.v155-yn span{max-width:100%}
+.v155-prev-note{flex-basis:100%;font-size:12px;color:var(--muted,#667085);margin-top:2px}
+/* Settings */
+.v155-group{padding:10px 0;border-top:1px solid var(--input-border,#e4e7ec)}
+.v155-group:first-of-type{border-top:0;padding-top:0}
+.v155-group-head{font-weight:700;font-size:14px}
+.v155-group-note{font-size:12.5px;color:var(--muted,#667085);margin:2px 0 8px;line-height:1.4}
+.v155-slot{display:flex;align-items:center;gap:10px;margin:6px 0}
+.v155-slot .v155-name{flex:1;min-width:0}
+.v155-slot.off .v155-name{opacity:.6}
+.v155-defmode{margin-top:12px;padding-top:12px;border-top:1px solid var(--input-border,#e4e7ec)}
+.v155-defmode-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.v155-defmode-row>div{flex:1 1 220px}
+.v155-defmode-row select{flex:0 0 auto;width:auto;min-width:200px}
+.v155-type{margin-top:10px;padding:10px 12px;border-radius:var(--radius-sm,12px);border:1px solid var(--input-border,#e4e7ec)}
+.v155-type.own{border-color:var(--accent,#0A84FF)}
+.v155-type-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.v155-type-head b{font-size:14px;letter-spacing:.02em}
+.v155-type-head span{font-size:12px;color:var(--muted,#667085)}
+.v155-type .default-checks label{height:32px;padding:0 11px;font-size:12px}
+.v155-prev-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 10px}
+.v155-prev-grid .field{margin:0}
+.v155-prev-meta{margin-top:10px}
+@media (max-width:620px){.v155-prev-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:380px){.v155-extra{grid-template-columns:1fr}}
+/* dark */
+body.v80-dark .v155-group,body.v80-dark .v155-defmode{border-color:rgba(255,255,255,.12)}
+body.v80-dark .v155-type{border-color:rgba(255,255,255,.16)}
+body.v80-dark .v155-type.own{border-color:#1683ff}
+body.v80-dark .v155-group-note,body.v80-dark .v155-type-head span,body.v80-dark .v155-prev-note{color:#a1a8b3}
+@media print{.v155-extra{display:none!important}}
+</style>
+
+<script id="v155-custom">
+/* V155 — Custom fields, per-aircraft defaults and previous experience.
+   settings.custom = {fn:[{on,name}×3], txt:[…], cnt:[…], yn:[…]}      user-named extra fields (slots 1-3 of each kind)
+   settings.flightDefaults.f1-f3                                        extra functions ticked on new flights (app-wide)
+   settings.defaultsMode = 'app' | 'aircraft'; settings.typeDefaults = {TYPE:{ifr,pic,sic,dual,instructor,picus,f1,f2,f3}}
+   settings.previousExperience = {spSE,spME,multi,duration|null,night,ifr,pic,co,dual,instructor,simulator,ldgDay,ldgNight,f1..,c1..,y1..,asOf,logbook}
+   flight.cx = {f1:minutes, t1:'text', c1:7, y1:true}  — keyed by slot, so renaming a field keeps its data. */
+(function(){
+'use strict';
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function S(){return (typeof settings!=='undefined'&&settings)||{}}
+function F(){return (typeof flights!=='undefined'&&flights)||[]}
+function A(){return (typeof aircraftLibrary!=='undefined'&&aircraftLibrary)||[]}
+function hm(m){m=Math.max(0,Math.round(Number(m)||0));return Math.floor(m/60)+':'+String(m%60).padStart(2,'0')}
+function num(n){return Number(n||0).toLocaleString('en-GB')}
+/* "1:30" → 90 · "1.5" → 90 · "130" → 90 (HMM) · "2" → 120 */
+function parseTime(v){v=String(v==null?'':v).trim().replace(',','.');if(!v)return 0;var m;
+  if((m=v.match(/^(\d+):(\d{1,2})$/)))return Number(m[1])*60+Math.min(59,Number(m[2]));
+  if(/^\d*\.\d+$/.test(v))return Math.round(Number(v)*60);
+  if(/^\d{3,4}$/.test(v))return Number(v.slice(0,-2))*60+Math.min(59,Number(v.slice(-2)));
+  if(/^\d{1,2}$/.test(v))return Number(v)*60;return 0}
+/* previous experience: plain numbers are hours ("1234" = 1234:00) */
+function parseHours(v){v=String(v==null?'':v).trim().replace(',','.');if(!v)return 0;var m;
+  if((m=v.match(/^(\d+):(\d{1,2})$/)))return Number(m[1])*60+Math.min(59,Number(m[2]));
+  if(/^\d+(\.\d+)?$/.test(v))return Math.round(Number(v)*60);return 0}
+function save(){try{window.saveData()}catch(e){console.error(e)}}
+
+/* ================= configuration ================= */
+var KINDS=['fn','txt','cnt','yn'],KEY={fn:'f',txt:'t',cnt:'c',yn:'y'};
+var DEF={fn:'Function',txt:'Text field',cnt:'Counter',yn:'Yes / No'};
+var EXAMPLE={fn:['e.g. XC','e.g. NVFR','e.g. Relief'],txt:['e.g. Flight number','e.g. Student','e.g. Exercise'],cnt:['e.g. Holdings','e.g. Approaches','e.g. Go-arounds'],yn:['e.g. Holding','e.g. Autoland','e.g. Check ride']};
+function cfg(){var s=S(),c=s.custom=(s.custom&&typeof s.custom==='object')?s.custom:{};
+  KINDS.forEach(function(k){var a=Array.isArray(c[k])?c[k]:[];var o=[];for(var i=0;i<3;i++)o.push({on:!!(a[i]&&a[i].on),name:String((a[i]&&a[i].name)||'')});c[k]=o});return c}
+function on(k,i){return !!cfg()[k][i-1].on}
+function name(k,i){var n=(cfg()[k][i-1].name||'').trim();return n||(DEF[k]+' '+i)}
+function slots(k){var r=[];for(var i=1;i<=3;i++)if(on(k,i))r.push({k:k,i:i,key:KEY[k]+i,name:name(k,i)});return r}
+function anyOn(){return KINDS.some(function(k){return slots(k).length})}
+
+/* ================= previous experience ================= */
+var PREV_TIME=[['duration','Total flight time'],['spSE','Single-pilot SE'],['spME','Single-pilot ME'],['multi','Multi-pilot'],['night','Night'],['ifr','IFR'],
+  ['pic','PIC (incl. PICUS)'],['co','Co-pilot'],['dual','Dual'],['instructor','Instructor'],['simulator','FSTD']];
+var PREV_NUM=[['ldgDay','Landings day'],['ldgNight','Landings night']];
+var BUCKETS=['spSE','spME','multi','duration','night','ifr','pic','co','dual','instructor','simulator','ldgDay','ldgNight'];
+function prevRaw(){var p=S().previousExperience;return (p&&typeof p==='object')?p:{}}
+/* buckets in printTimeBuckets() shape (+ custom keys), or null when nothing is entered */
+function prev(){var p=prevRaw(),t={},any=false;
+  BUCKETS.forEach(function(k){t[k]=Math.max(0,Math.round(Number(p[k]||0)));if(t[k])any=true});
+  if(p.duration==null||p.duration==='')t.duration=t.spSE+t.spME+t.multi;
+  for(var i=1;i<=3;i++){['f','c','y'].forEach(function(x){var v=Math.max(0,Math.round(Number(p[x+i]||0)));t[x+i]=v;if(v)any=true})}
+  if(t.duration)any=true;if(!any)return null;
+  t.asOf=p.asOf||'';t.logbook=Number(p.logbook)||1;return t}
+function lbCount(){var L=window.EASALOG_LOGBOOK;return L?L.config().count:1}
+/* previous experience counts towards logbook n (all logbooks when n is 0/undefined) */
+function prevFor(n){var p=prev();if(!p)return null;if(!n||lbCount()<2)return p;return (p.logbook||1)===n?p:null}
+function printPrev(){var L=window.EASALOG_LOGBOOK,n=L?L.printing().n:1;return prevFor(n||1)}
+function addB(a,b){var o={};Object.keys(a||{}).forEach(function(k){o[k]=a[k]});if(b)BUCKETS.forEach(function(k){o[k]=(Number(o[k])||0)+(Number(b[k])||0)});return o}
+
+/* ================= totals of the custom fields over a list of flights ================= */
+function sums(list){var t={};for(var i=1;i<=3;i++){t['f'+i]=0;t['c'+i]=0;t['y'+i]=0}
+  (list||[]).forEach(function(f){var x=f&&f.cx;if(!x)return;for(var i=1;i<=3;i++){t['f'+i]+=Number(x['f'+i]||0);t['c'+i]+=Number(x['c'+i]||0);if(x['y'+i])t['y'+i]++}});return t}
+/* label/value rows for every enabled numeric custom field: [[label, text, kind, key]] */
+function summaryRows(list,p){var t=sums(list),r=[];
+  slots('fn').forEach(function(s){r.push([s.name,hm(t[s.key]+(p?p[s.key]||0:0)),'fn',s.key])});
+  slots('cnt').forEach(function(s){r.push([s.name,num(t[s.key]+(p?p[s.key]||0:0)),'cnt',s.key])});
+  slots('yn').forEach(function(s){var n=t[s.key]+(p?p[s.key]||0:0);r.push([s.name,num(n)+' flight'+(n===1?'':'s'),'yn',s.key])});
+  return r}
+
+/* ================= per-flight values: form ⇄ flight ================= */
+function fnBox(i){return $('v155F'+i)}function fnTime(i){return $('v155F'+i+'Time')}
+function formCx(){var o={};
+  slots('fn').forEach(function(s){var b=fnBox(s.i);if(b&&b.checked)o[s.key]=parseTime((fnTime(s.i)||{}).value)});
+  slots('txt').forEach(function(s){var v=(($('v155T'+s.i)||{}).value||'').trim();if(v)o[s.key]=v});
+  slots('cnt').forEach(function(s){var v=Math.max(0,Math.round(Number(($('v155C'+s.i)||{}).value||0)));if(v)o[s.key]=v});
+  slots('yn').forEach(function(s){var b=$('v155Y'+s.i);if(b&&b.checked)o[s.key]=true});
+  return o}
+/* merge into a flight: enabled slots come from the form, hidden (disabled) slots keep their stored values */
+function applyCx(f,form){var keep={};Object.keys(f.cx||{}).forEach(function(k){var kind={f:'fn',t:'txt',c:'cnt',y:'yn'}[k[0]],i=Number(k.slice(1));if(kind&&!on(kind,i))keep[k]=f.cx[k]});
+  var o=Object.assign(keep,form);if(Object.keys(o).length)f.cx=o;else delete f.cx}
+function clearExtraInputs(){for(var i=1;i<=3;i++){var t=$('v155T'+i),c=$('v155C'+i),y=$('v155Y'+i);if(t)t.value='';if(c)c.value='';if(y)y.checked=false}}
+function clearManual(){for(var i=1;i<=3;i++){var e=fnTime(i);if(e)delete e.dataset.manual}}
+function blockMinutes(){var d=$('duration');return d?parseTime(d.value):0}
+function allocOne(i,force){var b=fnBox(i),e=fnTime(i);if(!b||!e)return;if(force||e.dataset.manual!=='1')e.value=hm(b.checked?blockMinutes():0)}
+function allocAll(force){for(var i=1;i<=3;i++)allocOne(i,force)}
+
+/* ================= New Flight form ================= */
+function buildForm(){
+  var grid=document.querySelector('#flightFields .v17-role-grid');
+  if(grid&&!$('v155F1')){for(var i=1;i<=3;i++){var l=document.createElement('label');l.className='v155-fn';l.id='v155F'+i+'Chip';
+      l.innerHTML='<span></span><input id="v155F'+i+'" type="checkbox">';grid.appendChild(l);
+      (function(i){$('v155F'+i).addEventListener('change',function(){allocOne(i,true)})})(i)}}
+  var tg=document.querySelector('#flightFields .time-grid-v15');
+  if(tg&&!$('v155F1Time')){for(var j=1;j<=3;j++){var d=document.createElement('div');d.className='field v155-fnt';d.id='v155F'+j+'TimeField';
+      d.innerHTML='<label></label><input id="v155F'+j+'Time" value="0:00" inputmode="decimal" autocomplete="off">';tg.appendChild(d);
+      (function(j){var e=$('v155F'+j+'Time');e.addEventListener('input',function(){e.dataset.manual='1'});
+        e.addEventListener('blur',function(){if(e.value.trim())e.value=hm(parseTime(e.value))})})(j)}}
+  if(!$('v155Extra')){var anchor=$('v154Tags')?($('v154Tags').closest('.field')):(($('remarks')||{}).closest?$('remarks').closest('.field'):null);
+    if(anchor){var x=document.createElement('div');x.id='v155Extra';x.className='v155-extra';var h='';
+      for(var a=1;a<=3;a++)h+='<div class="field v155-x" id="v155T'+a+'Field"><label></label><input id="v155T'+a+'" placeholder="OPTIONAL" autocomplete="off"></div>';
+      for(var b=1;b<=3;b++)h+='<div class="field v155-x" id="v155C'+b+'Field"><label></label><div class="v155-stepper"><button type="button" class="secondary small" data-step="-1" data-for="v155C'+b+'" aria-label="Decrease">−</button><input id="v155C'+b+'" type="number" min="0" step="1" inputmode="numeric" placeholder="0"><button type="button" class="secondary small" data-step="1" data-for="v155C'+b+'" aria-label="Increase">+</button></div></div>';
+      h+='<div class="v17-role-grid v155-yn" id="v155YnGrid">';for(var c=1;c<=3;c++)h+='<label id="v155Y'+c+'Chip"><span></span><input id="v155Y'+c+'" type="checkbox"></label>';h+='</div>';
+      x.innerHTML=h;anchor.parentNode.insertBefore(x,anchor.nextSibling);
+      x.addEventListener('click',function(e){var bt=e.target.closest('button[data-step]');if(!bt)return;var inp=$(bt.dataset.for);inp.value=Math.max(0,(Math.round(Number(inp.value||0))||0)+Number(bt.dataset.step))||'';})}}
+  syncForm();
+}
+function syncForm(){
+  for(var i=1;i<=3;i++){
+    var chip=$('v155F'+i+'Chip');if(chip){chip.style.display=on('fn',i)?'':'none';chip.querySelector('span').textContent=name('fn',i);chip.title=name('fn',i)}
+    var tf=$('v155F'+i+'TimeField');if(tf){tf.style.display=on('fn',i)?'':'none';tf.querySelector('label').textContent=name('fn',i).toUpperCase()}
+    var t=$('v155T'+i+'Field');if(t){t.style.display=on('txt',i)?'':'none';t.querySelector('label').textContent=name('txt',i)}
+    var c=$('v155C'+i+'Field');if(c){c.style.display=on('cnt',i)?'':'none';c.querySelector('label').textContent=name('cnt',i)}
+    var y=$('v155Y'+i+'Chip');if(y){y.style.display=on('yn',i)?'':'none';y.querySelector('span').textContent=name('yn',i);y.title=name('yn',i)}
+  }
+  var x=$('v155Extra');if(x){x.style.display=(slots('txt').length||slots('cnt').length||slots('yn').length)?'':'none';var g=$('v155YnGrid');if(g)g.style.display=slots('yn').length?'':'none'}
+  var hint=document.querySelector('#timeAllocation .time-summary-hint');if(hint){if(!hint.dataset.base)hint.dataset.base=hint.textContent;
+    hint.textContent=[hint.dataset.base].concat(slots('fn').map(function(s){return s.name})).join(' · ')}
+}
+function isEditing(){var b=$('saveChangesBtn');return !!(b&&b.style.display&&b.style.display!=='none')}
+
+/* ================= defaults: app-wide or per aircraft type ================= */
+var ROLE_KEYS=[['ifr','IFR'],['pic','PIC'],['sic','SIC'],['dual','DUAL'],['instructor','Instructor'],['picus','PICUS']];
+function appDefaults(){var d=typeof v11Defaults==='function'?v11Defaults():(S().flightDefaults||{});for(var i=1;i<=3;i++)d['f'+i]=!!d['f'+i];return d}
+function mode(){return S().defaultsMode==='aircraft'?'aircraft':'app'}
+function typeKey(t){return String(t||'').trim().toUpperCase()}
+function typeDefaults(){var s=S();if(!s.typeDefaults||typeof s.typeDefaults!=='object')s.typeDefaults={};return s.typeDefaults}
+function effective(type){var d=Object.assign({},appDefaults());var k=typeKey(type);
+  if(mode()==='aircraft'&&k&&typeDefaults()[k])Object.assign(d,typeDefaults()[k]);return d}
+function currentType(){var id=typeof selectedAircraftProfileId!=='undefined'?selectedAircraftProfileId:'';var a=A().find(function(x){return x.id===id});return a?a.type:''}
+function setC(id,v){var e=$(id);if(e)e.checked=!!v}
+function applyDefaults(d,force){
+  setC('ifr',d.ifr);setC('picLog',d.pic||d.picus);setC('sicLog',d.sic);setC('dualLog',d.dual);setC('instructorLog',d.instructor);setC('picusLog',d.picus);
+  for(var i=1;i<=3;i++)setC('v155F'+i,on('fn',i)&&d['f'+i]);
+  var r=$('role');if(r)r.value=d.picus?'PICUS':d.pic?'PIC':d.instructor?'Instructor':d.dual?'Dual':'SIC';
+  try{if(typeof v15SyncRole==='function')v15SyncRole()}catch(e){}
+  if(typeof v11Allocate==='function')v11Allocate(!!force);else allocAll(!!force)}
+var lastType=null;
+window.v11ApplyDefaults=function(){applyDefaults(effective(currentType()),false)};
+function onAircraftPicked(){if(isEditing()||mode()!=='aircraft')return;var t=typeKey(currentType());if(!t||t===lastType)return;lastType=t;applyDefaults(effective(t),true)}
+
+/* ================= hooks into the existing app ================= */
+function wrap(name,fn){var o=window[name];if(typeof o!=='function')return;window[name]=fn(o)}
+var action=null,editId=null;
+function idSet(){var s={};F().forEach(function(f){s[f.id]=1});return s}
+function picusOpen(){var m=$('picusModal');return !!(m&&m.style.display&&m.style.display!=='none')}
+function installHooks(){
+  /* the form is read when the button is pressed (some flows clear it before they save); each flight gets it once */
+  wrap('saveData',function(o){return function(){try{if(action){var form=action.form;F().forEach(function(f){if(action.done[f.id])return;
+      if(action.kind==='edit'&&f.id===action.id){applyCx(f,form);action.done[f.id]=1;action.saved=true}
+      else if(action.kind==='new'&&!action.before[f.id]){if(!f.cx&&Object.keys(form).length)f.cx=Object.assign({},form);action.done[f.id]=1;action.saved=true}})}}catch(e){console.error('custom fields save failed',e)}
+    return o.apply(this,arguments)}});
+  function act(name,kind,nextLeg){wrap(name,function(o){return function(){if(action&&action.kind==='edit'&&kind==='edit')return o.apply(this,arguments); // re-entry (e.g. after the PICUS signature)
+    var a=action={kind:kind,id:kind==='edit'?editId:null,before:idSet(),saved:false,form:formCx(),done:{}};
+    try{return o.apply(this,arguments)}finally{var done=function(){if(action===a)action=null;if(a.saved&&nextLeg){clearExtraInputs();clearManual();allocAll(false)}};
+      if(picusOpen()){var t=setInterval(function(){if(!picusOpen()){clearInterval(t);setTimeout(done,50)}},300)}else done()}}})}
+  act('addFlight','new',false);act('saveEditedFlight','edit',false);act('createReturnLeg','new',true);act('createThirdLeg','new',true);
+  wrap('editFlight',function(o){return function(id){editId=id;var r=o.apply(this,arguments);try{fillFromFlight(F().find(function(x){return x.id===id}))}catch(e){console.error(e)}return r}});
+  wrap('v11ResetForm',function(o){return function(){clearManual();lastType=null;var r=o.apply(this,arguments);clearExtraInputs();clearManual();allocAll(false);return r}});
+  wrap('resetAllTimesV13',function(o){return function(){var r=o.apply(this,arguments);clearManual();allocAll(true);return r}});
+  wrap('v11Allocate',function(o){return function(force){var r=o.apply(this,arguments);try{allocAll(force)}catch(e){}return r}});
+  wrap('selectAircraftProfile',function(o){return function(){var r=o.apply(this,arguments);try{onAircraftPicked()}catch(e){console.error(e)}return r}});
+  wrap('applyAircraftProfile',function(o){return function(){var r=o.apply(this,arguments);try{setTimeout(onAircraftPicked,0)}catch(e){}return r}});
+  wrap('printRows',function(o){return function(chunk,start,rows,before){var p=null;try{p=printPrev()}catch(e){}return o.call(this,chunk,start,rows,p?addB(before||{},p):before)}});
+  wrap('updateTotalsPeriodV23',function(o){return function(){var r=o.apply(this,arguments);try{applyTotals()}catch(e){console.error('totals',e)}return r}});
+  wrap('render',function(o){return function(){var r=o.apply(this,arguments);try{applyTotals()}catch(e){}try{renderTypeList()}catch(e){}return r}});
+  wrap('saveSettingsPage',function(o){return function(){var keep={};var d=S().flightDefaults||{};for(var i=1;i<=3;i++)keep['f'+i]=!!d['f'+i];
+    var r=o.apply(this,arguments);S().flightDefaults=Object.assign(S().flightDefaults||{},keep);try{window.saveData()}catch(e){}return r}});
+  window.exportCSV=exportCSV;
+}
+function fillFromFlight(f){if(!f)return;var x=f.cx||{},d=Number(f.duration||0);lastType=typeKey(f.aircraft);
+  for(var i=1;i<=3;i++){var b=fnBox(i),e=fnTime(i);if(b)b.checked=x['f'+i]!=null;
+    if(e){var v=Number(x['f'+i]||0);e.value=hm(v);if(x['f'+i]!=null&&v!==d)e.dataset.manual='1';else delete e.dataset.manual}
+    var t=$('v155T'+i),c=$('v155C'+i),y=$('v155Y'+i);if(t)t.value=x['t'+i]||'';if(c)c.value=x['c'+i]?x['c'+i]:'';if(y)y.checked=!!x['y'+i]}}
+
+/* ================= Flights page totals ================= */
+function applyTotals(){
+  var sel=$('totalsPeriod'),modeP=sel?sel.value:'all';
+  var a=typeof flightsForTotalsV23==='function'?flightsForTotalsV23():F();
+  var p=modeP==='all'?prev():null,n=function(v){return Number(v||0)};
+  var t={duration:0,night:0,pic:0,sic:0,dual:0,instr:0,day:0,ngt:0,ifr:0};
+  a.forEach(function(f){var d=n(f.duration);t.duration+=d;t.night+=n(f.night);
+    t.pic+=Number.isFinite(+f.picTime)?+f.picTime:((f.role==='PIC'||f.role==='PICUS')?d:0);
+    t.sic+=Number.isFinite(+f.sicTime)?+f.sicTime:((f.role==='SIC'||f.role==='Co-pilot')?d:0);
+    t.dual+=n(f.dualTime);t.instr+=n(f.instructorTime);t.day+=n(f.ldgDay);t.ngt+=n(f.ldgNight);t.ifr+=Number.isFinite(+f.ifrTime)?+f.ifrTime:(f.ifr?d:0)});
+  if(p){t.duration+=p.duration;t.night+=p.night;t.pic+=p.pic;t.sic+=p.co;t.dual+=p.dual;t.instr+=p.instructor;t.day+=p.ldgDay;t.ngt+=p.ldgNight;t.ifr+=p.ifr}
+  var set=function(id,v){var e=$(id);if(e)e.textContent=v};
+  set('mTotal',hm(t.duration));set('mNight',hm(t.night));set('mIFR',hm(t.ifr));set('mPIC',hm(t.pic));set('mCo',hm(t.sic));set('mLdg',num(t.day+t.ngt));
+  var el=$('totalsSummaryV23');if(!el)return;
+  var chips=[['Flights',a.length],['Flight',hm(t.duration)],['Night',hm(t.night)],['PIC',hm(t.pic)],['SIC',hm(t.sic)],['DUAL',hm(t.dual)],['Instructor',hm(t.instr)],['LDG Day',t.day],['LDG Night',t.ngt]];
+  summaryRows(a,p).forEach(function(r){chips.push(r[2]==='yn'?[r[0]+' (yes)',r[1].replace(/ flights?$/,'')]:[r[0],r[1]])});
+  el.innerHTML=chips.map(function(x){return '<div class="total-chip-v23"><b>'+esc(x[1])+'</b>'+esc(x[0])+'</div>'}).join('')+
+    (p?'<div class="v155-prev-note">Includes previous experience'+(p.asOf?' up to '+esc(p.asOf.split('-').reverse().join('/')):'')+': '+hm(p.duration)+' total, '+num(p.ldgDay+p.ldgNight)+' landings</div>':'');
+}
+
+/* ================= Settings: custom fields card ================= */
+function settingsAnchor(){var d=$('defaultIFR');return d?d.closest('section.card'):null}
+function buildCustomCard(){
+  if($('v155CustomCard'))return;var anchor=settingsAnchor();if(!anchor)return;
+  var card=document.createElement('section');card.className='card';card.id='v155CustomCard';
+  var groups=[['fn','Extra function times','A toggle next to PIC / SIC on the New Flight page. When ticked it logs the block time, which you can change under <b>Flight times</b>. Tick them automatically with the flight-entry defaults above.'],
+    ['txt','Text fields','Free text saved with each flight.'],['cnt','Counters','Whole numbers per flight, added up in your totals.'],['yn','Yes / No fields','A toggle per flight; totals count the flights marked yes.']];
+  card.innerHTML='<div class="section-title">Custom fields</div><div class="notice" style="margin-bottom:10px">Switch on up to three of each and name them as you like. Values are saved with each flight, shown in your totals and kept in backups (JSON, Google Drive and the QR codes in the printed logbook). Switching a field off only hides it — the values stay saved.</div>'+
+    groups.map(function(g){var h='<div class="v155-group"><div class="v155-group-head">'+g[1]+'</div><div class="v155-group-note">'+g[2]+'</div>';
+      for(var i=1;i<=3;i++)h+='<div class="v155-slot"><label class="v80-switch" aria-label="Use '+DEF[g[0]].toLowerCase()+' '+i+'"><input type="checkbox" data-k="'+g[0]+'" data-i="'+i+'"><span></span></label>'+
+        '<input class="v155-name" data-k="'+g[0]+'" data-i="'+i+'" maxlength="'+(g[0]==='fn'?14:24)+'" placeholder="'+esc(DEF[g[0]]+' '+i+' · '+EXAMPLE[g[0]][i-1])+'" autocomplete="off"></div>';
+      return h+'</div>'}).join('');
+  anchor.parentNode.insertBefore(card,anchor.nextSibling);
+  card.addEventListener('change',function(e){var k=e.target.dataset.k,i=Number(e.target.dataset.i);if(!k||!i)return;var c=cfg()[k][i-1];
+    if(e.target.type==='checkbox')c.on=e.target.checked;else{c.name=e.target.value.trim();if(c.name&&!c.on){c.on=true}}
+    save();refreshAll()});
+  syncCustomCard();
+}
+function syncCustomCard(){var card=$('v155CustomCard');if(!card)return;
+  card.querySelectorAll('input[data-k]').forEach(function(inp){var c=cfg()[inp.dataset.k][Number(inp.dataset.i)-1];
+    if(inp.type==='checkbox')inp.checked=c.on;else if(document.activeElement!==inp)inp.value=c.name;
+    if(inp.classList.contains('v155-name'))inp.closest('.v155-slot').classList.toggle('off',!c.on)})}
+
+/* ================= Settings: flight-entry defaults (extra functions + per aircraft type) ================= */
+function buildDefaults(){
+  var card=settingsAnchor();if(!card||$('v155DefMode'))return;var checks=card.querySelector('.default-checks');
+  if(checks)for(var i=1;i<=3;i++){var l=document.createElement('label');l.id='v155DefF'+i+'Chip';l.innerHTML='<input id="v155DefF'+i+'" type="checkbox"> <span></span>';checks.appendChild(l);
+    (function(i){$('v155DefF'+i).addEventListener('change',function(){var d=S().flightDefaults=Object.assign(appDefaults(),S().flightDefaults||{});d['f'+i]=this.checked;save();renderTypeList()})})(i)}
+  // the built-in default chips save straight away too (no need to press Save)
+  [['defaultIFR','ifr'],['defaultPIC','pic'],['defaultSIC','sic'],['defaultDUAL','dual'],['defaultInstructor','instructor'],['defaultPICUS','picus']].forEach(function(p){var e=$(p[0]);if(e)e.addEventListener('change',function(){var d=appDefaults();d[p[1]]=e.checked;S().flightDefaults=d;save();renderTypeList()})});
+  var box=document.createElement('div');box.className='v155-defmode';
+  box.innerHTML='<div class="v155-defmode-row"><div><div class="v155-group-head">Apply defaults</div><div class="v155-group-note" id="v155DefModeNote"></div></div>'+
+    '<select id="v155DefMode"><option value="app">Same for every aircraft</option><option value="aircraft">Per aircraft type</option></select></div><div id="v155TypeList"></div>';
+  var note=card.querySelector('.default-checks');note=note?note.nextElementSibling:null;
+  if(note&&note.classList.contains('notice'))card.insertBefore(box,note.nextSibling);else card.appendChild(box);
+  $('v155DefMode').addEventListener('change',function(){S().defaultsMode=this.value;lastType=null;save();renderTypeList()});
+  $('v155TypeList').addEventListener('change',function(e){var t=e.target.dataset.type,k=e.target.dataset.key;if(!t||!k)return;
+    var td=typeDefaults(),cur=effective(t),o={};ROLE_KEYS.forEach(function(r){o[r[0]]=!!cur[r[0]]});for(var i=1;i<=3;i++)o['f'+i]=!!cur['f'+i];
+    o[k]=e.target.checked;if(k==='picus'&&o.picus)o.pic=true;td[t]=o;save();renderTypeList()});
+  $('v155TypeList').addEventListener('click',function(e){var b=e.target.closest('button[data-reset]');if(!b)return;delete typeDefaults()[b.dataset.reset];save();renderTypeList()});
+  syncDefaults();
+}
+function syncDefaults(){for(var i=1;i<=3;i++){var c=$('v155DefF'+i+'Chip');if(!c)continue;c.style.display=on('fn',i)?'':'none';c.querySelector('span').textContent=name('fn',i);$('v155DefF'+i).checked=!!appDefaults()['f'+i]}
+  if($('v155DefMode'))$('v155DefMode').value=mode();renderTypeList()}
+function types(){var seen={},out=[];A().forEach(function(a){if(a.simulator)return;var k=typeKey(a.type);if(k&&!seen[k]){seen[k]=1;out.push(k)}});
+  Object.keys(typeDefaults()).forEach(function(k){if(!seen[k]){seen[k]=1;out.push(k)}});return out.sort()}
+function renderTypeList(){var el=$('v155TypeList');if(!el)return;var m=mode();
+  $('v155DefModeNote').textContent=m==='aircraft'?'Choosing an aircraft on the New Flight page ticks the boxes set for its type. Types you leave alone use the boxes above.':'The boxes above are ticked for every new flight.';
+  if(m!=='aircraft'){el.innerHTML='';return}
+  var T=types();if(!T.length){el.innerHTML='<div class="v154-empty">No aircraft saved yet. Add one on the New Flight page (Aircraft → Add) and it appears here.</div>';return}
+  var keys=ROLE_KEYS.concat(slots('fn').map(function(s){return [s.key,s.name]}));
+  el.innerHTML=T.map(function(t){var own=!!typeDefaults()[t],d=effective(t);
+    return '<div class="v155-type'+(own?' own':'')+'"><div class="v155-type-head"><b>'+esc(t)+'</b>'+(own?'<button type="button" class="secondary small" data-reset="'+esc(t)+'">Use defaults above</button>':'<span>Uses the defaults above</span>')+'</div>'+
+      '<div class="default-checks">'+keys.map(function(k){return '<label><input type="checkbox" data-type="'+esc(t)+'" data-key="'+k[0]+'"'+(d[k[0]]?' checked':'')+'> '+esc(k[1])+'</label>'}).join('')+'</div></div>'}).join('');
+}
+
+/* ================= Settings: previous experience card ================= */
+function buildPrevCard(){
+  if($('v155PrevCard'))return;var anchor=$('v155CustomCard')||settingsAnchor();if(!anchor)return;
+  var card=document.createElement('section');card.className='card';card.id='v155PrevCard';
+  card.innerHTML='<div class="section-title">Previous experience</div><div class="notice" style="margin-bottom:10px">Hours and landings logged before you started using this app, for example in a paper logbook. They are added to your all-time totals, the hours summary and the <b>Brought forward</b> line of the printed logbook. Times as <b>1234:30</b> or decimal hours (<b>1234.5</b>).</div>'+
+    '<div class="v155-prev-grid" id="v155PrevGrid"></div><div id="v155PrevCustom"></div>'+
+    '<div class="v155-prev-grid v155-prev-meta"><div class="field"><label>Up to (optional)</label><input id="v155PrevAsOf" type="date"></div><div class="field" id="v155PrevLbField"><label>Count in logbook</label><select id="v155PrevLb"></select></div></div>'+
+    '<div id="v155PrevSum" class="notice" style="margin-top:8px"></div><div class="actions" style="margin-top:6px"><button type="button" class="secondary small" id="v155PrevClear">Clear previous experience</button></div>';
+  anchor.parentNode.insertBefore(card,anchor.nextSibling);
+  $('v155PrevGrid').innerHTML=PREV_TIME.map(function(r){return '<div class="field"><label>'+r[1]+'</label><input data-prev="'+r[0]+'" data-type="time" inputmode="decimal" autocomplete="off" placeholder="'+(r[0]==='duration'?'Auto: SE + ME + MP':'0:00')+'"></div>'}).join('')+
+    PREV_NUM.map(function(r){return '<div class="field"><label>'+r[1]+'</label><input data-prev="'+r[0]+'" data-type="num" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></div>'}).join('');
+  card.addEventListener('change',function(e){var t=e.target;var p=Object.assign({},prevRaw());
+    if(t.dataset.prev){var k=t.dataset.prev,v=t.value.trim();
+      if(t.dataset.type==='time'){if(k==='duration'&&!v)p.duration=null;else p[k]=parseHours(v)}else p[k]=Math.max(0,Math.round(Number(v||0)))}
+    else if(t.id==='v155PrevAsOf')p.asOf=t.value;else if(t.id==='v155PrevLb')p.logbook=Number(t.value)||1;else return;
+    S().previousExperience=p;save();syncPrevCard()});
+  $('v155PrevClear').addEventListener('click',function(){if(!prev()||!confirm('Clear all previous-experience figures?'))return;delete S().previousExperience;save();syncPrevCard()});
+  syncPrevCard();
+}
+function syncPrevCard(){var card=$('v155PrevCard');if(!card)return;var p=prevRaw();
+  var cust='';var rows=[];slots('fn').forEach(function(s){rows.push([s.key,s.name+' (time)','time'])});slots('cnt').forEach(function(s){rows.push([s.key,s.name+' (total)','num'])});slots('yn').forEach(function(s){rows.push([s.key,s.name+' (flights marked yes)','num'])});
+  if(rows.length)cust='<div class="v155-group-head" style="margin:16px 0 6px">Custom fields</div><div class="v155-prev-grid">'+rows.map(function(r){return '<div class="field"><label>'+esc(r[1])+'</label><input data-prev="'+r[0]+'" data-type="'+r[2]+'" '+(r[2]==='num'?'type="number" min="0" step="1" inputmode="numeric" placeholder="0"':'inputmode="decimal" autocomplete="off" placeholder="0:00"')+'></div>'}).join('')+'</div>';
+  var pc=$('v155PrevCustom');if(pc&&pc.dataset.sig!==cust){pc.innerHTML=cust;pc.dataset.sig=cust}
+  card.querySelectorAll('input[data-prev]').forEach(function(inp){if(document.activeElement===inp)return;var k=inp.dataset.prev,v=p[k];
+    if(inp.dataset.type==='time')inp.value=(k==='duration'&&(v==null||v===''))?'':(Number(v)?hm(v):'');else inp.value=Number(v)?String(v):''});
+  var tot=$('v155PrevGrid').querySelector('[data-prev="duration"]');var pp=prev();if(tot&&(p.duration==null||p.duration===''))tot.placeholder=pp&&pp.duration?'Auto: '+hm(pp.duration):'Auto: SE + ME + MP';
+  if(document.activeElement!==$('v155PrevAsOf'))$('v155PrevAsOf').value=p.asOf||'';
+  var c=lbCount(),L=window.EASALOG_LOGBOOK,sel=$('v155PrevLb');$('v155PrevLbField').style.display=c>1?'':'none';
+  var opts='';for(var n=1;n<=c;n++)opts+='<option value="'+n+'">'+esc(L?L.name(n):'Logbook '+n)+'</option>';if(sel.dataset.sig!==opts){sel.innerHTML=opts;sel.dataset.sig=opts}sel.value=String(Math.min(c,Number(p.logbook)||1));
+  var s=$('v155PrevSum');if(!pp){s.style.display='none';return}s.style.display='';
+  var parts=hm(pp.duration)+' total flight time · '+num(pp.ldgDay+pp.ldgNight)+' landings'+(pp.simulator?' · '+hm(pp.simulator)+' FSTD':'');
+  var warn=(p.duration!=null&&p.duration!==''&&pp.duration!==pp.spSE+pp.spME+pp.multi&&(pp.spSE+pp.spME+pp.multi))?'<br><b>Check:</b> SE + ME + multi-pilot add up to '+hm(pp.spSE+pp.spME+pp.multi)+', not the total of '+hm(pp.duration)+'. The printed logbook shows both columns as entered.':'';
+  s.innerHTML='Previous experience: <b>'+parts+'</b>'+(c>1?' · counted in '+esc(L?L.name(pp.logbook):'')+' when printing':'')+warn}
+
+/* ================= Flights list columns, CSV export ================= */
+function listCols(){var r=[];KINDS.forEach(function(k){slots(k).forEach(function(s){r.push(['cx:'+s.key,s.name])})});return r}
+function cell(f,key){var k=String(key).replace(/^cx:/,''),v=f.cx&&f.cx[k];if(v==null||v===''||v===false)return '';
+  switch(k[0]){case 'f':return hm(v);case 'c':return esc(String(v));case 'y':return 'Yes';default:return esc(v)}}
+function exportCSV(){
+  var header=["Date","PIC","Departure","Dep UTC","Arrival","Arr UTC","Aircraft","Registration","Operation","Powerplant","Engine","Simulator","Total","Night","IFR","Role","PF","PM","Day landings","Night landings","Remarks"];
+  var cols=[];KINDS.forEach(function(k){for(var i=1;i<=3;i++){var key=KEY[k]+i;if(on(k,i)||F().some(function(f){return f.cx&&f.cx[key]!=null}))cols.push([key,name(k,i)])}});
+  var rows=F().map(function(f){var a=A().find(function(x){return x.id===f.aircraftProfileId});
+    var base=[f.date,f.pic,f.dep,f.dt,f.arr,f.at,f.aircraft,f.reg,(a&&a.operation)||"",(a&&a.power)||"",f.engine,(a&&a.simulator)?"YES":"NO",hm(f.duration),hm(f.night),hm(f.ifrTime!=null?f.ifrTime:(f.ifr?f.duration:0)),f.role,f.pf?"YES":"",f.pm?"YES":"",f.ldgDay,f.ldgNight,f.remarks];
+    return base.concat(cols.map(function(c){var v=f.cx&&f.cx[c[0]];if(v==null)return '';return c[0][0]==='f'?hm(v):c[0][0]==='y'?(v?'YES':''):v}))});
+  var csv=[header.concat(cols.map(function(c){return c[1]}))].concat(rows).map(function(r){return r.map(function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'}).join(',')}).join('\n');
+  downloadBlob(csv,'flightlog-'+new Date().toISOString().slice(0,10)+'.csv','text/csv;charset=utf-8');
+}
+
+/* ================= QR backup encoding: "f1=1:30;c1=7;y1=Y;t1=TEXT" ================= */
+function encode(cx){if(!cx)return '';return Object.keys(cx).sort().map(function(k){var v=cx[k];
+  return k+'='+(k[0]==='f'?hm(v):k[0]==='y'?(v?'Y':''):String(v).replace(/[%;=\r\n]/g,function(c){return '%'+c.charCodeAt(0).toString(16).toUpperCase().padStart(2,'0')}))}).join(';')}
+function decode(s){s=String(s||'').trim();if(!s)return null;var o={};s.split(';').forEach(function(p){var i=p.indexOf('=');if(i<1)return;var k=p.slice(0,i),v=p.slice(i+1);if(!/^[ftcy][1-3]$/.test(k))return;
+  if(k[0]==='f'){var m=v.match(/^(\d+):(\d{2})$/);o[k]=m?Number(m[1])*60+Number(m[2]):0}else if(k[0]==='c')o[k]=Number(v)||0;else if(k[0]==='y'){if(v)o[k]=true}
+  else{try{o[k]=decodeURIComponent(v)}catch(e){o[k]=v}}});return Object.keys(o).length?o:null}
+function namesMeta(){var r=[];KINDS.forEach(function(k){for(var i=1;i<=3;i++)if(on(k,i)||cfg()[k][i-1].name)r.push(KEY[k]+i+'='+name(k,i).replace(/[,;=]/g,' '))});return r}
+/* restore: switch on (and name) the slots that restored flights use */
+function adoptNames(list){var changed=false;(list||[]).forEach(function(pair){var i=pair.indexOf('=');if(i<1)return;var key=pair.slice(0,i),nm=pair.slice(i+1).trim(),k={f:'fn',t:'txt',c:'cnt',y:'yn'}[key[0]],n=Number(key.slice(1));
+  if(!k||!(n>=1&&n<=3))return;var c=cfg()[k][n-1];if(!c.on){c.on=true;changed=true}if(!c.name&&nm&&nm!==DEF[k]+' '+n){c.name=nm;changed=true}});if(changed)refreshAll();return changed}
+
+/* ================= refresh everything that depends on the configuration ================= */
+function refreshAll(){try{syncForm()}catch(e){}try{syncCustomCard()}catch(e){}try{syncDefaults()}catch(e){}try{syncPrevCard()}catch(e){}try{applyTotals()}catch(e){}
+  try{if(window.EASALOG_PERSONAL)window.EASALOG_PERSONAL.renderList()}catch(e){}}
+
+window.EASALOG_CUSTOM={cfg:cfg,slots:slots,name:name,on:on,anyOn:anyOn,prev:prev,prevFor:prevFor,printPrev:printPrev,addBuckets:addB,sums:sums,summaryRows:summaryRows,
+  listCols:listCols,cell:cell,encode:encode,decode:decode,namesMeta:namesMeta,adoptNames:adoptNames,effectiveDefaults:effective,parseTime:parseTime,refresh:refreshAll};
+
+function init(){installHooks();buildForm();buildCustomCard();buildDefaults();buildPrevCard();
+  var st=window.showTab;if(typeof st==='function')window.showTab=function(id){var r=st.apply(this,arguments);if(id==='settingsPage')setTimeout(refreshAll,0);return r};
+  // a new flight opened before this module loaded still gets its extra-function defaults
+  if(!isEditing()){var d=effective(currentType());for(var i=1;i<=3;i++)setC('v155F'+i,on('fn',i)&&d['f'+i]);allocAll(false)}
+  setTimeout(applyTotals,400)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 

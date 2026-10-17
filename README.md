@@ -603,3 +603,59 @@ gives zero field differences; logbook, endorsement and per-logbook print tests
 pass. Footer/numbering adds no pages. The summary prints as one portrait page
 and the logbook prints landscape afterwards. The dark-mode audit over every
 page and state finds no unreadable text.
+
+## Round 15 — V155: custom fields, per-aircraft defaults, previous experience
+
+New module `v155-custom` (appended last), plus small hooks in the QR backup,
+print extras, statistics and Flights list modules.
+
+- **Custom fields** (Settings → *Custom fields*): up to 3 each of extra
+  function times, text fields, counters and yes/no fields, each switched on
+  and named by the user. Stored per flight as `flight.cx = {f1:minutes,
+  t1:'text', c1:7, y1:true}`, keyed by slot so renaming keeps the data.
+  Switching a slot off only hides it; stored values stay (editing a flight
+  never wipes a hidden slot).
+  - Extra function times get a toggle in the New Flight role grid (after PM)
+    and a time box under *Flight times*. Ticked = block time, kept in step
+    with block time unless typed by hand (same rule as PIC/SIC); *Reset Auto*
+    resets them too.
+  - Text, counter (− / + stepper) and yes/no fields sit under Tags. They are
+    cleared after each save, including Create Return / 3rd Leg; function
+    toggles carry over to the next leg like the built-in ones.
+  - The form is read when the button is pressed (Create Return clears the
+    form before it saves), and each flight receives it once per action.
+- **Flight-entry defaults:** extra functions can be default-ticked; the
+  built-in default chips now save immediately. *Apply defaults*: "Same for
+  every aircraft" or "Per aircraft type". Per type, each saved aircraft type
+  (simulators excluded) has its own chips; untouched types use the app-wide
+  boxes. Choosing an aircraft on a new flight applies its type's boxes (not
+  while editing, and only when the type changes).
+  Stored in `settings.defaultsMode` and `settings.typeDefaults[TYPE]`.
+- **Previous experience** (Settings): SE, ME, multi-pilot, total (auto =
+  SE+ME+MP when empty), night, IFR, PIC, co-pilot, dual, instructor, FSTD,
+  landings, plus custom fields; optional "up to" date and, with several
+  logbooks, the logbook it belongs to. Times as H:MM or decimal hours.
+  Added to: Flights page totals (All time only, with a note), Statistics
+  ("Incl. previous experience" KPI), the hours summary, the printed logbook's
+  BROUGHT FORWARD / ACCUMULATED lines (via a `printRows` wrapper, only for the
+  logbook it belongs to), and the Totals per year page (own row).
+- **Totals & lists:** Flights page chips, Statistics (function bars + KPIs),
+  hours summary (PDF and text), CSV export and optional Flights-list columns
+  include the enabled custom fields.
+- **QR backup:** new trailing CSV column `cx` (`f1=1:30;c1=7;y1=Y;t1=TEXT`,
+  `% ; =` and line breaks percent-escaped) and a `#custom` meta line with the
+  field names. The index code gains `PREVIOUS,0,<totals> (UP TO date)` and
+  `PREVIOUS_CUSTOM,f1=30:00;c1=12`. Page 1's brought-forward includes previous
+  experience, so all restore checks still pass. Restore switches on and names
+  the slots used and restores previous experience if none is set. Old codes
+  (no `cx` column) restore as before; the Python tool reads `cx` too.
+
+**Verified:** with no custom fields or previous experience, the printed
+logbook pages are pixel-identical to V154 (only the QR sheets differ: new
+column and version label). Printed with 681 flights carrying custom values
+(including Unicode, `;`, `=`, `,`, `"` and `%`), scanned with zbar from the
+PDF and restored into an empty app: all 31 pages and year checks pass,
+custom values match exactly and previous experience is restored. Form flows
+tested: add, edit (incl. hidden slot kept), Create Return, per-type defaults
+(C172 PIC+XC without IFR, A320 IFR+SIC), Reset Auto. Earlier list, logbook,
+statistics and dark-mode tests still pass.
