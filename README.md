@@ -659,3 +659,35 @@ custom values match exactly and previous experience is restored. Form flows
 tested: add, edit (incl. hidden slot kept), Create Return, per-type defaults
 (C172 PIC+XC without IFR, A320 IFR+SIC), Reset Auto. Earlier list, logbook,
 statistics and dark-mode tests still pass.
+
+## Round 16 — V156: A5 paper, binding margin, two-sided printing
+
+New module `v156-paper` (after `v155-custom`). Print customization gets
+**Paper** (A4 / A5), **Binding margin** (none, 10–25 mm) and **Two-sided
+printing**. Settings are per device (`localStorage['easa-logbook-paper-v156']`).
+
+- The logbook keeps its A4 layout; when A5 or a binding margin is chosen the
+  whole printout is scaled with CSS `zoom` on `#printArea` (A5 landscape with
+  15 mm: 67 %, 7 pt text ≈ 4.7 pt) and each sheet is moved (relative `top`,
+  `margin-left`) so the binding margin is on the left of front pages and,
+  two-sided, on the right of back pages. 5 mm outer margin, content centred
+  vertically. Dark print uses its taller sheet height (207 mm).
+- Two-sided + two-page layout: a blank page is inserted before any left-hand
+  page that would land on a front, so every spread faces in the binder.
+- Chrome keeps the size of the first `!important` @page rule, and the older
+  patches have several; so on `beforeprint` every other @page rule is set to
+  the chosen size with margin 0, and `afterprint` restores them. The hours
+  summary print is left alone.
+- Safari: the Safari zoom (0.938) is multiplied in; the paper must be chosen in
+  Safari's dialog (it ignores @page size). Not verified in real Safari.
+- A note under the controls gives the scale, resulting text size and the
+  printer settings (paper, two-sided, flip on short edge for landscape / long
+  edge for portrait, 100 % scale).
+
+**Verified:** A4 without a margin prints pixel-identical to V155 (logbook
+pages). A5 landscape/portrait, A4 with margin, dark print, and two-page
+two-sided were measured page by page: margins alternate correctly, nothing is
+cut off, page counts unchanged (plus the one blank page for two-page). QR codes
+on the A5 printout still all decode at 300 dpi and restore with all checks
+passing. Pre-existing and unchanged: portrait layout truncates cell text; the
+two-page layout misprints from the second spread on.

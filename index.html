@@ -8714,7 +8714,7 @@ function indexCard(book){
   d.innerHTML=Q.toSVG(book.index.qr,'v150-qr-svg',4)+'<div class="v150-qr-cap"><b>INDEX</b><span>'+book.entries+' entries · '+book.pages+' pages · years '+esc(book.years[0]+(book.years.length>1?'–'+book.years[book.years.length-1]:''))+'</span></div>';
   return d}
 function titleBar(book,extra){var t=document.createElement('div');t.className='v150-qr-title';
-  t.innerHTML='<span>FLIGHT DATA — QR BACKUP'+(extra?' · '+extra:'')+'</span><span>'+esc(book.pilot)+' · ID '+esc(book.id)+' · APP V155</span>';return t}
+  t.innerHTML='<span>FLIGHT DATA — QR BACKUP'+(extra?' · '+extra:'')+'</span><span>'+esc(book.pilot)+' · ID '+esc(book.id)+' · APP V156</span>';return t}
 
 /* Safari/WebKit adds a table cell's padding and border ON TOP of an explicit cell height, while Chrome counts
    them inside it. Older print patches set the same height on every <td> as on its row, so in Safari each row grew
@@ -8978,9 +8978,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="v150-version">
 (function(){
  function setV(){
-  document.querySelectorAll('.sub').forEach(function(e){e.textContent='V155 • local/offline-first test build'});
-  var b=document.getElementById('v36VersionBadge');if(b)b.textContent='V155';
-  document.title='EASA Flight Logbook V155';
+  document.querySelectorAll('.sub').forEach(function(e){e.textContent='V156 • local/offline-first test build'});
+  var b=document.getElementById('v36VersionBadge');if(b)b.textContent='V156';
+  document.title='EASA Flight Logbook V156';
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setV);else setV();
  setTimeout(setV,50);setTimeout(setV,300);
@@ -10343,6 +10343,8 @@ body.v80-dark .v155-type{border-color:rgba(255,255,255,.16)}
 body.v80-dark .v155-type.own{border-color:#1683ff}
 body.v80-dark .v155-group-note,body.v80-dark .v155-type-head span,body.v80-dark .v155-prev-note{color:#a1a8b3}
 @media print{.v155-extra{display:none!important}}
+.v156-note{flex-basis:100%;width:100%;grid-column:1/-1;font-size:12px;line-height:1.45;color:var(--muted,#667085);padding:2px 0}
+body.v80-dark .v156-note{color:#a1a8b3}
 </style>
 
 <script id="v155-custom">
@@ -10665,6 +10667,107 @@ function init(){installHooks();buildForm();buildCustomCard();buildDefaults();bui
   // a new flight opened before this module loaded still gets its extra-function defaults
   if(!isEditing()){var d=effective(currentType());for(var i=1;i<=3;i++)setC('v155F'+i,on('fn',i)&&d['f'+i]);allocAll(false)}
   setTimeout(applyTotals,400)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+</script>
+<script id="v156-paper">
+/* V156 — Paper size (A4 / A5), binding margin for screw posts / rings, two-sided printing.
+   The logbook is still laid out exactly as on A4; when A5 or a binding margin is chosen, the whole printout is
+   scaled (CSS zoom on #printArea) into the paper minus the margins, and every sheet is shifted so the binding
+   margin sits on the left of front pages and — two-sided — on the right of back pages.
+   With A4 and no binding margin nothing changes (output identical to before).
+   Settings are per device (printer-specific): localStorage 'easa-logbook-paper-v156' = {size,bind,duplex}. */
+(function(){
+'use strict';
+function $(id){return document.getElementById(id)}
+var KEY='easa-logbook-paper-v156',OUTER=5,VERT=5,SAFARI=0.938;
+function prefs(){var p={};try{p=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){}
+  return {size:p.size==='A5'?'A5':'A4',bind:Math.max(0,Math.min(30,Number(p.bind)||0)),duplex:!!p.duplex}}
+function savePrefs(p){try{localStorage.setItem(KEY,JSON.stringify(p))}catch(e){}}
+function active(p){return p.size!=='A4'||p.bind>0}
+function portrait(){return (($('v103Orientation')||{}).value)==='portrait'}
+/* geometry in mm: the A4 content box the logbook is laid out in, and where it goes on the chosen paper */
+function geometry(p){var pt=portrait(),A={A4:[297,210],A5:[210,148]}[p.size],pw=pt?A[1]:A[0],ph=pt?A[0]:A[1];
+  var dark=!!(($('v110DarkPrint')||{}).checked); // dark print sheets are a little taller (they carry their own black margins)
+  var W0=pt?196:283,H0=dark?(pt?294:207):(pt?289:202),avail=pw-p.bind-OUTER;
+  var s=Math.min(1,avail/W0,(ph-2*VERT)/H0),cw=W0*s,ch=H0*s,pad=(avail-cw)/2;
+  return {pw:pw,ph:ph,W0:W0,H0:H0,s:s,top:(ph-ch)/2,leftFront:p.bind+pad,leftBack:OUTER+pad,portrait:pt}}
+function fontPt(){return Number((($('printFontSize')||{}).value)||7)}
+
+/* ---------- apply to the rendered printout ---------- */
+function styleEl(){var st=$('v156PaperStyle');if(!st){st=document.createElement('style');st.id='v156PaperStyle'}document.body.appendChild(st);return st} // always last: wins over the older !important @page rules
+function apply(){
+  var area=$('printArea');if(!area)return;var p=prefs(),st=styleEl();
+  area.querySelectorAll(':scope > .v156-blank').forEach(function(x){x.remove()});
+  var sheets=Array.prototype.slice.call(area.children);
+  sheets.forEach(function(c){['margin-left','top','position'].forEach(function(k){c.style.removeProperty(k)})});
+  if(!active(p)){area.classList.remove('v156-paper');st.textContent='';syncNote();return}
+  var g=geometry(p),n=1,mm=function(v){return (v/g.s).toFixed(3)+'mm'};
+  sheets.forEach(function(c){
+    // two-sided two-page layout: a left-hand page must be the back of a sheet so it faces the right-hand page
+    if(p.duplex&&c.classList.contains('left-sheet')&&n%2===1){var b=document.createElement('div');b.className='v156-blank';
+      area.insertBefore(b,c);n++}
+    var back=p.duplex&&n%2===0;
+    c.style.setProperty('margin-left',mm(back?g.leftBack:g.leftFront),'important');
+    // a top margin would be dropped at the page break, so the sheet is moved down instead
+    c.style.setProperty('position','relative','important');c.style.setProperty('top',mm(g.top),'important');n++});
+  area.classList.add('v156-paper');
+  var sel='#printArea#printArea.v156-paper.v156-paper:not(.v154-summary-mode)'; // must outrank body:has(#printArea…) #printArea.v110-dark-print
+  st.textContent='@media print{@page{size:'+p.size+' '+(g.portrait?'portrait':'landscape')+'!important;margin:0!important}'+
+    sel+'{zoom:'+g.s.toFixed(4)+'!important;width:'+g.W0+'mm!important;min-width:0!important;max-width:none!important;padding:0!important;margin:0!important;box-sizing:content-box!important}'+
+    'html.v150-safari '+sel+'{zoom:'+(g.s*SAFARI).toFixed(4)+'!important}'+
+    sel+' > .v156-blank{display:block!important;height:'+(g.H0-8)+'mm;break-after:page;page-break-after:always}}'+
+    '@media screen{#printArea > .v156-blank{display:none}}';
+  syncNote();
+}
+
+/* ---------- controls in Print customization ---------- */
+function buildControls(){
+  var box=document.querySelector('#v103PrintOptions .v103-print-controls');if(!box||$('v156Paper'))return;
+  var orient=$('v103Orientation');var anchor=orient?orient.closest('label'):null;
+  var html='<label>Paper<select id="v156Paper"><option value="A4">A4</option><option value="A5">A5</option></select></label>'+
+    '<label>Binding margin<select id="v156Bind"><option value="0">None</option><option value="10">10 mm</option><option value="12">12 mm</option><option value="15">15 mm</option><option value="18">18 mm</option><option value="20">20 mm</option><option value="25">25 mm</option></select></label>'+
+    '<label class="v103-check"><input type="checkbox" id="v156Duplex"> Two-sided printing</label>';
+  var tmp=document.createElement('div');tmp.innerHTML=html;var nodes=Array.prototype.slice.call(tmp.children);
+  var ref=anchor?anchor.nextSibling:null;nodes.forEach(function(nd){box.insertBefore(nd,ref)});
+  var note=document.createElement('div');note.id='v156PaperNote';note.className='v156-note';box.appendChild(note);
+  var p=prefs();$('v156Paper').value=p.size;$('v156Bind').value=String(p.bind);$('v156Duplex').checked=p.duplex;
+  function store(){var q={size:$('v156Paper').value,bind:Number($('v156Bind').value)||0,duplex:$('v156Duplex').checked};savePrefs(q);apply()}
+  ['v156Paper','v156Bind','v156Duplex'].forEach(function(id){$(id).addEventListener('change',store)});
+  if(orient)orient.addEventListener('change',function(){setTimeout(apply,0)});
+  var dk=$('v110DarkPrint');if(dk)dk.addEventListener('change',function(){setTimeout(apply,0)});
+  var fs=$('printFontSize');if(fs)fs.addEventListener('change',function(){setTimeout(syncNote,0)});
+  syncNote();
+}
+function syncNote(){var el=$('v156PaperNote');if(!el)return;var p=prefs();
+  if(!active(p)){el.style.display='none';return}
+  var g=geometry(p),pct=Math.round(g.s*100),two=(($('v103Layout')||{}).value)==='two';
+  var where=p.bind?(p.duplex?' with a '+p.bind+' mm binding margin on the left of front pages and the right of back pages':' with a '+p.bind+' mm binding margin on the left'):'';
+  var flip=g.portrait?'long':'short';
+  el.style.display='';
+  el.innerHTML='Prints on <b>'+p.size+' '+(g.portrait?'portrait':'landscape')+'</b> at '+pct+' %'+where+' — text about '+(fontPt()*g.s).toFixed(1)+' pt. '+
+    'In the print dialog choose paper <b>'+p.size+'</b>'+(p.duplex?', <b>two-sided</b>, <b>flip on '+flip+' edge</b>':'')+' and scale 100 % (no “fit to page”).'+
+    (p.size==='A5'?' Fewer flights per page gives taller rows.':'')+
+    (two&&!p.duplex&&p.bind?' Tip: for a binder, the two-page layout needs two-sided printing so the pages of a spread face each other.':'')+
+    (two&&p.duplex?' A blank page is added where needed so every left-hand page is printed on the back of a sheet.':'');
+}
+
+/* ---------- hooks: after the whole print pipeline (QR, endorsements, totals per year, footer) ---------- */
+function wrap(name){var o=window[name];if(typeof o!=='function')return;window[name]=function(){var r=o.apply(this,arguments);try{apply()}catch(e){console.error('paper layout failed',e)}return r}}
+wrap('__v148AppendQRPages');wrap('v103ApplyPrintCustomization');wrap('renderPrintPreview');
+/* Chrome keeps the page size of the FIRST !important @page rule, and the older print patches have several. So while
+   printing (only), every other @page rule is told the same size and margin; afterprint puts them back. */
+var patched=[];
+function pageSpec(){var p=prefs();if(!active(p))return null;var g=geometry(p);return p.size+' '+(g.portrait?'portrait':'landscape')}
+function patchPages(){restorePages();var spec=pageSpec();if(!spec)return;var mine=$('v156PaperStyle');
+  Array.prototype.forEach.call(document.styleSheets,function(sh){if(sh.ownerNode===mine)return;var rules;try{rules=sh.cssRules}catch(e){return}
+    (function walk(rs){for(var i=0;i<rs.length;i++){var r=rs[i];if(r.type===6){patched.push({r:r,t:r.style.cssText});r.style.setProperty('size',spec,'important');r.style.setProperty('margin','0','important')}else if(r.cssRules)walk(r.cssRules)}})(rules)})}
+function restorePages(){patched.forEach(function(x){try{x.r.style.cssText=x.t}catch(e){}});patched=[]}
+window.addEventListener('beforeprint',function(){try{if(!document.querySelector('#printArea.v154-summary-mode')){apply();patchPages()}}catch(e){console.error(e)}});
+window.addEventListener('afterprint',function(){try{restorePages()}catch(e){}});
+window.EASALOG_PAPER={prefs:prefs,geometry:function(){return geometry(prefs())},apply:apply,beforePrint:function(){apply();patchPages()},afterPrint:restorePages};
+function init(){buildControls();try{apply()}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
