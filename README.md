@@ -800,3 +800,14 @@ two-line stack (0.8 em, line-height 1) that fits the 4 mm total rows, so even
 5-digit hours fit. Same scope as before: total rows of the logbook pages and
 the Totals per year page; flight rows stay H:MM. Old setting `{on:true}` maps
 to decimal. Page counts unchanged (one- and two-page layouts tested).
+
+## Round 25 — V165: full-size "hours over minutes"
+
+The stacked totals use the normal total-row font again (line-height 1.15).
+Instead, the total rows grow to fit two lines (2 × font × 1.15 + 1.4 mm, ≈ 9 mm
+at the default size) and the flight rows on that page give up exactly that
+height between them (≈ 0.4–0.5 mm each with 24 rows), so the table keeps its
+height (185.2 mm vs 185.5 mm for H:MM) and page counts are unchanged. Target
+heights are stored on each table (`data-v165f`/`data-v165t`) and re-applied
+after later layout passes and on `beforeprint`, because older print code
+re-sets the flight-row heights asynchronously.

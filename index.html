@@ -8721,7 +8721,7 @@ function indexCard(book){
   d.innerHTML=Q.toSVG(book.index.qr,'v150-qr-svg',4)+'<div class="v150-qr-cap"><b>INDEX</b><span>'+book.entries+' entries · '+book.pages+' pages · years '+esc(book.years[0]+(book.years.length>1?'–'+book.years[book.years.length-1]:''))+'</span></div>';
   return d}
 function titleBar(book,extra){var t=document.createElement('div');t.className='v150-qr-title';
-  t.innerHTML='<span>FLIGHT DATA — QR BACKUP'+(extra?' · '+extra:'')+'</span><span>'+esc(book.pilot)+' · ID '+esc(book.id)+' · APP V164</span>';return t}
+  t.innerHTML='<span>FLIGHT DATA — QR BACKUP'+(extra?' · '+extra:'')+'</span><span>'+esc(book.pilot)+' · ID '+esc(book.id)+' · APP V165</span>';return t}
 
 /* Safari/WebKit adds a table cell's padding and border ON TOP of an explicit cell height, while Chrome counts
    them inside it. Older print patches set the same height on every <td> as on its row, so in Safari each row grew
@@ -8985,9 +8985,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="v150-version">
 (function(){
  function setV(){
-  document.querySelectorAll('.sub').forEach(function(e){e.textContent='V164 • local/offline-first test build'});
-  var b=document.getElementById('v36VersionBadge');if(b)b.textContent='V164';
-  document.title='EASA Flight Logbook V164';
+  document.querySelectorAll('.sub').forEach(function(e){e.textContent='V165 • local/offline-first test build'});
+  var b=document.getElementById('v36VersionBadge');if(b)b.textContent='V165';
+  document.title='EASA Flight Logbook V165';
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setV);else setV();
  setTimeout(setV,50);setTimeout(setV,300);
@@ -10373,11 +10373,9 @@ body.v80-dark .v157-dim{color:#a1a8b3}
 body.v80-dark #totalsFilterV23.v158-coll .v158-coll-period,body.v80-dark .v158-metrics-period{color:#a1a8b3}
 /* V161 bigger front-page logo */
 #printArea#printArea .v103-front-page img{width:50mm!important;height:50mm!important;max-width:none!important;max-height:none!important}
-/* V164 hours over minutes in total rows: two small lines that fit the 4 mm total rows */
-.v164-st{display:inline-flex;flex-direction:column;align-items:flex-end;line-height:1;font-size:.8em;vertical-align:middle}
+/* V165 hours over minutes in total rows: two full-size lines; the rows are made taller in paper.js */
+.v164-st{display:inline-flex;flex-direction:column;align-items:flex-end;line-height:1.15;vertical-align:middle}
 .v164-st>span{display:block;white-space:nowrap}
-#printArea tr.print-total td:has(.v164-st),#printArea tr.brought-total td:has(.v164-st),#printArea tr.acc-total td:has(.v164-st){padding-top:0!important;padding-bottom:0!important;line-height:1!important}
-.v154-yt .v164-st{font-size:.9em}
 </style>
 
 <script id="v155-custom">
@@ -10847,7 +10845,28 @@ function convert(){var q=dprefs();if(q.mode==='hm')return;var area=document.getE
     var t=td.textContent.trim(),m=t.match(HM);if(!m||td.children.length>1)return;
     var target=td.children.length===1?td.firstElementChild:td;if(target.textContent.trim()!==t)return;
     if(q.mode==='dec')target.textContent=(Number(m[1])+Number(m[2])/60).toFixed(q.places);
-    else target.innerHTML='<span class="v164-st"><span>'+Number(m[1])+'h</span><span>'+m[2]+'m</span></span>'})}
+    else target.innerHTML='<span class="v164-st"><span>'+Number(m[1])+'h</span><span>'+m[2]+'m</span></span>'});
+  if(q.mode==='stack'){growRows(area);setTimeout(reapply,0);setTimeout(reapply,150);setTimeout(reapply,600)}}
+/* Hours over minutes needs two full-size lines: the total rows get taller and the flight rows give up exactly that
+   much height between them, so every page keeps its size (one- and two-page layouts). */
+var PX=96/25.4;
+function mmOf(el,nominal){var h=el.style.height;if(/mm$/.test(h))return parseFloat(h);var o=el.offsetHeight/PX;return o>0.5?o:(nominal||0)}
+function flightNominal(tr){return parseFloat(getComputedStyle(tr).getPropertyValue('--flight-row-height'))||5.5}
+function setH(el,mm){el.style.setProperty('height',mm.toFixed(3)+'mm','important');el.style.setProperty('min-height',mm.toFixed(3)+'mm','important')}
+function growRows(area){
+  area.querySelectorAll('table').forEach(function(t){
+    var flights=t.querySelectorAll('tr.flight-row'),totals=t.querySelectorAll('tr.print-total, tr.brought-total, tr.acc-total');
+    if(!flights.length||!totals.length)return;
+    if(!t.getAttribute('data-v165f')){ // first time: work out the target heights from the layout's own heights
+      var cell=totals[0].querySelector('td')||totals[0],fs=parseFloat(getComputedStyle(cell).fontSize)||9.3;
+      var need=(2*fs*1.15)/PX+1.4,extra=0;
+      totals.forEach(function(tr){var cur=mmOf(tr,tr.classList.contains('acc-total')?8:4);if(cur+0.05<need)extra+=need-cur});
+      var h=mmOf(flights[0],flightNominal(flights[0]));
+      t.setAttribute('data-v165f',(h-extra/flights.length).toFixed(3));t.setAttribute('data-v165t',Math.max(need,0).toFixed(3))}
+    var fh=parseFloat(t.getAttribute('data-v165f')),th=parseFloat(t.getAttribute('data-v165t'));
+    flights.forEach(function(tr){setH(tr,fh);Array.prototype.forEach.call(tr.cells,function(td){setH(td,Math.max(0.5,fh-1.06))})});
+    totals.forEach(function(tr){if(mmOf(tr,0)>th+0.05&&!tr.style.height)return;setH(tr,th);Array.prototype.forEach.call(tr.cells,function(td){if(td.rowSpan>1)return;setH(td,Math.max(0.5,th-1.06))})})})}
+function reapply(){try{var q=dprefs();if(q.mode==='stack'){var a=document.getElementById('printArea');if(a)growRows(a)}}catch(e){}}
 function build(){var box=document.querySelector('#v103PrintOptions .v103-print-controls');if(!box||document.getElementById('v163Mode'))return;
   var note=document.getElementById('v156PaperNote');
   var l1=document.createElement('label');l1.innerHTML='Totals as<select id="v163Mode"><option value="hm">H:MM (1509:58)</option><option value="dec">Decimal hours (1509.97)</option><option value="stack">Hours over minutes (1509h / 58m)</option></select>';
@@ -10859,7 +10878,7 @@ function build(){var box=document.querySelector('#v103PrintOptions .v103-print-c
   document.getElementById('v163Mode').addEventListener('change',store);document.getElementById('v163Places').addEventListener('change',store)}
 function hook(name){var o=window[name];if(typeof o!=='function')return;window[name]=function(){var r=o.apply(this,arguments);try{convert()}catch(e){console.error('totals format',e)}return r}}
 hook('__v148AppendQRPages');hook('v103ApplyPrintCustomization');hook('renderPrintPreview');
-window.addEventListener('beforeprint',function(){try{convert()}catch(e){}});
+window.addEventListener('beforeprint',function(){try{convert();reapply()}catch(e){}});
 window.EASALOG_DECTOTALS={prefs:dprefs,convert:convert};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else build();
 })();
