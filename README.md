@@ -791,3 +791,12 @@ hours (1553:58 → 1553.97); flight rows stay H:MM. Each cell is rounded on its
 own. QR codes are built from the data and are unaffected. Per device:
 `localStorage['easa-logbook-dec-totals'] = {on, places}`. Code lives at the
 end of `paper.js`.
+
+## Round 24 — V164: totals format choice
+
+The V163 tick box is now **Totals as**: H:MM (default), Decimal hours (with
+Decimals 1–3) or **Hours over minutes** — "1509h" above "58m" in a small
+two-line stack (0.8 em, line-height 1) that fits the 4 mm total rows, so even
+5-digit hours fit. Same scope as before: total rows of the logbook pages and
+the Totals per year page; flight rows stay H:MM. Old setting `{on:true}` maps
+to decimal. Page counts unchanged (one- and two-page layouts tested).

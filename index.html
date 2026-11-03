@@ -8721,7 +8721,7 @@ function indexCard(book){
   d.innerHTML=Q.toSVG(book.index.qr,'v150-qr-svg',4)+'<div class="v150-qr-cap"><b>INDEX</b><span>'+book.entries+' entries · '+book.pages+' pages · years '+esc(book.years[0]+(book.years.length>1?'–'+book.years[book.years.length-1]:''))+'</span></div>';
   return d}
 function titleBar(book,extra){var t=document.createElement('div');t.className='v150-qr-title';
-  t.innerHTML='<span>FLIGHT DATA — QR BACKUP'+(extra?' · '+extra:'')+'</span><span>'+esc(book.pilot)+' · ID '+esc(book.id)+' · APP V163</span>';return t}
+  t.innerHTML='<span>FLIGHT DATA — QR BACKUP'+(extra?' · '+extra:'')+'</span><span>'+esc(book.pilot)+' · ID '+esc(book.id)+' · APP V164</span>';return t}
 
 /* Safari/WebKit adds a table cell's padding and border ON TOP of an explicit cell height, while Chrome counts
    them inside it. Older print patches set the same height on every <td> as on its row, so in Safari each row grew
@@ -8985,9 +8985,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="v150-version">
 (function(){
  function setV(){
-  document.querySelectorAll('.sub').forEach(function(e){e.textContent='V163 • local/offline-first test build'});
-  var b=document.getElementById('v36VersionBadge');if(b)b.textContent='V163';
-  document.title='EASA Flight Logbook V163';
+  document.querySelectorAll('.sub').forEach(function(e){e.textContent='V164 • local/offline-first test build'});
+  var b=document.getElementById('v36VersionBadge');if(b)b.textContent='V164';
+  document.title='EASA Flight Logbook V164';
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setV);else setV();
  setTimeout(setV,50);setTimeout(setV,300);
@@ -10373,6 +10373,11 @@ body.v80-dark .v157-dim{color:#a1a8b3}
 body.v80-dark #totalsFilterV23.v158-coll .v158-coll-period,body.v80-dark .v158-metrics-period{color:#a1a8b3}
 /* V161 bigger front-page logo */
 #printArea#printArea .v103-front-page img{width:50mm!important;height:50mm!important;max-width:none!important;max-height:none!important}
+/* V164 hours over minutes in total rows: two small lines that fit the 4 mm total rows */
+.v164-st{display:inline-flex;flex-direction:column;align-items:flex-end;line-height:1;font-size:.8em;vertical-align:middle}
+.v164-st>span{display:block;white-space:nowrap}
+#printArea tr.print-total td:has(.v164-st),#printArea tr.brought-total td:has(.v164-st),#printArea tr.acc-total td:has(.v164-st){padding-top:0!important;padding-bottom:0!important;line-height:1!important}
+.v154-yt .v164-st{font-size:.9em}
 </style>
 
 <script id="v155-custom">
@@ -10827,28 +10832,32 @@ function init(){buildControls();try{apply()}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
-/* ---------- V163: decimal hours in the total rows ---------- */
+/* ---------- V163/V164: how the total rows show times: H:MM, decimal hours, or hours over minutes ---------- */
 (function(){
 var KEY2='easa-logbook-dec-totals';
-function dprefs(){var q={};try{q=JSON.parse(localStorage.getItem(KEY2)||'{}')||{}}catch(e){}return {on:!!q.on,places:[1,2,3].indexOf(Number(q.places))>=0?Number(q.places):2}}
+function dprefs(){var q={};try{q=JSON.parse(localStorage.getItem(KEY2)||'{}')||{}}catch(e){}
+  var mode=q.mode||(q.on?'dec':'hm');if(['hm','dec','stack'].indexOf(mode)<0)mode='hm';
+  return {mode:mode,places:[1,2,3].indexOf(Number(q.places))>=0?Number(q.places):2}}
 function dsave(q){try{localStorage.setItem(KEY2,JSON.stringify(q))}catch(e){}}
 var HM=/^(\d+):([0-5]\d)$/;
 /* total rows of the logbook pages (one- and two-page layouts) and the totals-per-year page; flight rows stay H:MM */
-function convert(){var q=dprefs();if(!q.on)return;var area=document.getElementById('printArea');if(!area)return;
+function convert(){var q=dprefs();if(q.mode==='hm')return;var area=document.getElementById('printArea');if(!area)return;
   area.querySelectorAll('tr.print-total td, tr.brought-total td, tr.acc-total td, .v154-yt tbody td, .v154-yt tfoot td').forEach(function(td){
+    if(td.querySelector('.v164-st'))return;
     var t=td.textContent.trim(),m=t.match(HM);if(!m||td.children.length>1)return;
-    var v=(Number(m[1])+Number(m[2])/60).toFixed(q.places);
-    if(td.children.length===1){var c=td.firstElementChild;if(c.textContent.trim()===t)c.textContent=v}else td.textContent=v})}
-function build(){var box=document.querySelector('#v103PrintOptions .v103-print-controls');if(!box||document.getElementById('v163Dec'))return;
+    var target=td.children.length===1?td.firstElementChild:td;if(target.textContent.trim()!==t)return;
+    if(q.mode==='dec')target.textContent=(Number(m[1])+Number(m[2])/60).toFixed(q.places);
+    else target.innerHTML='<span class="v164-st"><span>'+Number(m[1])+'h</span><span>'+m[2]+'m</span></span>'})}
+function build(){var box=document.querySelector('#v103PrintOptions .v103-print-controls');if(!box||document.getElementById('v163Mode'))return;
   var note=document.getElementById('v156PaperNote');
-  var l1=document.createElement('label');l1.className='v103-check';l1.innerHTML='<input type="checkbox" id="v163Dec"> Decimal hours in totals';
+  var l1=document.createElement('label');l1.innerHTML='Totals as<select id="v163Mode"><option value="hm">H:MM (1509:58)</option><option value="dec">Decimal hours (1509.97)</option><option value="stack">Hours over minutes (1509h / 58m)</option></select>';
   var l2=document.createElement('label');l2.id='v163PlacesLabel';l2.innerHTML='Decimals<select id="v163Places"><option value="1">1 (1510.0)</option><option value="2">2 (1509.97)</option><option value="3">3 (1509.967)</option></select>';
   box.insertBefore(l1,note||null);box.insertBefore(l2,note||null);
-  var q=dprefs();document.getElementById('v163Dec').checked=q.on;document.getElementById('v163Places').value=String(q.places);l2.style.display=q.on?'':'none';
-  function store(){var n={on:document.getElementById('v163Dec').checked,places:Number(document.getElementById('v163Places').value)||2};dsave(n);l2.style.display=n.on?'':'none';
+  var q=dprefs();document.getElementById('v163Mode').value=q.mode;document.getElementById('v163Places').value=String(q.places);l2.style.display=q.mode==='dec'?'':'none';
+  function store(){var n={mode:document.getElementById('v163Mode').value,places:Number(document.getElementById('v163Places').value)||2};dsave(n);l2.style.display=n.mode==='dec'?'':'none';
     try{if(typeof window.renderPrintPreview==='function')window.renderPrintPreview()}catch(e){}try{if(typeof window.v103ApplyPrintCustomization==='function')window.v103ApplyPrintCustomization()}catch(e){}}
-  document.getElementById('v163Dec').addEventListener('change',store);document.getElementById('v163Places').addEventListener('change',store)}
-function hook(name){var o=window[name];if(typeof o!=='function')return;window[name]=function(){var r=o.apply(this,arguments);try{convert()}catch(e){console.error('decimal totals',e)}return r}}
+  document.getElementById('v163Mode').addEventListener('change',store);document.getElementById('v163Places').addEventListener('change',store)}
+function hook(name){var o=window[name];if(typeof o!=='function')return;window[name]=function(){var r=o.apply(this,arguments);try{convert()}catch(e){console.error('totals format',e)}return r}}
 hook('__v148AppendQRPages');hook('v103ApplyPrintCustomization');hook('renderPrintPreview');
 window.addEventListener('beforeprint',function(){try{convert()}catch(e){}});
 window.EASALOG_DECTOTALS={prefs:dprefs,convert:convert};
