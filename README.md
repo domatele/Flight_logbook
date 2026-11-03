@@ -746,3 +746,48 @@ iPad only change after removing the app and adding it to the Home Screen again.
   FSTD on All time) and **Flights**. Four columns on wider screens, two on
   phones.
 - The period chips also list FSTD time and the number of FSTD sessions.
+
+## Round 20 — V160: clearer manual QR recovery
+
+The "How to recover" sheet now says to delete the label (`EASALOG1 ID… PAGE
+n/N PART p/P N<len> `) before decoding. Base45's alphabet contains capitals,
+digits and space, so CyberChef otherwise decodes the label too ("Triplet too
+large"). The CyberChef recipe on the sheet is now "Find / Replace" (regex
+`^EASALOG1 .*? N\d+ `, replace with nothing) → "From Base45" → "Zlib Inflate";
+verified on a real page code.
+
+## Round 21 — V161: bigger front-page logo
+
+The printed front-page logo is now 50 mm (was 35 mm) and the embedded print
+images are cropped tighter (mark fills 92 % instead of 62 %), so the visible
+logo is about 46 mm tall instead of about 22 mm. The size rule
+(`#printArea#printArea .v103-front-page img`) outranks the older 35 mm rules.
+The front page still prints on one page, light and dark.
+
+## Round 22 — V162: column widths, ICAO codes from Pilotlog
+
+- **One-page layout widths** (original `printRows` colgroup, patched in
+  `assemble.py`): every time column (SE, ME, multi-pilot, total, night, IFR,
+  PIC, co-pilot, dual, instructor, SIM) is now 4.3 %, which fits totals up to
+  5-digit hours (tested with 11 489:40). Date 5.3 → 4.8 %, places 3.8 → 3.4 %,
+  name 10.2 → 9.4 %, landings 3.2 → 3.0 %, remarks 10.2 → 10.8 %, registration
+  5.0 % (unchanged). Measured on every printed cell: nothing in the total rows
+  overflows; the flight-row overflows are the same three as before (a long
+  simulator registration, "KINGAIR", one long remark).
+- **Pilotlog import uses ICAO codes:** the CSV only has IATA codes (`af_dep`,
+  `af_arr`). They are converted with the airport database (large > medium >
+  small airport when an IATA code is shared). Flights imported earlier from
+  Pilotlog are converted once the airport database is ready (and again 20 s
+  later in case the worldwide database finishes downloading), and before
+  every Pilotlog import, so re-importing doesn't duplicate them. Codes the
+  database doesn't know stay as they are.
+
+## Round 23 — V163: decimal hours in totals
+
+Print customization → **Decimal hours in totals** (+ **Decimals**: 1, 2 or 3,
+default 2). When ticked, the PAGE TOTAL / BROUGHT FORWARD / ACCUMULATED TOTAL
+rows (one- and two-page layouts) and the Totals per year page print decimal
+hours (1553:58 → 1553.97); flight rows stay H:MM. Each cell is rounded on its
+own. QR codes are built from the data and are unaffected. Per device:
+`localStorage['easa-logbook-dec-totals'] = {on, places}`. Code lives at the
+end of `paper.js`.
