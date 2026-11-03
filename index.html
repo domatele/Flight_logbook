@@ -5171,8 +5171,8 @@ setTimeout(()=>{
         const source=$("dataImportSource")?.value;
         if(source!=="pilotlog") throw new Error("Please select Pilotlog CSV as the import source.");
         if(btn)btn.disabled=false;
-        const nSimV158=window.EASALOG_FSTDIMPORT?rows.filter(r=>EASALOG_FSTDIMPORT.isSim(r)).length:0,nFltV158=rows.length-nSimV158;
-        statusV68(`${file.name} • ${nFltV158} flight${nFltV158===1?"":"s"}${nSimV158?` and ${nSimV158} FSTD session${nSimV158===1?"":"s"}`:""} detected. Choose the import method and press Import flights.`);
+        const nSimV159=window.EASALOG_FSTDIMPORT?rows.filter(r=>EASALOG_FSTDIMPORT.isSim(r)).length:0,nFltV159=rows.length-nSimV159;
+        statusV68(`${file.name} • ${nFltV159} flight${nFltV159===1?"":"s"}${nSimV159?` and ${nSimV159} FSTD session${nSimV159===1?"":"s"}`:""} detected. Choose the import method and press Import flights.`);
       }catch(e){
         importRowsV68=[];
         if(btn)btn.disabled=true;
@@ -5200,10 +5200,10 @@ setTimeout(()=>{
     const imported=[];
     let skipped=0;
     const errors=[];
-    const simRowsV158=[];
+    const simRowsV159=[];
     importRowsV68.forEach((r,i)=>{
       try{
-        if(window.EASALOG_FSTDIMPORT&&EASALOG_FSTDIMPORT.isSim(r)){simRowsV158.push(r);return;}
+        if(window.EASALOG_FSTDIMPORT&&EASALOG_FSTDIMPORT.isSim(r)){simRowsV159.push(r);return;}
         const f=rowToFlightV68(r);
         if(f.error){skipped++;errors.push(`Row ${i+2}: missing mandatory source data`);return;}
         imported.push(f);
@@ -5212,7 +5212,7 @@ setTimeout(()=>{
       }
     });
 
-    if(!imported.length&&!simRowsV158.length){
+    if(!imported.length&&!simRowsV159.length){
       alert("No flights could be imported.\n\n"+errors.slice(0,8).join("\n"));
       return;
     }
@@ -5220,7 +5220,7 @@ setTimeout(()=>{
     if(mode==="replace"){
       if(imported.length)flights=imported;
     }
-    const simResV158=window.EASALOG_FSTDIMPORT?EASALOG_FSTDIMPORT.importSims(simRowsV158,mode):null,simMsgV158=window.EASALOG_FSTDIMPORT?EASALOG_FSTDIMPORT.summary(simResV158):"";
+    const simResV159=window.EASALOG_FSTDIMPORT?EASALOG_FSTDIMPORT.importSims(simRowsV159,mode):null,simMsgV159=window.EASALOG_FSTDIMPORT?EASALOG_FSTDIMPORT.summary(simResV159):"";
     if(mode==="replace"){
     }else{
       const existing=new Set(flights.map(flightKeyV68));
@@ -5235,7 +5235,7 @@ setTimeout(()=>{
       localStorage.setItem(CREW_STORAGE_KEY,JSON.stringify(crewLibrary));
       localStorage.setItem(AIRCRAFT_STORAGE_KEY,JSON.stringify(aircraftLibrary));
       saveData();
-      statusV68(`${importFileNameV68} imported • ${added} added${duplicates?` • ${duplicates} duplicates skipped`:""}${skipped?` • ${skipped} rows skipped`:""}${simMsgV158}.`);
+      statusV68(`${importFileNameV68} imported • ${added} added${duplicates?` • ${duplicates} duplicates skipped`:""}${skipped?` • ${skipped} rows skipped`:""}${simMsgV159}.`);
       $("dataImportFile").value="";
       importRowsV68=[]; importFileNameV68="";
       if($("dataImportRunBtn"))$("dataImportRunBtn").disabled=true;
@@ -5249,7 +5249,7 @@ setTimeout(()=>{
     renderCrewSelectors();
     renderAircraftLibrary();
     renderCrewLibrary();
-    const msg=`${importFileNameV68} imported • ${imported.length} flights loaded${skipped?` • ${skipped} rows skipped`:""}${simMsgV158}.`;
+    const msg=`${importFileNameV68} imported • ${imported.length} flights loaded${skipped?` • ${skipped} rows skipped`:""}${simMsgV159}.`;
     statusV68(msg);
     $("dataImportFile").value="";
     importRowsV68=[]; importFileNameV68="";
@@ -8720,7 +8720,7 @@ function indexCard(book){
   d.innerHTML=Q.toSVG(book.index.qr,'v150-qr-svg',4)+'<div class="v150-qr-cap"><b>INDEX</b><span>'+book.entries+' entries · '+book.pages+' pages · years '+esc(book.years[0]+(book.years.length>1?'–'+book.years[book.years.length-1]:''))+'</span></div>';
   return d}
 function titleBar(book,extra){var t=document.createElement('div');t.className='v150-qr-title';
-  t.innerHTML='<span>FLIGHT DATA — QR BACKUP'+(extra?' · '+extra:'')+'</span><span>'+esc(book.pilot)+' · ID '+esc(book.id)+' · APP V158</span>';return t}
+  t.innerHTML='<span>FLIGHT DATA — QR BACKUP'+(extra?' · '+extra:'')+'</span><span>'+esc(book.pilot)+' · ID '+esc(book.id)+' · APP V159</span>';return t}
 
 /* Safari/WebKit adds a table cell's padding and border ON TOP of an explicit cell height, while Chrome counts
    them inside it. Older print patches set the same height on every <td> as on its row, so in Safari each row grew
@@ -8984,9 +8984,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <script id="v150-version">
 (function(){
  function setV(){
-  document.querySelectorAll('.sub').forEach(function(e){e.textContent='V158 • local/offline-first test build'});
-  var b=document.getElementById('v36VersionBadge');if(b)b.textContent='V158';
-  document.title='EASA Flight Logbook V158';
+  document.querySelectorAll('.sub').forEach(function(e){e.textContent='V159 • local/offline-first test build'});
+  var b=document.getElementById('v36VersionBadge');if(b)b.textContent='V159';
+  document.title='EASA Flight Logbook V159';
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setV);else setV();
  setTimeout(setV,50);setTimeout(setV,300);
@@ -10360,6 +10360,16 @@ body.v80-dark .v157-pick .suggestions{background:#1c1c1e!important}
 body.v80-dark .v157-opt.on{background:rgba(22,131,255,.28)}
 body.v80-dark .v157-add{color:#6cb4ff}
 body.v80-dark .v157-dim{color:#a1a8b3}
+/* V158 Flights page totals */
+#totalsFilterV23.v158-coll .v158-coll-head{display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;user-select:none}
+#totalsFilterV23.v158-coll .v158-coll-period{margin-left:auto;font-size:13px;font-weight:600;color:var(--muted,#667085)}
+#totalsFilterV23.v158-coll .v158-chev svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s;display:block}
+#totalsFilterV23.v158-coll.open .v158-chev svg{transform:rotate(90deg)}
+#totalsFilterV23.v158-coll:not(.open) .totals-period-row,#totalsFilterV23.v158-coll:not(.open) #totalsSummaryV23{display:none!important}
+#totalsFilterV23.v158-coll.open .v158-coll-head{margin-bottom:10px}
+.v158-metrics-period{font-size:13px;font-weight:600;color:var(--muted,#667085)}
+@media (min-width:621px){.summary.v158-grid{grid-template-columns:repeat(4,1fr)}}
+body.v80-dark #totalsFilterV23.v158-coll .v158-coll-period,body.v80-dark .v158-metrics-period{color:#a1a8b3}
 </style>
 
 <script id="v155-custom">
@@ -10546,13 +10556,41 @@ function applyTotals(){
     t.sic+=Number.isFinite(+f.sicTime)?+f.sicTime:((f.role==='SIC'||f.role==='Co-pilot')?d:0);
     t.dual+=n(f.dualTime);t.instr+=n(f.instructorTime);t.day+=n(f.ldgDay);t.ngt+=n(f.ldgNight);t.ifr+=Number.isFinite(+f.ifrTime)?+f.ifrTime:(f.ifr?d:0)});
   if(p){t.duration+=p.duration;t.night+=p.night;t.pic+=p.pic;t.sic+=p.co;t.dual+=p.dual;t.instr+=p.instructor;t.day+=p.ldgDay;t.ngt+=p.ldgNight;t.ifr+=p.ifr}
+  // FSTD: simulator sessions in the period, flights logged on an aircraft profile marked as simulator, previous experience
+  var S=(typeof simSessions!=='undefined'&&simSessions)||[],R=typeof rangeV23==='function'?rangeV23():{},sims=S.filter(function(x){if(!R.from&&!R.to)return true;
+    var d=typeof parseFlightDateV23==='function'?parseFlightDateV23(x):new Date(String(x.date)+'T12:00:00');return d&&(!R.from||d>=R.from)&&(!R.to||d<=R.to)});
+  var simMin=sims.reduce(function(s2,x){return s2+n(x.duration)},0);
+  a.forEach(function(f){var ap=A().find(function(x){return x.id===f.aircraftProfileId});if(ap&&ap.simulator)simMin+=n(f.duration)});
+  if(p)simMin+=n(p.simulator);
+  buildTotalsUI();
   var set=function(id,v){var e=$(id);if(e)e.textContent=v};
+  set('mSim',hm(simMin));set('mFlights',num(a.length));
   set('mTotal',hm(t.duration));set('mNight',hm(t.night));set('mIFR',hm(t.ifr));set('mPIC',hm(t.pic));set('mCo',hm(t.sic));set('mLdg',num(t.day+t.ngt));
   var el=$('totalsSummaryV23');if(!el)return;
-  var chips=[['Flights',a.length],['Flight',hm(t.duration)],['Night',hm(t.night)],['PIC',hm(t.pic)],['SIC',hm(t.sic)],['DUAL',hm(t.dual)],['Instructor',hm(t.instr)],['LDG Day',t.day],['LDG Night',t.ngt]];
+  var chips=[['Flights',a.length],['Flight',hm(t.duration)],['Night',hm(t.night)],['PIC',hm(t.pic)],['SIC',hm(t.sic)],['DUAL',hm(t.dual)],['Instructor',hm(t.instr)],['LDG Day',t.day],['LDG Night',t.ngt],['FSTD',hm(simMin)],['FSTD sessions',sims.length]];
+  var per=$('totalsPeriod'),plab=per?per.options[per.selectedIndex].text:'All time';
+  set('v158TotalsPeriod',plab+(modeP==='custom'&&$('totalsFrom')&&($('totalsFrom').value||$('totalsTo').value)?' ('+($('totalsFrom').value||'…')+' – '+($('totalsTo').value||'…')+')':''));
+  set('v158MetricsPeriod',modeP==='all'?'':' · '+plab);
   summaryRows(a,p).forEach(function(r){chips.push(r[2]==='yn'?[r[0]+' (yes)',r[1].replace(/ flights?$/,'')]:[r[0],r[1]])});
   el.innerHTML=chips.map(function(x){return '<div class="total-chip-v23"><b>'+esc(x[1])+'</b>'+esc(x[0])+'</div>'}).join('')+
     (p?'<div class="v155-prev-note">Includes previous experience'+(p.asOf?' up to '+esc(p.asOf.split('-').reverse().join('/')):'')+': '+hm(p.duration)+' total, '+num(p.ldgDay+p.ldgNight)+' landings</div>':'');
+}
+
+/* ---------- Flights page: collapsible period totals, FSTD + flights in the big totals ---------- */
+var OPEN_KEY='easa-logbook-totals-open';
+function buildTotalsUI(){
+  var sec=$('totalsFilterV23');
+  if(sec&&!sec.classList.contains('v158-coll')){var title=sec.querySelector('.section-title');
+    if(title){sec.classList.add('v158-coll');title.classList.add('v158-coll-head');title.setAttribute('role','button');title.setAttribute('tabindex','0');
+      title.innerHTML='<span class="v158-chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span>Totals by period</span><span class="v158-coll-period" id="v158TotalsPeriod"></span>';
+      var open=false;try{open=localStorage.getItem(OPEN_KEY)==='1'}catch(e){}
+      var setOpen=function(o){sec.classList.toggle('open',o);title.setAttribute('aria-expanded',o?'true':'false');try{localStorage.setItem(OPEN_KEY,o?'1':'0')}catch(e){}};
+      setOpen(open);title.addEventListener('click',function(){setOpen(!sec.classList.contains('open'))});
+      title.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();title.click()}})}}
+  var mt=$('mTotal'),grid=mt?mt.closest('.summary'):null;
+  if(grid&&!$('mSim')){grid.classList.add('v158-grid');
+    grid.insertAdjacentHTML('beforeend','<div class="metric"><div class="v" id="mSim">0:00</div><div class="l">FSTD</div></div><div class="metric"><div class="v" id="mFlights">0</div><div class="l">Flights</div></div>');
+    var head=grid.parentNode.querySelector('.section-title');if(head&&!$('v158MetricsPeriod'))head.insertAdjacentHTML('beforeend','<span id="v158MetricsPeriod" class="v158-metrics-period"></span>')}
 }
 
 /* ================= Settings: custom fields card ================= */

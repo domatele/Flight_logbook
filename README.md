@@ -734,3 +734,15 @@ icons, favicon and print, beige #E1D3C2 on transparent for dark print).
 Embedded print logos are swapped in `assemble.py` by fingerprint. Service
 worker cache bumped so the new icons are fetched. Home-screen icons on iPhone /
 iPad only change after removing the app and adding it to the Home Screen again.
+
+## Round 19 — V159: Flights page totals
+
+- The period card ("Totals by period") is collapsible and starts collapsed;
+  its header shows the chosen period. Open/closed is remembered per device
+  (`localStorage['easa-logbook-totals-open']`).
+- "Logbook totals" shows the period in its title when it isn't All time, and
+  gets two more tiles: **FSTD** (simulator sessions in the period + flights
+  logged on an aircraft profile marked as simulator + previous-experience
+  FSTD on All time) and **Flights**. Four columns on wider screens, two on
+  phones.
+- The period chips also list FSTD time and the number of FSTD sessions.

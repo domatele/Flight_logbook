@@ -1,4 +1,4 @@
-const CACHE_NAME = "easa-logbook-v140";
+const CACHE_NAME = "easa-logbook-v141";
 const APP_SHELL = [
   "./",
   "./index.html",
