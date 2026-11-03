@@ -691,3 +691,46 @@ cut off, page counts unchanged (plus the one blank page for two-page). QR codes
 on the A5 printout still all decode at 300 dpi and restore with all checks
 passing. Pre-existing and unchanged: portrait layout truncates cell text; the
 two-page layout misprints from the second spread on.
+
+## Round 17 — V157: FSTD crew search, FSTD sessions in the Pilotlog import
+
+New module `v157-fstd` (after `v156-paper`) plus small patches to the V95
+Pilotlog importer (applied in `assemble.py`).
+
+- **FSTD page:** Instructor and Other crew are type-to-search fields (the
+  original selects stay hidden underneath and still hold the value). Matches
+  by company code (prefix) or any part of the name, best matches first;
+  arrow keys + Enter work. If nobody matches, "+ Add “NAME” as new crew
+  member" saves the person (role Instructor for the instructor field, PIC for
+  the other). A name typed but not picked is matched exactly on save, or
+  added as a new crew member.
+- **Pilotlog CSV:** rows with `ac_issim` = sim / true become FSTD sessions:
+  date, block total as session time, simulator found by registration
+  (ignoring dots/dashes, so LT.FSTD.13 = LT.FSTD13) or created, the first
+  non-SELF pilot as instructor and the next as other crew, remarks + training
+  text. Duplicates (date + simulator + duration) are skipped. Flights that an
+  earlier Pilotlog import made from the same rows are removed, and the
+  aircraft profile it created for the simulator is dropped if no flight uses
+  it. The file status and result line count flights and FSTD sessions
+  separately. Replace mode no longer empties the flights when the file holds
+  only FSTD sessions.
+
+**Verified:** with the user's Pilotlog export (51 flights + 2 sessions on
+LT.FSTD.13): old-style import reproduced the problem (2 bogus 4:00 flights +
+an LT.FSTD.13 aircraft); importing with V157 moved both to FSTD sessions
+(instructor Edgars Vaivars, other crew Henrich Los), removed the aircraft and
+skipped the 51 duplicate flights; a third import skipped everything. Crew
+search: pick by name, pick by code, add new from the list, typed-only names
+on save. Earlier form, logbook, list and statistics tests still pass.
+
+## Round 18 — V158: Niner logo
+
+App icons, favicon and the printed front-page logos now use the agreed Niner
+"9" logo (with the plane and contrail), without the NINER wordmark. The mark
+was taken from the supplied logo image (text removed, colour #0D2553), kept
+at the old layout: about 62 % of the icon height, centred, on the same
+backgrounds as before (light grey #E9E9EE for app icons, white for the 32/64 px
+icons, favicon and print, beige #E1D3C2 on transparent for dark print).
+Embedded print logos are swapped in `assemble.py` by fingerprint. Service
+worker cache bumped so the new icons are fetched. Home-screen icons on iPhone /
+iPad only change after removing the app and adding it to the Home Screen again.
